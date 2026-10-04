@@ -1,0 +1,120 @@
+(footprint "MotorPads_2P_Relief"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Motor wire solder pads, pitch 5.08mm, with strain-relief holes (pass the wire through the small hole first)")
+	(tags "motor wire solder pad relief")
+	(property "Reference" "REF**"
+		(at 2.54 2.9 0)
+		(layer "F.SilkS")
+		(uuid "136b57d8-6569-5895-a3ec-86857e98ff8b")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "MotorPads_2P_Relief"
+		(at 2.54 4.4 0)
+		(layer "F.Fab")
+		(uuid "5f864290-7539-5adf-bede-0ba342bf3423")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "f7cf7fd5-0811-5270-8f6a-4f3db6a594db")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" "Motor wire solder pads, pitch 5.08mm, with strain-relief holes (pass the wire through the small hole first)"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "e3e5325d-0bec-535c-bbbe-b89200ab01ea")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_rect
+		(start -1.8 -4.8)
+		(end 6.9 1.8)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "bf10349f-8098-5a39-93ce-bd6f3599cc39")
+	)
+	(fp_text user "+"
+		(at -2.3 1.9 0)
+		(layer "F.SilkS")
+		(uuid "88f4f6ab-0a95-58c4-b0b4-f2d7543d6abe")
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.25)
+			)
+		)
+	)
+	(fp_text user "-"
+		(at 7.3 1.9 0)
+		(layer "F.SilkS")
+		(uuid "d25f55b5-00c7-54b3-9e61-a51852f96838")
+		(effects
+			(font
+				(size 1.2 1.2)
+				(thickness 0.25)
+			)
+		)
+	)
+	(pad "" np_thru_hole circle
+		(at 0 -3.4)
+		(size 1.7 1.7)
+		(drill 1.7)
+		(layers "*.Cu" "*.Mask")
+		(uuid "66828d59-67e7-59f6-ac36-80f29c1b8862")
+	)
+	(pad "" np_thru_hole circle
+		(at 5.08 -3.4)
+		(size 1.7 1.7)
+		(drill 1.7)
+		(layers "*.Cu" "*.Mask")
+		(uuid "efc1329c-ef51-524b-b6d1-73c5edf9bd9a")
+	)
+	(pad "1" thru_hole rect
+		(at 0 0)
+		(size 2.3 2.3)
+		(drill 1.1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "48f4427a-8b88-52c0-aa74-232b73d6a071")
+	)
+	(pad "2" thru_hole circle
+		(at 5.08 0)
+		(size 2.3 2.3)
+		(drill 1.1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "391a1ec7-b5cf-5347-bfaa-974bdfcbd760")
+	)
+	(embedded_fonts no)
+)

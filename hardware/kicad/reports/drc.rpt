@@ -1,0 +1,29 @@
+** Drc report for Linetracer2.kicad_pcb **
+** Created on 2026-10-05T03:36:31 **
+** Report includes: Errors, Warnings, Exclusions **
+
+** Found 3 DRC violations **
+[track_dangling]: Track has unconnected end
+    Local override; warning
+    @(180.6857 mm, 75.2517 mm): 配線 [GND] ( F.Cu 上、長さ: 0.9956 mm )
+[track_dangling]: Track has unconnected end
+    Local override; warning
+    @(185.9817 mm, 74.5476 mm): 配線 [GND] ( F.Cu 上、長さ: 0.9957 mm )
+[track_dangling]: Track has unconnected end
+    Local override; warning
+    @(162.5000 mm, 72.0000 mm): 配線 [GND] ( B.Cu 上、長さ: 1.2017 mm )
+
+** Found 0 unconnected pads **
+
+** Found 0 Footprint errors **
+
+** Ignored checks **
+    - Footprint has no courtyard defined
+    - Track endpoint not centered on via
+    - Tuning profile track geometries
+    - Footprint doesn't match symbol's footprint filters
+    - Footprint component type doesn't match footprint pads
+    - Footprint not found in libraries
+    - Footprint doesn't match copy in library
+
+** End of Report **

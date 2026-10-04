@@ -1,0 +1,161 @@
+(footprint "BatteryXH_2P"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Battery input, JST XH 2P (B2B-XH-A) header OR direct wire soldering. Symmetric silk: orient by wire colour (red=+)")
+	(tags "battery JST XH B2B-XH-A")
+	(property "Reference" "REF**"
+		(at 1.25 -3.6 0)
+		(layer "F.SilkS")
+		(uuid "efc408c2-55ce-5f11-95e8-3e707a251b7f")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "BatteryXH_2P"
+		(at 1.25 6.2 0)
+		(layer "F.Fab")
+		(uuid "5a302c7d-42ca-578e-a3a6-84af2dd10c55")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "b6f8a6d1-f3f2-5248-9f63-9ce8e69cd927")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" "Battery input, JST XH 2P (B2B-XH-A) header OR direct wire soldering. Symmetric silk: orient by wire colour (red=+)"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "6dd786d0-9a22-5f16-a06f-e8b77baee312")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_rect
+		(start -2.45 -2.45)
+		(end 4.95 3.3)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "eaf5bff3-80d8-58ee-9877-7b32afbf52c5")
+	)
+	(fp_rect
+		(start -4.4 -2.95)
+		(end 6.9 5.2)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "dadde422-426d-5ee0-a295-014f661bd631")
+	)
+	(fp_rect
+		(start -2.45 -2.45)
+		(end 4.95 3.3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "32e0d8b6-bc1e-5750-bc0a-5b0b68a3c66f")
+	)
+	(fp_text user "+"
+		(at -3.4 0 0)
+		(layer "F.SilkS")
+		(uuid "65428043-4089-5c0e-9d3f-2a228c10bda0")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+			)
+		)
+	)
+	(fp_text user "RED"
+		(at 0 4.4 0)
+		(layer "F.SilkS")
+		(uuid "e7a5a435-1bfe-554d-8b79-a438257efb26")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+		)
+	)
+	(fp_text user "BLK"
+		(at 2.5 4.4 0)
+		(layer "F.SilkS")
+		(uuid "576e5e1b-838e-5822-91d9-cec67c5ee8de")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+		)
+	)
+	(fp_text user "-"
+		(at 5.9 0 0)
+		(layer "F.SilkS")
+		(uuid "468ef4c9-8247-52c5-a1c6-f265bd0e9a4f")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+			)
+		)
+	)
+	(pad "1" thru_hole rect
+		(at 0 0)
+		(size 1.8 2.2)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "6c6b9acc-0849-5101-b901-4a9abaf876b8")
+	)
+	(pad "2" thru_hole oval
+		(at 2.5 0)
+		(size 1.8 2.2)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "9ce2da41-ef54-5cb8-b171-b68b9d821ece")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/lib/3d/BatteryXH_2P.wrl"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)

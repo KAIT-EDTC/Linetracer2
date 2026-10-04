@@ -1,0 +1,3 @@
+#!/bin/sh
+# python3 inside the KiCad flatpak (has the pcbnew module)
+exec flatpak run --command=python3 org.kicad.KiCad "$@"

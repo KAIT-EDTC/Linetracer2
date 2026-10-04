@@ -1,0 +1,29 @@
+# KiCad (per-user / automatic files)
+*.kicad_prl
+*-backups/
+.history/
+fp-info-cache
+*.lck
+_autosave-*
+\#auto_saved_files\#
+# footprint exported from the board by hand (the real one is lib/Linetracer2.pretty/)
+hardware/kicad/AE-TC78H653FTG.kicad_mod
+
+# auto-router intermediates (scripts/route_pcb.py makes them again)
+hardware/kicad/reports/*.dsn
+hardware/kicad/reports/*.ses
+hardware/kicad/reports/placement.pdf
+hardware/kicad/reports/top.pdf
+hardware/kicad/reports/bot.pdf
+hardware/kicad/reports/drc_place.rpt
+
+# datasheets are the makers' documents: keep links only (docs/datasheets/README.md)
+docs/datasheets/*.pdf
+
+# Python
+__pycache__/
+*.pyc
+
+# misc
+.tmp/
+.DS_Store
