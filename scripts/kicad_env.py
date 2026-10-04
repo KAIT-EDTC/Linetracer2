@@ -1,12 +1,27 @@
-"""Shared paths/helpers for the Linetracer2 KiCad generator scripts."""
+"""Shared paths/helpers for the Linetracer2 KiCad generator scripts.
+
+Two boards are generated from the same scripts; pick one with the environment variable LT2_VARIANT:
+  (unset) / std : standard rev.A1  -> hardware/kicad/       Linetracer2.*
+  lite          : low-cost Lite    -> hardware/lite/kicad/  Linetracer2-Lite.*
+"""
 import glob
 import os
 import uuid
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-KDIR = os.path.join(ROOT, "hardware", "kicad")
+VARIANT = os.environ.get("LT2_VARIANT", "std") or "std"
+if VARIANT not in ("std", "lite"):
+    raise SystemExit("LT2_VARIANT must be 'std' or 'lite' (got %r)" % VARIANT)
+if VARIANT == "lite":
+    HWDIR = os.path.join(ROOT, "hardware", "lite")
+    KDIR = os.path.join(HWDIR, "kicad")
+    PROJ = "Linetracer2-Lite"
+else:
+    HWDIR = os.path.join(ROOT, "hardware")
+    KDIR = os.path.join(HWDIR, "kicad")
+    PROJ = "Linetracer2"
 LIBDIR = os.path.join(KDIR, "lib")
-PROJ = "Linetracer2"
+LIBNICK = "Linetracer2"          # nickname of the project library (same for both boards)
 
 _NS = uuid.UUID("6c1d7a52-2f0e-4c0b-9d1c-4c2e5b1a7e10")
 

@@ -29,6 +29,9 @@
 - 外部 ADC は GP26/27/28 の 3 本だけ → センサー 6 個は 4051 で切り替え。
 - **RP2350（Pico 2）エラッタ E9**: 入力ピンの内部プルダウンを使うと約 2 V に張り付くことがある。プルダウンに頼らない回路にした。
 - 秋月: Pico ¥800、Pico 2 ¥990、Pico 2 W ¥1,375（2026-10）。
+- **ピンヘッダなしで基板にじかにはんだ付けできる**（端がキャスタレーション＝半分に切ったスルーホール）。基板側のパッドを Pico の端より外へ伸ばしておけば、こてを当てやすい（Lite は 1.9 mm）。KiCad 標準の `RaspberryPi_Pico_Common_Unspecified` に、**Pico の裏の USB コネクタの足の逃げ穴**と、**裏のむき出しのテストパッド（TP1〜TP7）の下の銅禁止エリア**がある → Lite のフットプリントにコピーした。そのままだと USB の足の穴（銅なし）が TP2/TP3 の禁止エリア（パッド禁止）にかかって DRC エラーになるので、エリアを「パッド可」に変えた。
+- Pico を平らに付けると **USB プラグの太い部分（オーバーモールド）が基板面より下まで来る**。USB コネクタの口（Pico の端から 1.3 mm 出ている）を基板の端より外に出す必要がある（Lite は 0.67 mm 外）。
+- **GP29（ADC3）= VSYS/3**（Pico の基板上の 200 kΩ/100 kΩ）、**GP24 = VBUS 検出**（USB で 1）。外付けの分圧なしで電池電圧が分かる（ショットキー D1 の分 0.3 V を足す）。ただし USB 接続中は VSYS が USB 側になり電池は測れない。**Pico W / Pico 2 W では GP29・GP24・GP25 が無線チップと共用**で、そのままでは使えない。
 
 ### A4. フォトリフレクタ LBR-123F（Letex、秋月 ¥40）
 - TPR-105F の後継。ピン: 1 アノード / 2 カソード（LED）、3 エミッタ / 4 コレクタ（フォトTr）。本体 2.7×3.4×1.5 mm、足は 3.7 mm × 1.8 mm 間隔の薄い板。
@@ -103,6 +106,11 @@ flatpak install --user flathub org.kicad.KiCad org.kicad.KiCad.Library.Footprint
   - 同じプロセスでトラックの削除・再追加を大量にした後に別の編集をすると落ちる（SIGSEGV）→ 処理を別プロセスに分け、最後は `os._exit(0)`
   - 裏面実装は `fp.Flip(pos, pcbnew.FLIP_DIRECTION_LEFT_RIGHT)` の後に `SetOrientationDegrees()`
   - 日本語シルク: `text.SetFontProp("Noto Sans CJK JP")`、**太字・1.3 mm 以上**（細いと DRC の「線の太さ不足」）、最後に `board.EmbedFonts()` でフォントを基板ファイルに埋め込む
+  - **字によっては大きくしても「太さ不足」が消えない**: 「ピンヘッダなし」は 2.6 mm、「低コスト版」は 3.0 mm でも警告、「じかに はんだづけ」は 1.4 mm で OK（2026-10-05、Lite で試した）。困ったらひらがなにする
+  - `fp.Models()` を for で回すと**コピー**が返る（`m.m_Show = False` が保存されない）→ `ms = fp.Models(); m = ms[i]; m.m_Show = False; ms[i] = m` と書き戻す
+  - 回路図で「未実装（DNP）」「部品表から除外」にした部品は、基板のフットプリントにも `SetDNP(True)` / `SetExcludedFromBOM(True)` を付けないと DRC の回路図整合チェックで警告になる（`gen_pcb.py` の `apply_netlist` で反映）
+  - 配線禁止エリア（ルールエリア）は `ZONE` の一種。`SetIsRuleArea(True)`、`SetDoNotAllowTracks/Vias(True)`。ゾーンを全部消す処理（`route_pcb.py`）では `GetIsRuleArea()` のものを残す。DSN に書き出すと Freerouting も守る。DRC では `items_not_allowed` になる
+- `LT2_VARIANT=lite` のような環境変数は `flatpak run`（`./kpy`, `./kc`）の中にもそのまま渡る → 同じスクリプトで標準版と Lite を作り分けている（`kicad_env.py`）
 - 秋月の TC78H653 モジュール、LBR-123F、XH 電池コネクタ、モーター線パッドは KiCad 標準ライブラリに無いので自作（`hardware/kicad/lib/Linetracer2.*`）。
 
 ### C3. 自動配線（Freerouting）
@@ -130,3 +138,7 @@ flatpak install --user flathub org.kicad.KiCad org.kicad.KiCad.Library.Footprint
 | 平歯車は 3D プリント、ピニオンはタミヤ品 | m0.5 の平歯車は売っていても高い。ピニオン（外径 5 mm）は印刷では無理 | 小原歯車 DS0.5-40（1 個数百円） |
 | 車軸は真鍮丸棒 φ2 | ホームセンターの定番品で切りやすい | ミニ四駆のシャフト（硬くて切りにくく、長さが合わない） |
 | ¥1,500 は「Pico 再利用」で達成 | T 番号のある店だけだと海外の互換ボードが使えない | センサーを減らす（性能が落ちる） |
+| 低コスト版 Lite は標準版を残したまま別の基板として追加（2026-10-05） | 標準版の性能（6 センサー）も残したい。3D プリント部品・ねじ・機械は共通にして、違いを基板とソフトだけにした | 標準版を Lite で置き換える（ブランチで分ける） |
+| Lite のセンサー 3 個は ADC に直結、電池は GP29（VSYS/3） | Pico の外部 ADC 3 本をセンサーで使い切るので、分圧抵抗の代わりに Pico 内部の分圧を使う。4051・分圧抵抗・コンデンサが減る | 4051 を残して 3 個（MUX が ¥15 残り、意味が薄い） |
+| Lite のスキッドはセンサーの 7 mm 後ろ（50, 11） | 真ん中のセンサーが元の位置に来る。後ろに下げたので金属ナットが使え、センサー高さの誤差も ±0.1 mm 程度 | スキッドを中心からずらす（左右非対称になる） |
+| Lite の LED は GPIO の赤 1 個（電源ランプなし） | ソフトで点ければ電源ランプにもなり、Lチカにも使える。Pico の緑 LED（GP25）も 2 個目として使える | 電源ランプだけ（プログラムで光らせられない） |

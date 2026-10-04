@@ -14,7 +14,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pcbnew  # noqa: E402
 import sexpr  # noqa: E402
-from kicad_env import KDIR, LIBDIR, PROJ  # noqa: E402
+from kicad_env import KDIR, LIBDIR, LIBNICK, PROJ  # noqa: E402
 
 OX, OY = 100.0, 50.0            # board origin on the KiCad page
 FPLIB = "/app/extensions/Library/footprints"
@@ -42,8 +42,8 @@ def P(x, y):
 
 
 def lib_path(nick):
-    if nick == PROJ:
-        return os.path.join(LIBDIR, PROJ + ".pretty")
+    if nick == LIBNICK:
+        return os.path.join(LIBDIR, LIBNICK + ".pretty")
     return os.path.join(FPLIB, nick + ".pretty")
 
 
@@ -65,7 +65,10 @@ def read_netlist():
         ds = sexpr.find(c, "datasheet")
         if ds is not None and len(ds) > 1:
             fields["Datasheet"] = ds[1]
+        flags = {sexpr.find(p, "name")[1] for p in sexpr.find_all(c, "property")}
         comps[ref] = {
+            "dnp": "dnp" in flags,
+            "no_bom": "exclude_from_bom" in flags,
             "value": sexpr.find(c, "value")[1],
             "footprint": sexpr.find(c, "footprint")[1],
             "tstamp": sexpr.find(c, "tstamps")[1],
@@ -262,6 +265,10 @@ def apply_netlist(board, comps, pinnet, nets=None):
         if c is None:
             continue
         fp.SetPath(pcbnew.KIID_PATH("/" + c["tstamp"]))
+        if c["dnp"]:
+            fp.SetDNP(True)
+        if c["no_bom"]:
+            fp.SetExcludedFromBOM(True)
         for k, v in c["fields"].items():
             fp.SetField(k, v)
             fp.GetField(k).SetVisible(False)
@@ -320,7 +327,7 @@ def main():
     pcbnew.SaveBoard(PCB, board)
 
     # report pad positions of a few parts for sanity
-    for ref in ("PS1", "U2", "U1", "U3", "Q1"):
+    for ref in [r for r in ("PS1", "U2", "U1", "U3", "Q1") if r in fps]:
         fp = fps[ref]
         pads = sorted(fp.Pads(), key=lambda p: int(p.GetNumber()) if p.GetNumber().isdigit() else 0)
         print(ref, [(p.GetNumber(), round(pcbnew.ToMM(p.GetPosition().x) - OX, 2),
