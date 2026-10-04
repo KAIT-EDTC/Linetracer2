@@ -76,6 +76,9 @@
 - 平歯車は外側の壁の出っぱり（φ6）と内側の軸受けの間に入れるので、車軸を押し込むだけで位置が決まる。車軸の穴は奥が止まりで、差し込む深さも決まる。
 - OpenSCAD で `intersection() { 部品A(); 部品B(); }` を書き出すと干渉チェックになる（空なら OK）。チェック自体が効いているかは、わざと重ねた条件（`-D DECK_UNDER=17.7` など）で空にならないことを確かめた。
 - STL の体積は三角形ごとの符号付き体積の和で計算できる（1 台分 約 35 cm³）。
+- **印刷した m0.5 平歯車（0.4 mm ノズル）**: Bambu Studio 2.08 の CLI で P1S 用にスライスし、G コードの外壁の半径を歯ごとに測った。**壁の生成「クラシック」なら 40 枚とも先端まで出る**、**Arachne だと 2 枚消えて 3 枚欠ける**。Bambu の P1S 0.4 mm プロファイルの既定はクラシックなので、そのままでよい。
+- Bambu Studio CLI のコツ: `flatpak run com.bambulab.BambuStudio --slice 0 --load-settings "machine.json;process.json" --load-filaments "filament.json" --outputdir out model.stl`。プロファイルの JSON は `inherits` をたどって**全部の値を展開したもの**を渡す（展開しないと層の高さなどが既定値 0.2 mm になる）。`"from": "system"` のままにしないと「process not compatible with printer」になる。インフィル 100% を指定したら「Invalid parameter」で止まった（推奨の 壁 4・インフィル 40% なら通り、歯も 40 枚そろう）。
+- 印刷時間（P1S、1 個ずつスライス）: 枠 21 分、デッキ 16 分、車輪 13 分、平歯車 17 分、スキッド 2 分 → **1 台分 約 2 時間**。
 
 
 ## C. 設計ツールの知見（KiCad 10 / Linux）
