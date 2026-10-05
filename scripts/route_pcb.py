@@ -29,7 +29,8 @@ def export(keep=False):
     import pcbnew
     b = pcbnew.LoadBoard(PCB)
     for z in list(b.Zones()):
-        b.Remove(z)
+        if not z.GetIsRuleArea():          # keep-out areas stay (the router must respect them)
+            b.Remove(z)
     for t in list(b.GetTracks()):
         if keep:
             t.SetLocked(True)
@@ -109,7 +110,8 @@ def do_import(pour=True):
     for t in b.GetTracks():
         t.SetLocked(False)
     for z in list(b.Zones()):
-        b.Remove(z)
+        if not z.GetIsRuleArea():
+            b.Remove(z)
     if pour:
         add_gnd_zones(b)
         pcbnew.ZONE_FILLER(b).Fill(b.Zones())

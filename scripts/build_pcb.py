@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Regenerate the PCB and keep the best of N autorouter runs.
+    python3 build_pcb.py 6                     # standard board
+    LT2_VARIANT=lite python3 build_pcb.py 6    # Lite board
 
 placement -> route signals (GND excluded) -> lock -> route GND -> GND pours -> post (silk etc.) -> DRC
 Freerouting is not deterministic; each attempt is scored (must be fully connected with no
-clearance errors; then shortest total track length + 2 mm per via wins).
+clearance errors; then shortest total track length + 2 mm per via + 20 mm per dangling-track warning wins).
 """
 import os
 import re
@@ -12,9 +14,16 @@ import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-KD = os.path.join(HERE, "..", "hardware", "kicad")
-PCB = os.path.join(KD, "Linetracer2.kicad_pcb")
-RPT = os.path.join(KD, "reports", "drc.rpt")
+sys.path.insert(0, HERE)
+from kicad_env import KDIR, LITE_SCRIPTS, PROJ, VARIANT  # noqa: E402
+
+PCB = os.path.join(KDIR, PROJ + ".kicad_pcb")
+RPT = os.path.join(KDIR, "reports", "drc.rpt")
+# placement / silkscreen scripts: lite/scripts/*_lite.py for the Lite board
+if VARIANT == "lite":
+    GEN, POST = os.path.join(LITE_SCRIPTS, "gen_pcb_lite.py"), os.path.join(LITE_SCRIPTS, "post_pcb_lite.py")
+else:
+    GEN, POST = "gen_pcb.py", "post_pcb.py"
 
 
 def run(*cmd, quiet=True):
@@ -38,7 +47,7 @@ print('SCORE', round(L, 1), V)
 
 
 def attempt(i):
-    run("./kpy", "gen_pcb.py")
+    run("./kpy", GEN)
     run("./kpy", "route_pcb.py", "export")
     o1 = run("python3", "route_pcb.py", "autoroute", "60", "--strip-gnd")
     run("./kpy", "route_pcb.py", "import", "--no-pour")
@@ -46,16 +55,18 @@ def attempt(i):
     o2 = run("python3", "route_pcb.py", "autoroute", "60")
     run("./kpy", "route_pcb.py", "import")
     for step in ("prune", "silk"):
-        out = run("./kpy", "post_pcb.py", step)
+        out = run("./kpy", POST, step)
         if "post %s done" % step not in out:
             print("post_pcb %s failed:" % step, out.strip().splitlines()[-3:])
     run("./kc", "pcb", "drc", "--severity-all", "--refill-zones", "-o", RPT, PCB)
     rpt = open(RPT).read()
     unc = len(re.findall(r"^\[unconnected_items\]", rpt, re.M))
-    err = len(re.findall(r"^\[(clearance|shorting_items|tracks_crossing|hole_clearance|copper_edge_clearance)\]", rpt, re.M))
+    err = len(re.findall(r"^\[(clearance|shorting_items|tracks_crossing|hole_clearance|copper_edge_clearance|"
+                         r"items_not_allowed)\]", rpt, re.M))
+    dang = len(re.findall(r"^\[track_dangling\]", rpt, re.M))
     L, V = score()
-    print("attempt %d: unconnected=%d errors=%d length=%.1fmm vias=%d" % (i, unc, err, L, V))
-    return unc, err, L + 2 * V
+    print("attempt %d: unconnected=%d errors=%d length=%.1fmm vias=%d dangling=%d" % (i, unc, err, L, V, dang))
+    return unc, err, L + 2 * V + 20 * dang
 
 
 def main(n):

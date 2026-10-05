@@ -5,7 +5,7 @@ import os
 
 import sexpr
 from sexpr import Q
-from kicad_env import LIBDIR, PROJ, uid, sym_dir
+from kicad_env import LIBDIR, LIBNICK, PROJ, uid, sym_dir
 
 GRID = 1.27
 
@@ -30,8 +30,8 @@ class LibCache:
 
     def _lib(self, lib):
         if lib not in self.libs:
-            if lib == PROJ:
-                path = os.path.join(LIBDIR, PROJ + ".kicad_sym")
+            if lib == LIBNICK:
+                path = os.path.join(LIBDIR, LIBNICK + ".kicad_sym")
             else:
                 path = os.path.join(sym_dir(), lib + ".kicad_sym")
             self.libs[lib] = sexpr.parse(open(path).read())
@@ -119,7 +119,7 @@ class Sch:
         return self.libsyms[lib_id]
 
     def place(self, lib_id, ref, value, x, y, rot=0, footprint=None, fields=None,
-              hide_ref=False, hide_val=False, in_bom=True, ref_off=None, val_off=None, just="left"):
+              hide_ref=False, hide_val=False, in_bom=True, ref_off=None, val_off=None, just="left", dnp=False):
         s = self._ensure(lib_id)
         pins = symbol_pins(s)
         x, y = snap(x), snap(y)
@@ -164,9 +164,10 @@ class Sch:
             props.append(ptext(k, v, 0, 0, True))
         pin_entries = " ".join('(pin "%s" (uuid "%s"))' % (num, uid("pin/%s/%s" % (ref, num)))
                                for num in sorted(pins, key=lambda t: (len(t), t)))
-        txt = ('(symbol (lib_id "%s") (at %s %s %d) (unit 1) (exclude_from_sim no) (in_bom %s) (on_board yes) (dnp no) (uuid "%s") %s %s '
+        txt = ('(symbol (lib_id "%s") (at %s %s %d) (unit 1) (exclude_from_sim no) (in_bom %s) (on_board yes) (dnp %s) (uuid "%s") %s %s '
                '(instances (project "%s" (path "/%s" (reference "%s") (unit 1)))))'
-               % (lib_id, x, y, rot, "yes" if in_bom else "no", u, " ".join(props), pin_entries, PROJ, self.root, ref))
+               % (lib_id, x, y, rot, "yes" if in_bom else "no", "yes" if dnp else "no", u, " ".join(props), pin_entries,
+                  PROJ, self.root, ref))
         self.items.append(sexpr.parse(txt))
         return Inst(self, lib_id, ref, x, y, rot, pins)
 

@@ -119,4 +119,19 @@ $OS -D 'part="frame_left"' -o frame_left.stl linetracer2_mech.scad
 $OS -D 'part="skid"' -D 'SKID_H=4.0' -o skid_h40.stl linetracer2_mech.scad
 ```
 
+## 5. 低コスト版 Lite で使うとき
+
+**印刷する部品（STL）は標準版とまったく同じ**（ツメ式スキッド `skid_clip_h40.stl` も同じ）。違うのは次の 2 つだけ（`lite/README.md`）。
+
+| | 標準版 | Lite |
+|---|---|---|
+| タイヤ | O リング P-24（TPU タイヤも可） | **`tire_tpu.stl`（TPU 95A）を 2 個印刷** |
+| スキッドを差す穴 | (50, 4)、センサー PS3・PS4 の間 | **(50, 11)**、真ん中のセンサーの 7 mm 後ろ |
+
+干渉チェックは `-D LITE=true` を付けて上と同じ一覧を実行する（2026-10-05、ツメ式スキッドを含め標準版・Lite とも全部「空」を確認。Lite でスキッドをわざと 4 mm 前の (50, 7) に置くと重なりを検出することも確認）。
+
+```bash
+$OS -D 'LITE=true' -D 'part="check_skidclip_sensor"' -o /tmp/c.stl linetracer2_mech.scad
+```
+
 > ⚠ これは**まだ実物で試していない試作データ**。最初に 1 台分だけ印刷して、モーター・ギヤ・車軸・デッキの入り具合を確認してから量産すること（特に平歯車のかみ合い）。
