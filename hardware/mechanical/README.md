@@ -19,6 +19,8 @@
 | `skid_clip_h40.stl` | **スキッド（ツメで差し込む、高さ 4.0 mm、標準）** | 1 | PETG（PLA も可） | 0.12 mm、壁 3、インフィル 40%。**横倒し**で書き出し済み（ツメが層に沿って曲がるので折れにくい） | 0.14 cm³ |
 | `skid_clip_h35.stl` / `skid_clip_h45.stl` | 同（センサー高さ調整用 3.5 / 4.5 mm） | 予備 | 同上 | 同上 | |
 | `skid_screw_h40.stl` | スキッド（ねじ止め版。ツメが折れたときの予備：M3×8 皿＋ナイロンナット） | (1) | 同上 | 0.12 mm、平らな面がベッド | 0.2 cm³ |
+| `caster_print_h40.stl` | **ボールキャスター（試作・任意）: 玉ごと一度に印刷**（スキッドの代わり。玉は φ4、中で転がる） | (1) | PETG（PLA も可） | 0.12 mm、壁 3、インフィル 40%。**横倒し**で書き出し済み。玉と受けは最初から別々（はがす作業なし） | 0.23 cm³ |
+| `caster_bead_h40.stl` | **ボールキャスター（試作・任意）: 受けだけ印刷、玉はダイソーのパール調ビーズ φ6** | (1) | PETG（PLA も可） | 同上 | 0.24 cm³ |
 | `deck_clip.stl` | **ツメ版デッキ（任意・試作）**: 電池ボックスをねじではなく 4 本のツメで押さえる | (1) | PLA / PETG | 0.20 mm、壁 3、インフィル 25%。**そのままの向き（ツメが上）** | 9.0 cm³ |
 | `tire_tpu.stl` | TPU タイヤ（O リングの代わり、任意） | (2) | TPU 95A | 0.20 mm、インフィル 100%、ゆっくり | 1.0 cm³ |
 | `linetracer2_mech.scad` | 上記の元データ（OpenSCAD、寸法はすべてパラメータ） | — | | | |
@@ -37,6 +39,7 @@
 | 車輪 | 0.16 mm | 約 13 分 ×2 |
 | 平歯車 40T | 0.08 mm（壁 4・インフィル 40%） | 約 17 分 ×2 |
 | スキッド（ツメ） | 0.12 mm | 約 3.5 分 |
+| （ボールキャスター 玉ごと／ビーズ用） | 0.12 mm（PETG） | 約 4.5 分 ／ 約 4.5 分 |
 | （ツメ版デッキ） | 0.20 mm | 約 23 分 |
 | **1 台分** | | **約 2 時間**（まとめて並べるともう少し短い） |
 
@@ -75,6 +78,32 @@ m0.5 の歯は先端の幅が約 0.28 mm で、0.4 mm ノズルの線（0.42 mm�
 - 外すときは基板の表に出たピンの先を指（またはラジオペンチ）でつまんで、すぼめながら裏へ押し出す。
 - 印刷は横倒しの向き（書き出したまま）。ピンの割れ目 0.8 mm がスライス後も開いていることを G コードで確認済み。
 
+### 2.3 ボールキャスター（試作・任意）
+
+スキッド（そり）の代わりに、前を**転がる玉**で支える試し用。スキッドと同じ `SKID` の穴にツメで差し込む。
+
+![caster](caster.png)
+
+（左: ビーズ版、右: 玉ごと印刷版。緑は基板の前の端）
+
+- 玉と受けは基板と床のすき間（4.0 mm）に入らないので、**玉は基板の前の端のすぐ前**に出し、基板の下のそり形の腕でピンまでつなぐ。腕は PS3・PS4 の間（幅 5 mm）を通る。
+- 高さはスキッドの標準と同じ 4.0 mm（基板の下面〜床）。3.5 / 4.5 mm にするときは `SKID_H` を変えて書き出す。
+- **標準版の基板専用**。Lite（`lite/`）はスキッドの穴が基板の端から 11 mm 奥にあり、腕が真ん中のセンサーの下を通ってしまうので使えない。
+
+| | `caster_print_h40.stl`（玉ごと印刷） | `caster_bead_h40.stl`（ビーズ） |
+|---|---|---|
+| 玉 | **φ4** を受けの中で一緒に印刷（すき間 0.35 mm、玉の上は 0.55 mm） | **ダイソーのパール調ビーズ φ6** を床側から押し込む |
+| 大きさ | ツメのスキッドと同じ幅 5 mm に収まり、**基板の上面より低い**。前への出っぱりは基板の端から 4.7 mm | 幅 7 mm、基板の上面より 1.6 mm 高い。前への出っぱり 7.6 mm |
+| 接地点 | 基板の端の 1.5 mm 前（センサーの列の 5.5 mm 前） | 基板の端の 3.5 mm 前（センサーの列の 7.5 mm 前） |
+| 床〜受けの下面 | 0.55 mm | 1.16 mm |
+| 部品 | 1 個 | 受け 1 個 ＋ ビーズ 1 個 |
+| 予想 | 積層の段差とベッド側の小さな平ら（φ1.9、高さ 0.25 mm）があり、なめらかには転がらない。スキッドとの比較用 | よく転がるはず。ビーズの糸穴が床に来たときに少し段がつく |
+
+- **玉ごと印刷版**: 印刷が終わったら、玉を指で押して回し、受けから離す（G コードで、各層の玉と受けの道すじの間に約 0.27 mm の空きがあること、玉の上に空の層が 4 層あることを確認済み）。動かなければ `BALL_CLR` を 0.4 に。玉の大きさは `PRINT_BALL_D`（φ4 より大きいと受けが基板の上面より高くなる）。
+- **ビーズ版**: 先にビーズの直径をノギスで測り、6.0 mm でなければ `BALL_D` を変えて書き出す。床側の口（φ5.6 = 玉 −0.4 mm）にビーズを当てて押し込む。前側の半分は切れ目（0.8 mm）で離してあり、前に少し開いてパチッと入る。抜けやすければ `BALL_LIP` を 0.5 に、入らなければ 0.3 に。
+- 玉ごと印刷版は床から受けまで 0.55 mm しかないので、床の段差やコースのつなぎ目で受けがこすれるかどうかを見ること。
+- 試してスキッドより良ければ標準にする。そのときは重さのバランス（`docs/02_concept.md` §4）を、実際の接地点で計算し直す。
+
 その他の機械部品: 真鍮丸棒 φ2×20 mm（車軸）×2、タミヤ 8T ピニオン（15289）×2、O リング P-24 ×2、FA-130RA ×2、電池ボックス BH-331-3ASTH（`docs/05_bom.md`）。
 
 ## 3. 寸法の決め方
@@ -94,7 +123,8 @@ m0.5 の歯は先端の幅が約 0.28 mm で、0.4 mm ノズルの線（0.42 mm�
 OS=~/.local/opt/openscad-2021/AppRun
 for c in check_deck_motor check_deck_frame check_frame_motor check_box_frame check_deck_box \
          check_skid_sensor check_gear_frame check_wheel_frame \
-         check_skidclip_sensor check_skidclip_pcb check_deckclip_motor check_deckclip_frame check_deckclip_box; do
+         check_skidclip_sensor check_skidclip_pcb check_deckclip_motor check_deckclip_frame check_deckclip_box \
+         check_caster_sensor check_caster_pcb check_caster_ball check_casterbead_ball; do
   $OS -D "part=\"$c\"" -o /tmp/$c.stl linetracer2_mech.scad 2>&1 | grep -q "empty" && echo "$c OK" || echo "$c NG"
 done
 ```
@@ -117,6 +147,7 @@ done
 OS=~/.local/opt/openscad-2021/AppRun
 $OS -D 'part="frame_left"' -o frame_left.stl linetracer2_mech.scad
 $OS -D 'part="skid"' -D 'SKID_H=4.0' -o skid_h40.stl linetracer2_mech.scad
+$OS -D 'part="caster_bead"' -D 'BALL_D=6.0' -o caster_bead_h40.stl linetracer2_mech.scad
 ```
 
 ## 5. 低コスト版 Lite で使うとき
