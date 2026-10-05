@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate the project-local symbol & footprint library (Linetracer2).
 
-Outputs
+Outputs (with LT2_VARIANT=lite: the same files under lite/hardware/kicad/lib/)
   hardware/kicad/lib/Linetracer2.kicad_sym
   hardware/kicad/lib/Linetracer2.pretty/*.kicad_mod
 
@@ -12,7 +12,7 @@ import os
 
 import sexpr
 from sexpr import Q
-from kicad_env import LIBDIR, uid, sym_dir
+from kicad_env import LIBDIR, uid, sym_dir, fp_dir
 
 FONT = "(effects (font (size 1.27 1.27)))"
 
@@ -163,6 +163,7 @@ class FP:
         self.tags = tags
         self.attr = attr
         self.n = 0
+        self.tail = []          # raw items written after everything else (zones, STEP models)
 
     def _u(self):
         self.n += 1
@@ -189,14 +190,16 @@ class FP:
         self.items.append('(fp_text user "%s" (at %s %s %s) (layer "%s") (uuid "%s") (effects (font (size %s %s) (thickness %s))%s))'
                           % (s, x, y, rot, layer, self._u(), size, size, thick, j))
 
-    def pad(self, num, x, y, shape, sx, sy, drill, kind="thru_hole"):
+    def pad(self, num, x, y, shape, sx, sy, drill, kind="thru_hole", offset=None):
         if kind == "np_thru_hole":
             self.items.append('(pad "" np_thru_hole circle (at %s %s) (size %s %s) (drill %s) (layers "*.Cu" "*.Mask") (uuid "%s"))'
                               % (x, y, sx, sy, drill, self._u()))
             return
         extra = " (roundrect_rratio 0.25)" if shape == "roundrect" else ""
-        self.items.append('(pad "%s" thru_hole %s (at %s %s) (size %s %s) (drill %s) (layers "*.Cu" "*.Mask")%s (uuid "%s"))'
-                          % (num, shape, x, y, sx, sy, drill, extra, self._u()))
+        # offset: the pad shape is shifted from the hole (hole stays at x, y)
+        dr = "(drill %s (offset %s %s))" % (drill, offset[0], offset[1]) if offset else "(drill %s)" % drill
+        self.items.append('(pad "%s" thru_hole %s (at %s %s) (size %s %s) %s (layers "*.Cu" "*.Mask")%s (uuid "%s"))'
+                          % (num, shape, x, y, sx, sy, dr, extra, self._u()))
 
     def write(self, ref_xy, val_xy, ref_layer="F.SilkS"):
         out = ['(footprint "%s"' % self.name,
@@ -210,6 +213,7 @@ class FP:
                '(property "Description" "%s" (at 0 0 0) (layer "F.Fab") (hide yes) (uuid "%s") (effects (font (size 1.27 1.27) (thickness 0.15))))' % (self.descr, self._u()),
                '(attr %s)' % self.attr]
         out += self.items
+        out += self.tail
         if os.path.exists(os.path.join(LIBDIR, "3d", self.name + ".wrl")):
             out.append('(model "${KIPRJMOD}/lib/3d/%s.wrl" (offset (xyz 0 0 0)) (scale (xyz 1 1 1)) (rotate (xyz 0 0 0)))'
                        % self.name)
@@ -320,7 +324,54 @@ def fp_buzzer():
     f.write((3.8, -7.4), (3.8, 7.6))
 
 
+def fp_pico_direct():
+    """Raspberry Pi Pico / Pico 2 soldered FLAT on the board without pin headers (Lite board).
+
+    Origin = module centre, USB at the top (-y), pin 1 top-left (as KiCad Module:RaspberryPi_Pico_*).
+    Each pin is ONE through-hole pad: the hole sits under the Pico's own hole (a pin header still fits),
+    and the copper is stretched 1.9 mm outwards past the Pico's edge, so the iron touches the board pad
+    and the castellated half-hole of the Pico at the same time.
+    Copied from the KiCad footprint RaspberryPi_Pico_Common_Unspecified: the holes for the USB
+    connector legs that stick out under the Pico, and the copper keep-outs under the bare test
+    pads on the Pico's bottom (TP1..TP7, debug pads) - no tracks / vias / pour may touch them."""
+    f = FP("RaspberryPi_Pico_DirectSolder",
+           "Raspberry Pi Pico / Pico 2 soldered flat (no pin header): one THT pad per pin, copper stretched "
+           "1.9 mm past the module edge for castellation soldering. Keep-outs from RaspberryPi_Pico_Common_Unspecified",
+           "Raspberry Pi Pico castellated direct solder no header")
+    PITCH, X, PAD_L, PAD_W, OFF = 2.54, 8.89, 4.3, 1.7, 1.35     # pad spans 8.09 .. 12.39 from the centre
+    for i in range(20):
+        y = round(-24.13 + PITCH * i, 3)
+        f.pad(str(i + 1), -X, y, "roundrect" if i == 0 else "oval", PAD_L, PAD_W, 1.0, offset=(-OFF, 0))
+        f.pad(str(40 - i), X, y, "oval", PAD_L, PAD_W, 1.0, offset=(OFF, 0))
+    stock = sexpr.parse(open(os.path.join(fp_dir(), "Module.pretty",
+                                          "RaspberryPi_Pico_Common_Unspecified.kicad_mod")).read())
+    for p in sexpr.find_all(stock, "pad"):
+        if p[2] == "np_thru_hole":                               # USB connector legs
+            at, size = sexpr.find(p, "at"), sexpr.find(p, "size")
+            f.pad("", at[1], at[2], None, size[1], size[2], size[1], kind="np_thru_hole")
+    for z in sexpr.find_all(stock, "zone"):
+        name = str(sexpr.find(z, "name")[1])
+        if name.startswith("Pad Keep Out"):
+            z = copy.deepcopy(z)
+            u = sexpr.find(z, "uuid")
+            u[1] = Q(f._u())
+            # the USB leg holes (no copper) reach into the TP2/TP3 areas: forbid copper, not holes
+            sexpr.find(sexpr.find(z, "keepout"), "pads")[1] = "allowed"
+            f.tail.append(sexpr.dump(z))
+    f.tail.append('(model "${KICAD10_3DMODEL_DIR}/Module.3dshapes/RaspberryPi_Pico.step" '
+                  '(offset (xyz 0 0 0)) (scale (xyz 1 1 1)) (rotate (xyz 0 0 0)))')
+    # module outline 21 x 51 (+ USB connector overhang 1.3 mm).  The USB end lies on the board edge,
+    # so the silkscreen only shows the far end and the pin-1 mark.
+    f.rect(-10.5, -25.5, 10.5, 25.5, layer="F.Fab", w=0.1)
+    f.rect(-4.0, -26.8, 4.0, -25.5, layer="F.Fab", w=0.1)
+    f.line(-10.5, 25.5, 10.5, 25.5)
+    f.text("1", -13.4, -24.13, size=1.0, thick=0.15)
+    f.rect(-12.75, -27.05, 12.75, 25.75, layer="F.CrtYd", w=0.05)
+    f.write((0, 27.0), (0, 28.5))
+
+
 def write_footprints():
+    fp_pico_direct()
     fp_buzzer()
     fp_module()
     fp_reflector()

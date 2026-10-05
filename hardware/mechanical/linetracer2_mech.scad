@@ -13,8 +13,12 @@
 //   4 x M3x20 pan  : from the PCB bottom, through the PCB and the frame towers, into nuts in the deck
 //   2 x M3x8  flat : battery box floor -> deck (nuts in the deck)
 //   1 x M3x8  flat : skid (from the floor side) -> NYLON nut on the PCB top (next to sensor solder joints)
+//
+// LITE = true : low-cost Lite board (3 sensors, skid at (50,11), printed TPU tyres instead of O-rings).
+//   openscad -D 'LITE=true' -D 'part="check_skid_sensor"' ...   All printed parts are the same for both boards.
 
 part = "assembly";
+LITE = false;
 $fn = 64;
 
 // ---------------------------------------------------------------- parameters
@@ -72,6 +76,9 @@ BOX_C = [50, 76];
 BOX_HOLES = [[50, 61], [50, 91]];
 
 // skid at H5 (50,4): between the bodies of PS3 (x <= 45.35) and PS4 (x >= 54.65)
+// Lite: H5 = (50,11), 7 mm behind the centre sensor (its body ends at y = 5.7, the skid starts at y = 6.7)
+SKID_XY = LITE ? [50, 11] : [50, 4];
+SENSOR_XS = LITE ? [38, 50, 62] : [20, 32, 44, 56, 68, 80];
 SKID_H = 4.0;                          // = PCB bottom .. floor  (print 3.5 / 4.0 / 4.5 to tune sensor height)
 SKID_D = 8.6;
 
@@ -373,7 +380,7 @@ BALL_CLR  = 0.35;                      // gap ball .. housing (print-in-place: 0
 BALL_FLAT = 0.25;                      // printed ball: flat on the bed (also sets the housing position)
 BALL_TOP_CLR = 0.2;                    // extra gap above the ball in the print direction (+x): the roof sags a little
 CASTER_WALL = 0.8;
-EDGE_Y   = -4.0;                       // PCB front edge in these coordinates (hole at PCB y = 4)
+EDGE_Y   = -4.0;                       // PCB front edge in these coordinates (hole at PCB y = 4; standard board only)
 EDGE_GAP = 0.3;                        // housing .. PCB edge
 ARM_W = 5.0;                           // sled under the PCB: x = CLIP_X0 .. +5 (fits between PS3 and PS4)
 ARM_CLEAR = 1.0;                       // sled .. floor at its rear end
@@ -454,8 +461,8 @@ module battery_box() {
     }
 }
 
-module sensors() {                 // LBR-123F bodies on the PCB bottom (2.7 x 3.4 x 1.5), PS1..PS6
-    for (x = [20, 32, 44, 56, 68, 80])
+module sensors() {                 // LBR-123F bodies on the PCB bottom (2.7 x 3.4 x 1.5), PS1..PS6 (Lite: PS1..PS3)
+    for (x = SENSOR_XS)
         color("black") translate([x - 1.35, 4 - 1.7, -PCB_T - 1.5]) cube([2.7, 3.4, 1.5]);
 }
 
@@ -464,7 +471,7 @@ module pcb() {
         offset(r = 2) offset(delta = -2) square([100, 100]);
         translate([-1, 70]) square([NOTCH_X + 1, 31]);
         translate([100 - NOTCH_X, 70]) square([NOTCH_X + 1, 31]);
-        for (h = concat(all_holes(), [[50, 4]])) translate(h) circle(d = 3.2);
+        for (h = concat(all_holes(), [SKID_XY])) translate(h) circle(d = 3.2);
     }
 }
 
@@ -473,14 +480,18 @@ module drive_side() {              // left side: gears, axle, wheel, tyre
     color("white") translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40();
     color("goldenrod") translate([AXLE_END_X - AXLE_L, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 2, h = AXLE_L);
     color("orange") translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel();
-    color("black") translate([WHEEL_X1 - (WHEEL_W - 3.5) / 2, AXLE_Y, AXIS_Z]) rotate([0, -90, 0])
-        rotate_extrude() translate([(23.7 + 3.5) / 2, 0]) circle(d = 3.5);
+    if (LITE)                      // TPU tyre, centred in the groove
+        color("black") translate([WHEEL_X1 - WHEEL_W / 2 + 1.7, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) tire_tpu();
+    else
+        color("black") translate([WHEEL_X1 - (WHEEL_W - 3.5) / 2, AXLE_Y, AXIS_Z]) rotate([0, -90, 0])
+            rotate_extrude() translate([(23.7 + 3.5) / 2, 0]) circle(d = 3.5);
 }
 
 DECK_VARIANT = "screw";                // "screw" | "clip"
 SKID_VARIANT = "clip";                 // "clip" | "caster_print" | "caster_bead"  (front support)
-module front_support() {
-    translate([50, 4, -PCB_T]) mirror([0, 0, 1]) {
+module front_support() {                // casters: standard board only (on Lite the arm would cover the centre sensor)
+    assert(SKID_VARIANT == "clip" || !LITE, "ball casters are for the standard board (skid hole 4 mm from the edge)");
+    translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) {
         if (SKID_VARIANT == "caster_print") { color("white") caster_housing(); color("orange") caster_ball(); }
         else if (SKID_VARIANT == "caster_bead") {
             color("white") caster_bead();
@@ -511,7 +522,7 @@ module nut(c = "silver") { color(c) difference() { cylinder(d = 6.35, h = 2.4, $
 EX = [0, 28, 56, 80];
 module exploded() {
     pcb(); sensors();
-    color("white") translate([50, 4, -PCB_T - 8]) mirror([0, 0, 1]) skid_clip();
+    color("white") translate([SKID_XY[0], SKID_XY[1], -PCB_T - 8]) mirror([0, 0, 1]) skid_clip();
     translate([0, 0, EX[1]]) {
         color("orange") frame_left(); color("orange") frame_right();
         motors(); drive_side(); translate([100, 0, 0]) mirror([1, 0, 0]) drive_side();
@@ -547,8 +558,8 @@ else if (part == "check_caster_pcb") intersection() { translate([50, 4, -PCB_T -
 else if (part == "check_caster_ball") intersection() { caster_housing(); caster_ball(); }
 else if (part == "check_casterbead_ball") intersection() { caster_bead(); bead(); }
 else if (part == "deck_clip") translate([0, 0, -TOWER_TOP]) deck_clip();                     // right side up
-else if (part == "check_skidclip_sensor") intersection() { translate([50, 4, -PCB_T]) mirror([0, 0, 1]) skid_clip(); sensors(); }
-else if (part == "check_skidclip_pcb") intersection() { translate([50, 4, -PCB_T]) mirror([0, 0, 1]) skid_clip(); pcb(); }
+else if (part == "check_skidclip_sensor") intersection() { translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) skid_clip(); sensors(); }
+else if (part == "check_skidclip_pcb") intersection() { translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) skid_clip(); pcb(); }
 else if (part == "check_deckclip_motor") intersection() { deck_clip(); motors(); }
 else if (part == "check_deckclip_frame") intersection() { deck_clip(); translate([0, 0, -0.01]) frames(); }
 else if (part == "check_deckclip_box") intersection() { deck_clip(); translate([0, 0, 0.01]) battery_box(); }
@@ -557,7 +568,7 @@ else if (part == "check_deck_motor") intersection() { deck(); motors(); }
 else if (part == "check_deck_frame") intersection() { deck(); translate([0, 0, -0.01]) frames(); }
 else if (part == "check_frame_motor") intersection() { frames(); motors(); }
 else if (part == "check_box_frame") intersection() { battery_box(); union() { frames(); motors(); } }
-else if (part == "check_skid_sensor") intersection() { translate([50, 4, -PCB_T]) mirror([0, 0, 1]) skid(); sensors(); }
+else if (part == "check_skid_sensor") intersection() { translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) skid(); sensors(); }
 else if (part == "check_gear_frame") intersection() { translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40(); frame_left(); }
 else if (part == "check_wheel_frame") intersection() { translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel(); frame_left(); }
 else if (part == "exploded") exploded();

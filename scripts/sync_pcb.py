@@ -18,7 +18,7 @@ G.apply_netlist(b, comps, pinnet)
 for fp in b.GetFootprints():
     name = str(fp.GetFPID().GetLibItemName())
     wrl = os.path.join(G.LIBDIR, "3d", name + ".wrl")
-    if str(fp.GetFPID().GetLibNickname()) == G.PROJ and os.path.exists(wrl):
+    if str(fp.GetFPID().GetLibNickname()) == G.LIBNICK and os.path.exists(wrl):
         if not any("/lib/3d/" in m.m_Filename for m in fp.Models()):
             m = pcbnew.FP_3DMODEL()
             m.m_Filename = "${KIPRJMOD}/lib/3d/%s.wrl" % name

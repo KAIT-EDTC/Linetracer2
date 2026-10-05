@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "Linetracer2")(type "KiCad")(uri "${KIPRJMOD}/lib/Linetracer2.pretty")(options "")(descr "Linetracer2 project footprints"))
+)
