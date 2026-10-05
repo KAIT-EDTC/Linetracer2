@@ -357,49 +357,64 @@ module skid_clip(H = SKID_H) {
 
 // ---------------------------------------------------------------- ball caster (trial, instead of the skid)
 // Same mount as skid_clip() (split pin in the 3.2 mm hole), same coordinates (z = 0 PCB bottom, floor z = H).
-// A 6 mm ball does not fit between the PCB and the floor (4.0 mm), so the ball sits IN FRONT of the board edge
-// (contact about 3.4 mm ahead of the edge = 7.4 mm ahead of the sensor line); an arm under the PCB carries the pin.
-//   caster_print(): the ball is printed in place inside the housing (one part, no extra parts)
+// A ball plus its housing does not fit between the PCB and the floor (4.0 mm), so the ball sits just IN FRONT of
+// the board edge; a sled-shaped arm under the PCB carries the pin.
+//   caster_print(): 4 mm ball printed in place inside the housing (one part).  The housing stays below the PCB top
+//                   and inside the 5 mm width of the snap skid (contact 1.5 mm ahead of the edge).
 //   caster_bead():  housing only, a DAISO pearl-like bead (6 mm) is pressed in from the floor side
+//                   (contact 3.5 mm ahead of the edge, the housing is 1.6 mm higher than the PCB top).
 // Both print LYING ON THEIR SIDE like skid_clip (the pin prongs and the bead finger bend along the layers).
 // The ball touches the bed through a 0.25 mm flat, so the housing has a small window on the bed side.
+PRINT_BALL_D = 4.0;                    // printed ball
+PRINT_LIP = 0.3;                       // its floor-side opening = 3.7 mm (the ball sticks out 0.55 mm)
 BALL_D    = 6.0;                       // bead diameter - MEASURE YOUR BEADS (calipers) and set this
-BALL_CLR  = 0.3;                       // gap ball .. housing (print-in-place needs >= 0.3)
+BALL_LIP  = 0.4;                       // the bead's floor-side opening is BALL_D - BALL_LIP (keeps it in)
+BALL_CLR  = 0.35;                      // gap ball .. housing (print-in-place: 0.35 -> about 0.27 mm of air in the G-code)
 BALL_FLAT = 0.25;                      // printed ball: flat on the bed (also sets the housing position)
 BALL_TOP_CLR = 0.2;                    // extra gap above the ball in the print direction (+x): the roof sags a little
-BALL_LIP  = 0.4;                       // the floor-side opening is BALL_D - BALL_LIP (keeps the ball in)
-CASTER_WALL = 1.0;
+CASTER_WALL = 0.8;
 EDGE_Y   = -4.0;                       // PCB front edge in these coordinates (hole at PCB y = 4)
 EDGE_GAP = 0.3;                        // housing .. PCB edge
-ARM_W = 5.0;                           // arm under the PCB: x = CLIP_X0 .. +5 (fits between PS3 and PS4)
-ARM_CLEAR = 1.0;                       // arm .. floor
+ARM_W = 5.0;                           // sled under the PCB: x = CLIP_X0 .. +5 (fits between PS3 and PS4)
+ARM_CLEAR = 1.0;                       // sled .. floor at its rear end
+ARM_Y1 = 3.0;                          // rear end of the sled
 BEAD_SLIT = 0.8;                       // slit that frees the front half of the lip (bead version)
 
-function caster_r()  = BALL_D / 2;
-function caster_rc() = BALL_D / 2 + BALL_CLR;
-function caster_zc(H) = H - BALL_D / 2;                                   // ball centre (below the PCB bottom)
-function caster_xb() = CLIP_X0 + BALL_D / 2 - BALL_FLAT;
-function caster_yb(H) = EDGE_Y - EDGE_GAP
-    - (caster_zc(H) <= 0 ? caster_rc() : sqrt(pow(caster_rc(), 2) - pow(caster_zc(H), 2)));   // cavity clears the edge
-function caster_zl(H) = caster_zc(H) + sqrt(pow(caster_rc(), 2) - pow((BALL_D - BALL_LIP) / 2, 2));   // housing bottom
+function caster_rc(D) = D / 2 + BALL_CLR;
+function caster_zc(H, D) = H - D / 2;                                     // ball centre (below the PCB bottom)
+function caster_xb(D) = CLIP_X0 + D / 2 - BALL_FLAT;
+function caster_yb(H, D) = EDGE_Y - EDGE_GAP
+    - (caster_zc(H, D) <= 0 ? caster_rc(D) : sqrt(pow(caster_rc(D), 2) - pow(caster_zc(H, D), 2)));  // cavity clears the edge
+function caster_zl(H, D, lip) = caster_zc(H, D) + sqrt(pow(caster_rc(D), 2) - pow((D - lip) / 2, 2));  // housing bottom
 
-module caster_housing(H = SKID_H, slit = false) {
-    xb = caster_xb(); yb = caster_yb(H); zc = caster_zc(H); zl = caster_zl(H);
+module caster_housing(H = SKID_H, D = PRINT_BALL_D, lip = PRINT_LIP, slit = false) {
+    xb = caster_xb(D); yb = caster_yb(H, D); zc = caster_zc(H, D); zl = caster_zl(H, D, lip);
+    ro = caster_rc(D) + CASTER_WALL;
     T = PCB_T + 0.15;
+    RR = 1.2;                                                   // rounded rear edge of the sled
     difference() {
         union() {
             intersection() {
-                translate([xb, yb, zc]) sphere(r = caster_rc() + CASTER_WALL, $fn = 48);
+                union() {
+                    translate([xb, yb, zc]) sphere(r = ro, $fn = 48);
+                    hull() {                                    // sled: blends the ball housing into the arm
+                        intersection() {
+                            translate([xb, yb, zc]) sphere(r = ro, $fn = 48);
+                            translate([CLIP_X0, -50, -50]) cube([ARM_W, 100, 100]);
+                        }
+                        translate([CLIP_X0, ARM_Y1 - 0.01, 0]) cube([ARM_W, 0.01, 0.01]);
+                        translate([CLIP_X0, ARM_Y1 - RR, H - ARM_CLEAR - RR]) rotate([0, 90, 0]) cylinder(r = RR, h = ARM_W, $fn = 32);
+                    }
+                }
                 union() {
                     translate([CLIP_X0, -50, 0]) cube([50, 100, zl]);                      // under the PCB level
                     translate([CLIP_X0, -50, -50]) cube([50, 50 + EDGE_Y - EDGE_GAP, 50]); // above it: only in front of the edge
                 }
             }
-            translate([CLIP_X0, yb, 0]) cube([ARM_W, 3.0 - yb, H - ARM_CLEAR]);            // arm to the pin
             translate([0, 0, -T]) cylinder(d = CLIP_PIN_D, h = T + CLIP_ROOT + 0.01);
             translate([0, 0, -T - 1.3]) cylinder(d1 = 2.5, d2 = CLIP_BARB_D, h = 1.3);
         }
-        hull() for (dx = [0, BALL_TOP_CLR]) translate([xb + dx, yb, zc]) sphere(r = caster_rc(), $fn = 48);
+        hull() for (dx = [0, BALL_TOP_CLR]) translate([xb + dx, yb, zc]) sphere(r = caster_rc(D), $fn = 48);
         difference() {                 // pin pocket + slit: same as skid_clip()
             translate([0, 0, -0.01]) cylinder(d = CLIP_POCKET_D, h = CLIP_ROOT + 0.01);
             translate([0, 0, -1]) cylinder(d = CLIP_PIN_D, h = CLIP_ROOT + 2);
@@ -408,19 +423,20 @@ module caster_housing(H = SKID_H, slit = false) {
         translate([CLIP_X0 - 10, -10, -10]) cube([10, 20, 20]);                    // print face (pin)
         // bead version: free the front half of the lip so it can bend forward (in the layer plane) when the bead
         // is pushed in from below.  The rear half is stiff (it is joined to the arm).
-        if (slit) translate([CLIP_X0 - 1, yb - BEAD_SLIT / 2, zc - 1.5]) cube([20, BEAD_SLIT, 20]);
+        if (slit) translate([CLIP_X0 - 1, yb - BEAD_SLIT / 2, zc - D / 4]) cube([20, BEAD_SLIT, 20]);
     }
 }
 
-module caster_ball(H = SKID_H) {
+module caster_ball(H = SKID_H, D = PRINT_BALL_D) {
     intersection() {
-        translate([caster_xb(), caster_yb(H), caster_zc(H)]) sphere(r = caster_r(), $fn = 48);
+        translate([caster_xb(D), caster_yb(H, D), caster_zc(H, D)]) sphere(d = D, $fn = 48);
         translate([CLIP_X0, -50, -50]) cube([100, 100, 100]);                           // the flat on the bed
     }
 }
+module bead(H = SKID_H) translate([caster_xb(BALL_D), caster_yb(H, BALL_D), caster_zc(H, BALL_D)]) sphere(d = BALL_D);
 
 module caster_print(H = SKID_H) { caster_housing(H); caster_ball(H); }
-module caster_bead(H = SKID_H)  { caster_housing(H, slit = true); }
+module caster_bead(H = SKID_H)  { caster_housing(H, BALL_D, BALL_LIP, slit = true); }
 
 // ---------------------------------------------------------------- simple models for the assembly / checks
 module battery_box() {
@@ -468,7 +484,7 @@ module front_support() {
         if (SKID_VARIANT == "caster_print") { color("white") caster_housing(); color("orange") caster_ball(); }
         else if (SKID_VARIANT == "caster_bead") {
             color("white") caster_bead();
-            color("ivory") translate([caster_xb(), caster_yb(SKID_H), caster_zc(SKID_H)]) sphere(d = BALL_D);
+            color("ivory") bead();
         }
         else color("white") skid_clip();
     }
@@ -529,7 +545,7 @@ else if (part == "caster_bead") translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) 
 else if (part == "check_caster_sensor") intersection() { translate([50, 4, -PCB_T]) mirror([0, 0, 1]) caster_print(); sensors(); }
 else if (part == "check_caster_pcb") intersection() { translate([50, 4, -PCB_T - 0.01]) mirror([0, 0, 1]) caster_print(); pcb(); }
 else if (part == "check_caster_ball") intersection() { caster_housing(); caster_ball(); }
-else if (part == "check_casterbead_ball") intersection() { caster_bead(); translate([caster_xb(), caster_yb(SKID_H), caster_zc(SKID_H)]) sphere(d = BALL_D); }
+else if (part == "check_casterbead_ball") intersection() { caster_bead(); bead(); }
 else if (part == "deck_clip") translate([0, 0, -TOWER_TOP]) deck_clip();                     // right side up
 else if (part == "check_skidclip_sensor") intersection() { translate([50, 4, -PCB_T]) mirror([0, 0, 1]) skid_clip(); sensors(); }
 else if (part == "check_skidclip_pcb") intersection() { translate([50, 4, -PCB_T]) mirror([0, 0, 1]) skid_clip(); pcb(); }
