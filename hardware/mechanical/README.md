@@ -100,7 +100,7 @@ $OS -D 'part="skid"' -D 'SKID_H=4.0' -o skid_h40.stl linetracer2_mech.scad
 
 ## 5. 低コスト版 Lite で使うとき
 
-**印刷する部品（STL）は標準版とまったく同じ**。違うのは次の 3 つだけ（`docs/09_lite.md`）。
+**印刷する部品（STL）は標準版とまったく同じ**。違うのは次の 3 つだけ（`lite/README.md`）。
 
 | | 標準版 | Lite |
 |---|---|---|

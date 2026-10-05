@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate the project-local symbol & footprint library (Linetracer2).
 
-Outputs (with LT2_VARIANT=lite: the same files under hardware/lite/kicad/lib/)
+Outputs (with LT2_VARIANT=lite: the same files under lite/hardware/kicad/lib/)
   hardware/kicad/lib/Linetracer2.kicad_sym
   hardware/kicad/lib/Linetracer2.pretty/*.kicad_mod
 

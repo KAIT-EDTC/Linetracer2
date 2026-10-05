@@ -10,12 +10,12 @@ _autosave-*
 hardware/kicad/AE-TC78H653FTG.kicad_mod
 
 # auto-router intermediates (scripts/route_pcb.py makes them again); standard and Lite boards
-hardware/**/reports/*.dsn
-hardware/**/reports/*.ses
-hardware/**/reports/placement.pdf
-hardware/**/reports/top.pdf
-hardware/**/reports/bot.pdf
-hardware/**/reports/drc_place.rpt
+**/reports/*.dsn
+**/reports/*.ses
+**/reports/placement.pdf
+**/reports/top.pdf
+**/reports/bot.pdf
+**/reports/drc_place.rpt
 
 # datasheets are the makers' documents: keep links only (docs/datasheets/README.md)
 docs/datasheets/*.pdf

@@ -23,7 +23,7 @@ Raspberry Pi Pico ＋ TC78H653FTG ＋ 130 モーター ×2 の、**全部足付�
 
 ## 低コスト版「Linetracer2 Lite」（rev.L1）
 
-標準版から部品を減らした版も用意した（詳しくは [docs/09_lite.md](docs/09_lite.md)）。**3D プリント部品・ねじ・モーター・電池ボックスは標準版と共通**で、基板とソフトだけが違う。
+標準版から部品を減らした版も用意した（詳しくは [lite/README.md](lite/README.md)）。**Lite のファイルはすべて `lite/` フォルダにまとめてあり、標準版のファイルとは混ざらない**。**3D プリント部品・ねじ・モーター・電池ボックスは標準版と共通**で、基板とソフトだけが違う。
 
 | | 標準版 rev.A1 | Lite rev.L1 |
 |---|---|---|
@@ -36,7 +36,7 @@ Raspberry Pi Pico ＋ TC78H653FTG ＋ 130 モーター ×2 の、**全部足付�
 
 > ⚠ Lite は Pico をはんだ付けしてしまうので、**Pico を回収して再利用する運用（標準版 約 ¥1,570）はできない**。子どもが持ち帰る講座なら Lite が安い。
 
-![Lite PCB](docs/lite/pcb_iso.png)
+![Lite PCB](lite/docs/pcb_iso.png)
 
 ## ドキュメント
 
@@ -50,12 +50,12 @@ Raspberry Pi Pico ＋ TC78H653FTG ＋ 130 モーター ×2 の、**全部足付�
 | [docs/06_assembly.md](docs/06_assembly.md) | 組み立て手順書（はんだ付けの順番・チェック・ねじ止め・トラブル） |
 | [docs/07_firmware.md](docs/07_firmware.md) | ソフトウェア（MicroPython のセットアップ、ライブラリ、PD 制御の調整） |
 | [docs/08_knowledge.md](docs/08_knowledge.md) | 知見メモ（部品のクセ、買い方、KiCad/Freerouting/OpenSCAD のハマりどころ、設計判断） |
-| [docs/09_lite.md](docs/09_lite.md) | **低コスト版 Lite**（変更点と理由、コスト比較、回路・基板・部品表・組み立て・ソフトの違い） |
+| [lite/README.md](lite/README.md) | **低コスト版 Lite**（変更点と理由、コスト比較、回路・基板・部品表・組み立て・ソフトの違い） |
 | [hardware/mechanical/README.md](hardware/mechanical/README.md) | 3D プリント部品と P1S の印刷設定、ねじの一覧 |
 | [hardware/mechanical/assembly.stl](hardware/mechanical/assembly.stl) | 全体を組み立てた 3D（STL、ブラウザで回して見られる） |
 | [hardware/kicad/Linetracer2_pcb.step](hardware/kicad/Linetracer2_pcb.step) | 部品付き基板の 3D（STEP、Fusion 等の CAD 用） |
 | [docs/Linetracer2_schematic.pdf](docs/Linetracer2_schematic.pdf) | 回路図 PDF |
-| [docs/lite/Linetracer2-Lite_schematic.pdf](docs/lite/Linetracer2-Lite_schematic.pdf) | Lite の回路図 PDF |
+| [lite/docs/Linetracer2-Lite_schematic.pdf](lite/docs/Linetracer2-Lite_schematic.pdf) | Lite の回路図 PDF |
 | [docs/datasheets/README.md](docs/datasheets/README.md) | 使った部品のデータシート（リンク集） |
 
 ## フォルダ構成
@@ -64,7 +64,6 @@ Raspberry Pi Pico ＋ TC78H653FTG ＋ 130 モーター ×2 の、**全部足付�
 Linetracer2/
 ├── README.md
 ├── docs/                     設計資料（Markdown）、回路図/基板 PDF、画像、データシートのリンク
-│   └── lite/                 Lite の回路図/組立図 PDF、3D 画像
 ├── hardware/
 │   ├── kicad/                KiCad 10 プロジェクト（.kicad_pro / _sch / _pcb）
 │   │   ├── lib/              自作シンボル・フットプリント（TC78H653 モジュール、LBR-123F、ブザー等）
@@ -72,11 +71,15 @@ Linetracer2/
 │   │   └── reports/          ERC / DRC レポート、ネットリスト
 │   ├── gerber/               製造用 Gerber・ドリル
 │   ├── Linetracer2_rev.A1_gerber.zip   ← 基板メーカーにそのまま渡す
-│   ├── lite/                 Lite の KiCad プロジェクト・Gerber（Linetracer2-Lite_rev.L1_gerber.zip）
 │   └── mechanical/           3D プリント部品（OpenSCAD 元データ、STL、組み立て図。両方の版で共通）
 ├── firmware/micropython/     ライブラリ・標準プログラム・授業用サンプル
-├── firmware/micropython-lite/  Lite 用（センサー 3 個・ボタン 1 個・LED 1 個）
-└── scripts/                  回路図・基板を生成するスクリプト（再生成用。LT2_VARIANT=lite で Lite）
+├── scripts/                  回路図・基板を生成するスクリプト（再生成用。LT2_VARIANT=lite で Lite も作る）
+└── lite/                     ★ 低コスト版 Lite 一式（標準版とは別フォルダ）
+    ├── README.md             Lite の設計書（変更点・コスト比較・組み立て・ソフト）
+    ├── docs/                 回路図/組立図 PDF、3D 画像
+    ├── hardware/             KiCad プロジェクト、Gerber（Linetracer2-Lite_rev.L1_gerber.zip）
+    ├── firmware/micropython/ Lite 用ソフト（センサー 3 個・ボタン 1 個・LED 1 個）
+    └── scripts/              Lite 専用の生成スクリプト（回路図・配置・シルク）
 ```
 
 ## 状態（2026-10-05, rev.A1）
@@ -90,4 +93,4 @@ Linetracer2/
 - [ ] **試作 1 台目の製作と実測**（センサーの感度、ギヤのかみ合い、PD ゲイン、電池の持ち）
 - [ ] 試作結果を反映した rev.B（`docs/04_pcb.md` §7）
 - [x] 低コスト版 Lite rev.L1 の回路図・基板（ERC 0・DRC 0・警告 0）・部品表・ソフト（2026-10-05）
-- [ ] Lite の試作（Pico 直付けのしやすさ、3 センサーでの走り、`docs/09_lite.md` §10）
+- [ ] Lite の試作（Pico 直付けのしやすさ、3 センサーでの走り、`lite/README.md` §10）

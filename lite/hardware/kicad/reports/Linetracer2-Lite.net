@@ -1,0 +1,3648 @@
+(export
+	(version "E")
+	(design
+		(source "/home/aonuma/Desktop/EDTC/Linetracer2/.claude/worktrees/low-cost-version-design-bc1652/lite/hardware/kicad/Linetracer2-Lite.kicad_sch")
+		(date "2026-10-05T11:40:11")
+		(tool "Eeschema 10.0.6")
+		(sheet
+			(number "1")
+			(name "/")
+			(tstamps "/")
+			(title_block
+				(title "Linetracer2 Lite - low-cost kids line tracer")
+				(company "EDTC")
+				(rev "L1")
+				(date "2026-10-05")
+				(source "Linetracer2-Lite.kicad_sch")
+				(comment
+					(number "1")
+					(value "All parts through-hole. Pico soldered flat (castellated edge)")
+				)
+				(comment
+					(number "2")
+					(value "Pico + Akizuki AE-TC78H653FTG module + 3 x LBR-123F")
+				)
+				(comment
+					(number "3")
+					(value "Design notes: lite/README.md")
+				)
+				(comment
+					(number "4")
+					(value "")
+				)
+				(comment
+					(number "5")
+					(value "")
+				)
+				(comment
+					(number "6")
+					(value "")
+				)
+				(comment
+					(number "7")
+					(value "")
+				)
+				(comment
+					(number "8")
+					(value "")
+				)
+				(comment
+					(number "9")
+					(value "")
+				)
+			)
+		)
+	)
+	(components
+		(comp
+			(ref "C1")
+			(value "470uF 16V")
+			(footprint "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm")
+			(description "Polarized capacitor")
+			(fields
+				(field
+					(name "Note") "motor bulk capacitor, place near U2 VM")
+				(field
+					(name "Akizuki") "108426 (Rubycon 16WXA470MEFC 8x9)")
+				(field
+					(name "Footprint") "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Polarized capacitor")
+			)
+			(libsource
+				(lib "Device")
+				(part "C_Polarized")
+				(description "Polarized capacitor")
+			)
+			(property
+				(name "Note")
+				(value "motor bulk capacitor, place near U2 VM")
+			)
+			(property
+				(name "Akizuki")
+				(value "108426 (Rubycon 16WXA470MEFC 8x9)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "CP_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "e8d2159b-e195-56c2-84db-c1534dd88003")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C2")
+			(value "470uF 16V")
+			(footprint "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm")
+			(description "Polarized capacitor")
+			(fields
+				(field
+					(name "Note") "hold-up for Pico when motors pull the battery down")
+				(field
+					(name "Akizuki") "108426 (Rubycon 16WXA470MEFC 8x9)")
+				(field
+					(name "Footprint") "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Polarized capacitor")
+			)
+			(libsource
+				(lib "Device")
+				(part "C_Polarized")
+				(description "Polarized capacitor")
+			)
+			(property
+				(name "Note")
+				(value "hold-up for Pico when motors pull the battery down")
+			)
+			(property
+				(name "Akizuki")
+				(value "108426 (Rubycon 16WXA470MEFC 8x9)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "CP_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "b14b34e0-1eb5-5620-9668-de3dc70877a5")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C3")
+			(value "0.1uF (at motor)")
+			(footprint "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm")
+			(description "Unpolarized capacitor")
+			(fields
+				(field
+					(name "Akizuki") "113582 (10pcs)")
+				(field
+					(name "Footprint") "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "Akizuki")
+				(value "113582 (10pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "ef77c171-7d1d-55f4-807a-dd21e5a21ba9")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "C4")
+			(value "0.1uF (at motor)")
+			(footprint "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm")
+			(description "Unpolarized capacitor")
+			(fields
+				(field
+					(name "Akizuki") "113582 (10pcs)")
+				(field
+					(name "Footprint") "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(libsource
+				(lib "Device")
+				(part "C")
+				(description "Unpolarized capacitor")
+			)
+			(property
+				(name "Akizuki")
+				(value "113582 (10pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "C_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "7972b2ed-77ae-5b3a-a5d1-9907e7100c3a")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "D1")
+			(value "1N5819")
+			(footprint "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal")
+			(description "Schottky diode")
+			(fields
+				(field
+					(name "Akizuki") "117244")
+				(field
+					(name "Note") "blocks USB 5V back-feed into batteries")
+				(field
+					(name "Footprint") "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Schottky diode")
+			)
+			(libsource
+				(lib "Device")
+				(part "D_Schottky")
+				(description "Schottky diode")
+			)
+			(property
+				(name "Akizuki")
+				(value "117244")
+			)
+			(property
+				(name "Note")
+				(value "blocks USB 5V back-feed into batteries")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "diode Schottky")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "TO-???* *_Diode_* *SingleDiode* D_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "9fd48fdd-d36f-5a96-a2f0-081a233922b0")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "D2")
+			(value "LED red")
+			(footprint "LED_THT:LED_D3.0mm")
+			(description "Light emitting diode")
+			(fields
+				(field
+					(name "Akizuki") "111577")
+				(field
+					(name "Footprint") "LED_THT:LED_D3.0mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Light emitting diode")
+			)
+			(libsource
+				(lib "Device")
+				(part "LED")
+				(description "Light emitting diode")
+			)
+			(property
+				(name "Akizuki")
+				(value "111577")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "LED diode")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "LED* LED_SMD:* LED_THT:*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "c48a1666-b800-522f-84ae-3ae963e28632")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "H1")
+			(value "M3")
+			(footprint "MountingHole:MountingHole_3.2mm_M3")
+			(description "Mounting Hole without connection")
+			(fields
+				(field
+					(name "Footprint") "MountingHole:MountingHole_3.2mm_M3")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Mounting Hole without connection")
+			)
+			(libsource
+				(lib "Mechanical")
+				(part "MountingHole")
+				(description "Mounting Hole without connection")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "mounting hole")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "MountingHole*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "1fefe230-6659-5e84-a95e-f8ca42dcb4de")
+			(units
+				(unit
+					(name "A")
+					(pins)
+				)
+			)
+		)
+		(comp
+			(ref "H2")
+			(value "M3")
+			(footprint "MountingHole:MountingHole_3.2mm_M3")
+			(description "Mounting Hole without connection")
+			(fields
+				(field
+					(name "Footprint") "MountingHole:MountingHole_3.2mm_M3")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Mounting Hole without connection")
+			)
+			(libsource
+				(lib "Mechanical")
+				(part "MountingHole")
+				(description "Mounting Hole without connection")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "mounting hole")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "MountingHole*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "7a5ff1fa-a87b-5e7a-ae53-3a23a9e135c9")
+			(units
+				(unit
+					(name "A")
+					(pins)
+				)
+			)
+		)
+		(comp
+			(ref "H3")
+			(value "M3")
+			(footprint "MountingHole:MountingHole_3.2mm_M3")
+			(description "Mounting Hole without connection")
+			(fields
+				(field
+					(name "Footprint") "MountingHole:MountingHole_3.2mm_M3")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Mounting Hole without connection")
+			)
+			(libsource
+				(lib "Mechanical")
+				(part "MountingHole")
+				(description "Mounting Hole without connection")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "mounting hole")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "MountingHole*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "e29521f9-8f75-5f60-9f6a-b7dc96b33fd1")
+			(units
+				(unit
+					(name "A")
+					(pins)
+				)
+			)
+		)
+		(comp
+			(ref "H4")
+			(value "M3")
+			(footprint "MountingHole:MountingHole_3.2mm_M3")
+			(description "Mounting Hole without connection")
+			(fields
+				(field
+					(name "Footprint") "MountingHole:MountingHole_3.2mm_M3")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Mounting Hole without connection")
+			)
+			(libsource
+				(lib "Mechanical")
+				(part "MountingHole")
+				(description "Mounting Hole without connection")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "mounting hole")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "MountingHole*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "dc3ed475-42fd-54fd-ab9c-8a83c96ea907")
+			(units
+				(unit
+					(name "A")
+					(pins)
+				)
+			)
+		)
+		(comp
+			(ref "H5")
+			(value "SKID M3")
+			(footprint "MountingHole:MountingHole_3.2mm_M3")
+			(description "Mounting Hole without connection")
+			(fields
+				(field
+					(name "Footprint") "MountingHole:MountingHole_3.2mm_M3")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Mounting Hole without connection")
+			)
+			(libsource
+				(lib "Mechanical")
+				(part "MountingHole")
+				(description "Mounting Hole without connection")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "mounting hole")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "MountingHole*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "238ec248-5022-5260-abfc-ebcbd01d6633")
+			(units
+				(unit
+					(name "A")
+					(pins)
+				)
+			)
+		)
+		(comp
+			(ref "J1")
+			(value "BATTERY (AA x3, XH 2P)")
+			(footprint "Linetracer2:BatteryXH_2P")
+			(description "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			(fields
+				(field
+					(name "Akizuki") "112247 (B2B-XH-A) / battery box 112243")
+				(field
+					(name "Note") "red wire = + (pin 1)")
+				(field
+					(name "Footprint") "Linetracer2:BatteryXH_2P")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(libsource
+				(lib "Connector_Generic")
+				(part "Conn_01x02")
+				(description "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(property
+				(name "Akizuki")
+				(value "112247 (B2B-XH-A) / battery box 112243")
+			)
+			(property
+				(name "Note")
+				(value "red wire = + (pin 1)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "connector")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Connector*:*_1x??_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "d09173ba-e174-5730-85b7-7d31f8ef7768")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "J2")
+			(value "I2C (0.96in OLED order)")
+			(footprint "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical")
+			(description "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			(fields
+				(field
+					(name "Note") "not fitted in the kit (no pin header). Solder a 1x4 header to add an OLED")
+				(field
+					(name "Footprint") "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(libsource
+				(lib "Connector_Generic")
+				(part "Conn_01x04")
+				(description "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(property
+				(name "Note")
+				(value "not fitted in the kit (no pin header). Solder a 1x4 header to add an OLED")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "dnp")
+			)
+			(property
+				(name "ki_keywords")
+				(value "connector")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Connector*:*_1x??_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "ce8b651b-9cf4-51d0-a370-edecf9861514")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "M1")
+			(value "LEFT motor  FA-130RA")
+			(footprint "Linetracer2:MotorPads_2P_Relief")
+			(description "DC Motor")
+			(fields
+				(field
+					(name "Akizuki") "106437")
+				(field
+					(name "Footprint") "Linetracer2:MotorPads_2P_Relief")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "DC Motor")
+			)
+			(libsource
+				(lib "Motor")
+				(part "Motor_DC")
+				(description "DC Motor")
+			)
+			(property
+				(name "Akizuki")
+				(value "106437")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "DC Motor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "PinHeader*P2.54mm* TerminalBlock*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "dca49e4f-506f-5952-9649-2b8041b0ae4f")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "M2")
+			(value "RIGHT motor FA-130RA")
+			(footprint "Linetracer2:MotorPads_2P_Relief")
+			(description "DC Motor")
+			(fields
+				(field
+					(name "Akizuki") "106437")
+				(field
+					(name "Footprint") "Linetracer2:MotorPads_2P_Relief")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "DC Motor")
+			)
+			(libsource
+				(lib "Motor")
+				(part "Motor_DC")
+				(description "DC Motor")
+			)
+			(property
+				(name "Akizuki")
+				(value "106437")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "DC Motor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "PinHeader*P2.54mm* TerminalBlock*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "6c591711-fa27-5c8d-b16e-a8b60495ddaa")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "PS1")
+			(value "LBR-123F")
+			(footprint "Linetracer2:LBR-123F")
+			(datasheet "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+			(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			(fields
+				(field
+					(name "Akizuki") "116455")
+				(field
+					(name "Footprint") "Linetracer2:LBR-123F")
+				(field
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+				(field
+					(name "Description") "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			)
+			(libsource
+				(lib "Linetracer2")
+				(part "LBR-123F")
+				(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			)
+			(property
+				(name "Akizuki")
+				(value "116455")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "28734c3a-3e14-543e-aa52-645e6c0aac5c")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "3")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "PS2")
+			(value "LBR-123F")
+			(footprint "Linetracer2:LBR-123F")
+			(datasheet "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+			(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			(fields
+				(field
+					(name "Akizuki") "116455")
+				(field
+					(name "Footprint") "Linetracer2:LBR-123F")
+				(field
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+				(field
+					(name "Description") "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			)
+			(libsource
+				(lib "Linetracer2")
+				(part "LBR-123F")
+				(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			)
+			(property
+				(name "Akizuki")
+				(value "116455")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "9ce04b8b-92cc-5784-ae4a-c35bd4167e69")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "3")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "PS3")
+			(value "LBR-123F")
+			(footprint "Linetracer2:LBR-123F")
+			(datasheet "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+			(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			(fields
+				(field
+					(name "Akizuki") "116455")
+				(field
+					(name "Footprint") "Linetracer2:LBR-123F")
+				(field
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+				(field
+					(name "Description") "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			)
+			(libsource
+				(lib "Linetracer2")
+				(part "LBR-123F")
+				(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			)
+			(property
+				(name "Akizuki")
+				(value "116455")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "33f2a772-d782-53c1-a89c-69b4f2abd5e7")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "3")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "Q1")
+			(value "2SC1815-GR")
+			(footprint "Package_TO_SOT_THT:TO-92_Inline_Wide")
+			(datasheet "https://media.digikey.com/pdf/Data%20Sheets/Toshiba%20PDFs/2SC1815.pdf")
+			(description "0.15A Ic, 50V Vce, Low Noise Audio NPN Transistor, TO-92")
+			(fields
+				(field
+					(name "Akizuki") "117089")
+				(field
+					(name "Footprint") "Package_TO_SOT_THT:TO-92_Inline_Wide")
+				(field
+					(name "Datasheet") "https://media.digikey.com/pdf/Data%20Sheets/Toshiba%20PDFs/2SC1815.pdf")
+				(field
+					(name "Description") "0.15A Ic, 50V Vce, Low Noise Audio NPN Transistor, TO-92")
+			)
+			(libsource
+				(lib "Transistor_BJT")
+				(part "2SC1815")
+				(description "0.15A Ic, 50V Vce, Low Noise Audio NPN Transistor, TO-92")
+			)
+			(property
+				(name "Akizuki")
+				(value "117089")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "Low Noise Audio NPN Transistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "TO?92*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "9ac54208-5b33-55df-b6bf-6c8b6a604ea9")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R1")
+			(value "100")
+			(footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Akizuki") "125101 (100pcs)")
+				(field
+					(name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Akizuki")
+				(value "125101 (100pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "867eff5a-a61b-5ad1-be22-c97e73079295")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R2")
+			(value "100")
+			(footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Akizuki") "125101 (100pcs)")
+				(field
+					(name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Akizuki")
+				(value "125101 (100pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "bde780ba-0890-5f4f-8ada-60cdb46b82d2")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R3")
+			(value "100")
+			(footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Akizuki") "125101 (100pcs)")
+				(field
+					(name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Akizuki")
+				(value "125101 (100pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "c030cf7d-5204-5c60-8f1c-3af4b2b96ce1")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R4")
+			(value "10k")
+			(footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Akizuki") "125103 (100pcs)")
+				(field
+					(name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Akizuki")
+				(value "125103 (100pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "0ad8bdd2-17df-50ca-a983-39bba9ac122f")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R5")
+			(value "10k")
+			(footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Akizuki") "125103 (100pcs)")
+				(field
+					(name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Akizuki")
+				(value "125103 (100pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "e0cff82a-f9c2-5f64-ab40-7ab3efad7f70")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R6")
+			(value "10k")
+			(footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Akizuki") "125103 (100pcs)")
+				(field
+					(name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Akizuki")
+				(value "125103 (100pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "03f5b732-25b0-5d01-9391-fb14300755d1")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R7")
+			(value "1k")
+			(footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Akizuki") "125102 (100pcs)")
+				(field
+					(name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Akizuki")
+				(value "125102 (100pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "7a8cc9f5-5067-519c-ae8c-0e6386ec4c18")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "R8")
+			(value "1k")
+			(footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Akizuki") "125102 (100pcs)")
+				(field
+					(name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Akizuki")
+				(value "125102 (100pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "c4f6a09a-c139-5027-85e9-00fd88e001a8")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "SW1")
+			(value "START")
+			(footprint "Button_Switch_THT:SW_PUSH_6mm")
+			(description "Push button switch, generic, two pins")
+			(fields
+				(field
+					(name "Akizuki") "108075")
+				(field
+					(name "Footprint") "Button_Switch_THT:SW_PUSH_6mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Push button switch, generic, two pins")
+			)
+			(libsource
+				(lib "Switch")
+				(part "SW_Push")
+				(description "Push button switch, generic, two pins")
+			)
+			(property
+				(name "Akizuki")
+				(value "108075")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "switch normally-open pushbutton push-button")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "964cfca4-704f-5fe5-b6a3-bcaed419ca09")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U1")
+			(value "Raspberry Pi Pico")
+			(footprint "Linetracer2:RaspberryPi_Pico_DirectSolder")
+			(datasheet "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf")
+			(description "Raspberry Pi Pico / Pico 2 (through-hole, soldered with 2.54mm pin headers). AGND set to passive.")
+			(fields
+				(field
+					(name "Akizuki") "116132 (Pico, Pico 2 also OK; not Pico W)")
+				(field
+					(name "Note") "solder the castellated edge straight onto the pads, no pin header")
+				(field
+					(name "Footprint") "Linetracer2:RaspberryPi_Pico_DirectSolder")
+				(field
+					(name "Datasheet") "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf")
+				(field
+					(name "Description") "Raspberry Pi Pico / Pico 2 (through-hole, soldered with 2.54mm pin headers). AGND set to passive.")
+			)
+			(libsource
+				(lib "Linetracer2")
+				(part "RaspberryPi_Pico_THT")
+				(description "Raspberry Pi Pico / Pico 2 (through-hole, soldered with 2.54mm pin headers). AGND set to passive.")
+			)
+			(property
+				(name "Akizuki")
+				(value "116132 (Pico, Pico 2 also OK; not Pico W)")
+			)
+			(property
+				(name "Note")
+				(value "solder the castellated edge straight onto the pads, no pin header")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "RP2350A M33 RISC-V Hazard3 usb")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "RaspberryPi?Pico?Common* RaspberryPi?Pico?SMD*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "c3dd97f8-00f0-5de2-9154-8a982f20214c")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "30")
+						)
+						(pin
+							(num "37")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "7")
+						)
+						(pin
+							(num "9")
+						)
+						(pin
+							(num "10")
+						)
+						(pin
+							(num "11")
+						)
+						(pin
+							(num "12")
+						)
+						(pin
+							(num "14")
+						)
+						(pin
+							(num "15")
+						)
+						(pin
+							(num "16")
+						)
+						(pin
+							(num "17")
+						)
+						(pin
+							(num "19")
+						)
+						(pin
+							(num "20")
+						)
+						(pin
+							(num "39")
+						)
+						(pin
+							(num "40")
+						)
+						(pin
+							(num "23")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "8")
+						)
+						(pin
+							(num "38")
+						)
+						(pin
+							(num "13")
+						)
+						(pin
+							(num "28")
+						)
+						(pin
+							(num "18")
+						)
+						(pin
+							(num "36")
+						)
+						(pin
+							(num "21")
+						)
+						(pin
+							(num "22")
+						)
+						(pin
+							(num "24")
+						)
+						(pin
+							(num "25")
+						)
+						(pin
+							(num "26")
+						)
+						(pin
+							(num "27")
+						)
+						(pin
+							(num "29")
+						)
+						(pin
+							(num "35")
+						)
+						(pin
+							(num "31")
+						)
+						(pin
+							(num "32")
+						)
+						(pin
+							(num "34")
+						)
+						(pin
+							(num "33")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "U2")
+			(value "AE-TC78H653FTG")
+			(footprint "Linetracer2:AE-TC78H653FTG")
+			(datasheet "https://akizukidenshi.com/catalog/g/g114746/")
+			(description "Akizuki TC78H653FTG dual H-bridge module (1.8-7.5V, 2A/ch small mode). DIP16 pin header")
+			(fields
+				(field
+					(name "Akizuki") "114746")
+				(field
+					(name "Note") "uses the two 1x8 pin headers that come with the module")
+				(field
+					(name "Footprint") "Linetracer2:AE-TC78H653FTG")
+				(field
+					(name "Datasheet") "https://akizukidenshi.com/catalog/g/g114746/")
+				(field
+					(name "Description") "Akizuki TC78H653FTG dual H-bridge module (1.8-7.5V, 2A/ch small mode). DIP16 pin header")
+			)
+			(libsource
+				(lib "Linetracer2")
+				(part "AE-TC78H653FTG")
+				(description "Akizuki TC78H653FTG dual H-bridge module (1.8-7.5V, 2A/ch small mode). DIP16 pin header")
+			)
+			(property
+				(name "Akizuki")
+				(value "114746")
+			)
+			(property
+				(name "Note")
+				(value "uses the two 1x8 pin headers that come with the module")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "motor driver H-bridge TC78H653FTG module")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "c4527a09-9911-56a1-a629-f41f9a639e7c")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "5")
+						)
+						(pin
+							(num "6")
+						)
+						(pin
+							(num "7")
+						)
+						(pin
+							(num "8")
+						)
+						(pin
+							(num "16")
+						)
+						(pin
+							(num "15")
+						)
+						(pin
+							(num "14")
+						)
+						(pin
+							(num "13")
+						)
+						(pin
+							(num "12")
+						)
+						(pin
+							(num "11")
+						)
+						(pin
+							(num "10")
+						)
+						(pin
+							(num "9")
+						)
+					)
+				)
+			)
+		)
+	)
+	(groups)
+	(variants)
+	(libparts
+		(libpart
+			(lib "Connector_Generic")
+			(part "Conn_01x02")
+			(description "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			(footprints
+				(fp "Connector*:*_1x??_*")
+			)
+			(fields
+				(field
+					(name "Reference") "J")
+				(field
+					(name "Value") "Conn_01x02")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "Pin_1")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "Pin_2")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Connector_Generic")
+			(part "Conn_01x04")
+			(description "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			(footprints
+				(fp "Connector*:*_1x??_*")
+			)
+			(fields
+				(field
+					(name "Reference") "J")
+				(field
+					(name "Value") "Conn_01x04")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "Pin_1")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "Pin_2")
+					(type "passive")
+				)
+				(pin
+					(num "3")
+					(name "Pin_3")
+					(type "passive")
+				)
+				(pin
+					(num "4")
+					(name "Pin_4")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "C")
+			(description "Unpolarized capacitor")
+			(footprints
+				(fp "C_*")
+			)
+			(fields
+				(field
+					(name "Reference") "C")
+				(field
+					(name "Value") "C")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Unpolarized capacitor")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "C_Polarized")
+			(description "Polarized capacitor")
+			(footprints
+				(fp "CP_*")
+			)
+			(fields
+				(field
+					(name "Reference") "C")
+				(field
+					(name "Value") "C_Polarized")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Polarized capacitor")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "D_Schottky")
+			(description "Schottky diode")
+			(footprints
+				(fp "TO-???*")
+				(fp "*_Diode_*")
+				(fp "*SingleDiode*")
+				(fp "D_*")
+			)
+			(fields
+				(field
+					(name "Reference") "D")
+				(field
+					(name "Value") "D_Schottky")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Schottky diode")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "K")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "A")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "LED")
+			(description "Light emitting diode")
+			(footprints
+				(fp "LED*")
+				(fp "LED_SMD:*")
+				(fp "LED_THT:*")
+			)
+			(fields
+				(field
+					(name "Reference") "D")
+				(field
+					(name "Value") "LED")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Light emitting diode")
+				(field
+					(name "Sim.Pins") "1=K 2=A")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "K")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "A")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "R")
+			(description "Resistor")
+			(footprints
+				(fp "R_*")
+			)
+			(fields
+				(field
+					(name "Reference") "R")
+				(field
+					(name "Value") "R")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Linetracer2")
+			(part "AE-TC78H653FTG")
+			(description "Akizuki TC78H653FTG dual H-bridge module (1.8-7.5V, 2A/ch small mode). DIP16 pin header")
+			(docs "https://akizukidenshi.com/catalog/g/g114746/")
+			(fields
+				(field
+					(name "Reference") "U")
+				(field
+					(name "Value") "AE-TC78H653FTG")
+				(field
+					(name "Footprint") "Linetracer2:AE-TC78H653FTG")
+				(field
+					(name "Datasheet") "https://akizukidenshi.com/catalog/g/g114746/")
+				(field
+					(name "Description") "Akizuki TC78H653FTG dual H-bridge module (1.8-7.5V, 2A/ch small mode). DIP16 pin header")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "LARGE")
+					(type "input")
+				)
+				(pin
+					(num "2")
+					(name "MODE")
+					(type "input")
+				)
+				(pin
+					(num "3")
+					(name "STBY")
+					(type "input")
+				)
+				(pin
+					(num "4")
+					(name "IN4")
+					(type "input")
+				)
+				(pin
+					(num "5")
+					(name "IN3")
+					(type "input")
+				)
+				(pin
+					(num "6")
+					(name "IN1")
+					(type "input")
+				)
+				(pin
+					(num "7")
+					(name "IN2")
+					(type "input")
+				)
+				(pin
+					(num "8")
+					(name "GND")
+					(type "power_in")
+				)
+				(pin
+					(num "9")
+					(name "GND")
+					(type "power_in")
+				)
+				(pin
+					(num "10")
+					(name "GND")
+					(type "power_in")
+				)
+				(pin
+					(num "11")
+					(name "OUT2")
+					(type "output")
+				)
+				(pin
+					(num "12")
+					(name "OUT1")
+					(type "output")
+				)
+				(pin
+					(num "13")
+					(name "OUT3")
+					(type "output")
+				)
+				(pin
+					(num "14")
+					(name "OUT4")
+					(type "output")
+				)
+				(pin
+					(num "15")
+					(name "VM")
+					(type "power_in")
+				)
+				(pin
+					(num "16")
+					(name "VM")
+					(type "power_in")
+				)
+			)
+		)
+		(libpart
+			(lib "Linetracer2")
+			(part "LBR-123F")
+			(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			(docs "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+			(fields
+				(field
+					(name "Reference") "PS")
+				(field
+					(name "Value") "LBR-123F")
+				(field
+					(name "Footprint") "Linetracer2:LBR-123F")
+				(field
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+				(field
+					(name "Description") "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "A")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "K")
+					(type "passive")
+				)
+				(pin
+					(num "3")
+					(name "E")
+					(type "passive")
+				)
+				(pin
+					(num "4")
+					(name "C")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Linetracer2")
+			(part "RaspberryPi_Pico_THT")
+			(description "Raspberry Pi Pico / Pico 2 (through-hole, soldered with 2.54mm pin headers). AGND set to passive.")
+			(docs "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf")
+			(footprints
+				(fp "RaspberryPi?Pico?Common*")
+				(fp "RaspberryPi?Pico?SMD*")
+			)
+			(fields
+				(field
+					(name "Reference") "A")
+				(field
+					(name "Value") "RaspberryPi_Pico")
+				(field
+					(name "Footprint") "Module:RaspberryPi_Pico_Common_THT")
+				(field
+					(name "Datasheet") "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf")
+				(field
+					(name "Description") "Raspberry Pi Pico / Pico 2 (through-hole, soldered with 2.54mm pin headers). AGND set to passive.")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "GPIO0")
+					(type "bidirectional")
+				)
+				(pin
+					(num "2")
+					(name "GPIO1")
+					(type "bidirectional")
+				)
+				(pin
+					(num "3")
+					(name "GND")
+					(type "power_out")
+				)
+				(pin
+					(num "4")
+					(name "GPIO2")
+					(type "bidirectional")
+				)
+				(pin
+					(num "5")
+					(name "GPIO3")
+					(type "bidirectional")
+				)
+				(pin
+					(num "6")
+					(name "GPIO4")
+					(type "bidirectional")
+				)
+				(pin
+					(num "7")
+					(name "GPIO5")
+					(type "bidirectional")
+				)
+				(pin
+					(num "8")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "9")
+					(name "GPIO6")
+					(type "bidirectional")
+				)
+				(pin
+					(num "10")
+					(name "GPIO7")
+					(type "bidirectional")
+				)
+				(pin
+					(num "11")
+					(name "GPIO8")
+					(type "bidirectional")
+				)
+				(pin
+					(num "12")
+					(name "GPIO9")
+					(type "bidirectional")
+				)
+				(pin
+					(num "13")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "14")
+					(name "GPIO10")
+					(type "bidirectional")
+				)
+				(pin
+					(num "15")
+					(name "GPIO11")
+					(type "bidirectional")
+				)
+				(pin
+					(num "16")
+					(name "GPIO12")
+					(type "bidirectional")
+				)
+				(pin
+					(num "17")
+					(name "GPIO13")
+					(type "bidirectional")
+				)
+				(pin
+					(num "18")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "19")
+					(name "GPIO14")
+					(type "bidirectional")
+				)
+				(pin
+					(num "20")
+					(name "GPIO15")
+					(type "bidirectional")
+				)
+				(pin
+					(num "21")
+					(name "GPIO16")
+					(type "bidirectional")
+				)
+				(pin
+					(num "22")
+					(name "GPIO17")
+					(type "bidirectional")
+				)
+				(pin
+					(num "23")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "24")
+					(name "GPIO18")
+					(type "bidirectional")
+				)
+				(pin
+					(num "25")
+					(name "GPIO19")
+					(type "bidirectional")
+				)
+				(pin
+					(num "26")
+					(name "GPIO20")
+					(type "bidirectional")
+				)
+				(pin
+					(num "27")
+					(name "GPIO21")
+					(type "bidirectional")
+				)
+				(pin
+					(num "28")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "29")
+					(name "GPIO22")
+					(type "bidirectional")
+				)
+				(pin
+					(num "30")
+					(name "RUN")
+					(type "passive")
+				)
+				(pin
+					(num "31")
+					(name "GPIO26_ADC0")
+					(type "bidirectional")
+				)
+				(pin
+					(num "32")
+					(name "GPIO27_ADC1")
+					(type "bidirectional")
+				)
+				(pin
+					(num "33")
+					(name "AGND")
+					(type "passive")
+				)
+				(pin
+					(num "34")
+					(name "GPIO28_ADC2")
+					(type "bidirectional")
+				)
+				(pin
+					(num "35")
+					(name "ADC_VREF")
+					(type "power_in")
+				)
+				(pin
+					(num "36")
+					(name "3V3")
+					(type "power_out")
+				)
+				(pin
+					(num "37")
+					(name "3V3_EN")
+					(type "passive")
+				)
+				(pin
+					(num "38")
+					(name "GND")
+					(type "passive")
+				)
+				(pin
+					(num "39")
+					(name "VSYS")
+					(type "power_in")
+				)
+				(pin
+					(num "40")
+					(name "VBUS")
+					(type "power_out")
+				)
+			)
+		)
+		(libpart
+			(lib "Mechanical")
+			(part "MountingHole")
+			(description "Mounting Hole without connection")
+			(footprints
+				(fp "MountingHole*")
+			)
+			(fields
+				(field
+					(name "Reference") "H")
+				(field
+					(name "Value") "MountingHole")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Mounting Hole without connection")
+			)
+		)
+		(libpart
+			(lib "Motor")
+			(part "Motor_DC")
+			(description "DC Motor")
+			(footprints
+				(fp "PinHeader*P2.54mm*")
+				(fp "TerminalBlock*")
+			)
+			(fields
+				(field
+					(name "Reference") "M")
+				(field
+					(name "Value") "Motor_DC")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "DC Motor")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "+")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "-")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Switch")
+			(part "SW_Push")
+			(description "Push button switch, generic, two pins")
+			(fields
+				(field
+					(name "Reference") "SW")
+				(field
+					(name "Value") "SW_Push")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Push button switch, generic, two pins")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "1")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "2")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Transistor_BJT")
+			(part "2SC1815")
+			(description "0.15A Ic, 50V Vce, Low Noise Audio NPN Transistor, TO-92")
+			(docs "https://media.digikey.com/pdf/Data%20Sheets/Toshiba%20PDFs/2SC1815.pdf")
+			(footprints
+				(fp "TO?92*")
+			)
+			(fields
+				(field
+					(name "Reference") "Q")
+				(field
+					(name "Value") "2SC1815")
+				(field
+					(name "Footprint") "Package_TO_SOT_THT:TO-92_Inline")
+				(field
+					(name "Datasheet") "https://media.digikey.com/pdf/Data%20Sheets/Toshiba%20PDFs/2SC1815.pdf")
+				(field
+					(name "Description") "0.15A Ic, 50V Vce, Low Noise Audio NPN Transistor, TO-92")
+				(field
+					(name "Sim.Device") "NPN")
+				(field
+					(name "Sim.Pins") "1=E 2=C 3=B")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "E")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "C")
+					(type "passive")
+				)
+				(pin
+					(num "3")
+					(name "B")
+					(type "input")
+				)
+			)
+		)
+	)
+	(libraries
+		(library
+			(logical "Connector_Generic")
+			(uri "${KICAD10_SYMBOL_DIR}/Connector_Generic.kicad_sym")
+		)
+		(library
+			(logical "Device")
+			(uri "${KICAD10_SYMBOL_DIR}/Device.kicad_sym")
+		)
+		(library
+			(logical "Linetracer2")
+			(uri "${KIPRJMOD}/lib/Linetracer2.kicad_sym")
+		)
+		(library
+			(logical "Mechanical")
+			(uri "${KICAD10_SYMBOL_DIR}/Mechanical.kicad_sym")
+		)
+		(library
+			(logical "Motor")
+			(uri "${KICAD10_SYMBOL_DIR}/Motor.kicad_sym")
+		)
+		(library
+			(logical "Switch")
+			(uri "${KICAD10_SYMBOL_DIR}/Switch.kicad_sym")
+		)
+		(library
+			(logical "Transistor_BJT")
+			(uri "${KICAD10_SYMBOL_DIR}/Transistor_BJT.kicad_sym")
+		)
+	)
+	(nets
+		(net
+			(code "1")
+			(name "+3V3")
+			(class "Power")
+			(node
+				(ref "J2")
+				(pin "2")
+				(pinfunction "Pin_2_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "R1")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R2")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R3")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R4")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R5")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R6")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "36")
+				(pinfunction "3V3_36")
+				(pintype "power_out")
+			)
+		)
+		(net
+			(code "2")
+			(name "/I2C_SCL")
+			(class "Default")
+			(node
+				(ref "J2")
+				(pin "3")
+				(pinfunction "Pin_3_3")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "7")
+				(pinfunction "GPIO5_7")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "3")
+			(name "/I2C_SDA")
+			(class "Default")
+			(node
+				(ref "J2")
+				(pin "4")
+				(pinfunction "Pin_4_4")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "6")
+				(pinfunction "GPIO4_6")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "4")
+			(name "/LED1")
+			(class "Default")
+			(node
+				(ref "R8")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "24")
+				(pinfunction "GPIO18_24")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "5")
+			(name "/LED_K")
+			(class "Power")
+			(node
+				(ref "PS1")
+				(pin "2")
+				(pinfunction "K_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "PS2")
+				(pin "2")
+				(pinfunction "K_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "PS3")
+				(pin "2")
+				(pinfunction "K_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "Q1")
+				(pin "2")
+				(pinfunction "C_2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "6")
+			(name "/MOT_IN1")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "16")
+				(pinfunction "GPIO12_16")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "U2")
+				(pin "6")
+				(pinfunction "IN1_6")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "7")
+			(name "/MOT_IN2")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "17")
+				(pinfunction "GPIO13_17")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "U2")
+				(pin "7")
+				(pinfunction "IN2_7")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "8")
+			(name "/MOT_IN3")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "19")
+				(pinfunction "GPIO14_19")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "U2")
+				(pin "5")
+				(pinfunction "IN3_5")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "9")
+			(name "/MOT_IN4")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "20")
+				(pinfunction "GPIO15_20")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "U2")
+				(pin "4")
+				(pinfunction "IN4_4")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "10")
+			(name "/MOT_OUT1")
+			(class "Motor")
+			(node
+				(ref "C3")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "M1")
+				(pin "1")
+				(pinfunction "+_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U2")
+				(pin "12")
+				(pinfunction "OUT1_12")
+				(pintype "output")
+			)
+		)
+		(net
+			(code "11")
+			(name "/MOT_OUT2")
+			(class "Motor")
+			(node
+				(ref "C3")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "M1")
+				(pin "2")
+				(pinfunction "-_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U2")
+				(pin "11")
+				(pinfunction "OUT2_11")
+				(pintype "output")
+			)
+		)
+		(net
+			(code "12")
+			(name "/MOT_OUT3")
+			(class "Motor")
+			(node
+				(ref "C4")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "M2")
+				(pin "1")
+				(pinfunction "+_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U2")
+				(pin "13")
+				(pinfunction "OUT3_13")
+				(pintype "output")
+			)
+		)
+		(net
+			(code "13")
+			(name "/MOT_OUT4")
+			(class "Motor")
+			(node
+				(ref "C4")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "M2")
+				(pin "2")
+				(pinfunction "-_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U2")
+				(pin "14")
+				(pinfunction "OUT4_14")
+				(pintype "output")
+			)
+		)
+		(net
+			(code "14")
+			(name "/MOT_STBY")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "15")
+				(pinfunction "GPIO11_15")
+				(pintype "bidirectional")
+			)
+			(node
+				(ref "U2")
+				(pin "3")
+				(pinfunction "STBY_3")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "15")
+			(name "/SENS1")
+			(class "Default")
+			(node
+				(ref "PS1")
+				(pin "4")
+				(pinfunction "C_4")
+				(pintype "passive")
+			)
+			(node
+				(ref "R4")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "34")
+				(pinfunction "GPIO28_ADC2_34")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "16")
+			(name "/SENS2")
+			(class "Default")
+			(node
+				(ref "PS2")
+				(pin "4")
+				(pinfunction "C_4")
+				(pintype "passive")
+			)
+			(node
+				(ref "R5")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "32")
+				(pinfunction "GPIO27_ADC1_32")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "17")
+			(name "/SENS3")
+			(class "Default")
+			(node
+				(ref "PS3")
+				(pin "4")
+				(pinfunction "C_4")
+				(pintype "passive")
+			)
+			(node
+				(ref "R6")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "31")
+				(pinfunction "GPIO26_ADC0_31")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "18")
+			(name "/SENS_LED_EN")
+			(class "Default")
+			(node
+				(ref "R7")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "2")
+				(pinfunction "GPIO1_2")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "19")
+			(name "/SW1")
+			(class "Default")
+			(node
+				(ref "SW1")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "21")
+				(pinfunction "GPIO16_21")
+				(pintype "bidirectional")
+			)
+		)
+		(net
+			(code "20")
+			(name "/VBAT")
+			(class "Motor")
+			(node
+				(ref "C1")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "D1")
+				(pin "2")
+				(pinfunction "A_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "J1")
+				(pin "1")
+				(pinfunction "Pin_1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U2")
+				(pin "15")
+				(pinfunction "VM_15")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U2")
+				(pin "16")
+				(pinfunction "VM_16")
+				(pintype "power_in")
+			)
+		)
+		(net
+			(code "21")
+			(name "/VSYS")
+			(class "Power")
+			(node
+				(ref "C2")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "D1")
+				(pin "1")
+				(pinfunction "K_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "39")
+				(pinfunction "VSYS_39")
+				(pintype "power_in")
+			)
+		)
+		(net
+			(code "22")
+			(name "GND")
+			(class "Ground")
+			(node
+				(ref "C1")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C2")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "D2")
+				(pin "1")
+				(pinfunction "K_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "J1")
+				(pin "2")
+				(pinfunction "Pin_2_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "J2")
+				(pin "1")
+				(pinfunction "Pin_1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "PS1")
+				(pin "3")
+				(pinfunction "E_3")
+				(pintype "passive")
+			)
+			(node
+				(ref "PS2")
+				(pin "3")
+				(pinfunction "E_3")
+				(pintype "passive")
+			)
+			(node
+				(ref "PS3")
+				(pin "3")
+				(pinfunction "E_3")
+				(pintype "passive")
+			)
+			(node
+				(ref "Q1")
+				(pin "1")
+				(pinfunction "E_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "SW1")
+				(pin "2")
+				(pinfunction "2_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "13")
+				(pinfunction "GND_13")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "18")
+				(pinfunction "GND_18")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "23")
+				(pinfunction "GND_23")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "28")
+				(pinfunction "GND_28")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "3")
+				(pinfunction "GND_3")
+				(pintype "power_out")
+			)
+			(node
+				(ref "U1")
+				(pin "33")
+				(pinfunction "AGND_33")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "38")
+				(pinfunction "GND_38")
+				(pintype "passive")
+			)
+			(node
+				(ref "U1")
+				(pin "8")
+				(pinfunction "GND_8")
+				(pintype "passive")
+			)
+			(node
+				(ref "U2")
+				(pin "1")
+				(pinfunction "LARGE_1")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "10")
+				(pinfunction "GND_10")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U2")
+				(pin "2")
+				(pinfunction "MODE_2")
+				(pintype "input")
+			)
+			(node
+				(ref "U2")
+				(pin "8")
+				(pinfunction "GND_8")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U2")
+				(pin "9")
+				(pinfunction "GND_9")
+				(pintype "power_in")
+			)
+		)
+		(net
+			(code "23")
+			(name "Net-(D2-A)")
+			(class "Default")
+			(node
+				(ref "D2")
+				(pin "2")
+				(pinfunction "A_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "R8")
+				(pin "2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "24")
+			(name "Net-(PS1-A)")
+			(class "Default")
+			(node
+				(ref "PS1")
+				(pin "1")
+				(pinfunction "A_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R1")
+				(pin "2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "25")
+			(name "Net-(PS2-A)")
+			(class "Default")
+			(node
+				(ref "PS2")
+				(pin "1")
+				(pinfunction "A_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R2")
+				(pin "2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "26")
+			(name "Net-(PS3-A)")
+			(class "Default")
+			(node
+				(ref "PS3")
+				(pin "1")
+				(pinfunction "A_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R3")
+				(pin "2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "27")
+			(name "Net-(Q1-B)")
+			(class "Default")
+			(node
+				(ref "Q1")
+				(pin "3")
+				(pinfunction "B_3")
+				(pintype "input")
+			)
+			(node
+				(ref "R7")
+				(pin "2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "28")
+			(name "unconnected-(U1-3V3_EN-Pad37)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "37")
+				(pinfunction "3V3_EN_37")
+				(pintype "passive+no_connect")
+			)
+		)
+		(net
+			(code "29")
+			(name "unconnected-(U1-ADC_VREF-Pad35)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "35")
+				(pinfunction "ADC_VREF_35")
+				(pintype "power_in+no_connect")
+			)
+		)
+		(net
+			(code "30")
+			(name "unconnected-(U1-GPIO0-Pad1)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "1")
+				(pinfunction "GPIO0_1")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "31")
+			(name "unconnected-(U1-GPIO2-Pad4)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "4")
+				(pinfunction "GPIO2_4")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "32")
+			(name "unconnected-(U1-GPIO3-Pad5)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "5")
+				(pinfunction "GPIO3_5")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "33")
+			(name "unconnected-(U1-GPIO6-Pad9)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "9")
+				(pinfunction "GPIO6_9")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "34")
+			(name "unconnected-(U1-GPIO7-Pad10)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "10")
+				(pinfunction "GPIO7_10")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "35")
+			(name "unconnected-(U1-GPIO8-Pad11)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "11")
+				(pinfunction "GPIO8_11")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "36")
+			(name "unconnected-(U1-GPIO9-Pad12)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "12")
+				(pinfunction "GPIO9_12")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "37")
+			(name "unconnected-(U1-GPIO10-Pad14)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "14")
+				(pinfunction "GPIO10_14")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "38")
+			(name "unconnected-(U1-GPIO17-Pad22)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "22")
+				(pinfunction "GPIO17_22")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "39")
+			(name "unconnected-(U1-GPIO19-Pad25)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "25")
+				(pinfunction "GPIO19_25")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "40")
+			(name "unconnected-(U1-GPIO20-Pad26)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "26")
+				(pinfunction "GPIO20_26")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "41")
+			(name "unconnected-(U1-GPIO21-Pad27)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "27")
+				(pinfunction "GPIO21_27")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "42")
+			(name "unconnected-(U1-GPIO22-Pad29)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "29")
+				(pinfunction "GPIO22_29")
+				(pintype "bidirectional+no_connect")
+			)
+		)
+		(net
+			(code "43")
+			(name "unconnected-(U1-RUN-Pad30)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "30")
+				(pinfunction "RUN_30")
+				(pintype "passive+no_connect")
+			)
+		)
+		(net
+			(code "44")
+			(name "unconnected-(U1-VBUS-Pad40)")
+			(class "Default")
+			(node
+				(ref "U1")
+				(pin "40")
+				(pinfunction "VBUS_40")
+				(pintype "power_out+no_connect")
+			)
+		)
+	)
+)

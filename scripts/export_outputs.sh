@@ -4,19 +4,19 @@
 #   LT2_VARIANT=lite ./export_outputs.sh     Lite board (rev.L1)
 #
 #                    standard                                   Lite
-#   Gerber + drill   hardware/gerber/  (+ zip in hardware/)     hardware/lite/gerber/  (+ zip in hardware/lite/)
-#   BOM csv          hardware/kicad/bom/                        hardware/lite/kicad/bom/
-#   ERC / DRC        hardware/kicad/reports/                    hardware/lite/kicad/reports/
-#   PDFs             docs/                                      docs/lite/
-#   3D renders       docs/images/                               docs/lite/
-#   3D STEP          hardware/kicad/Linetracer2_pcb.step        hardware/lite/kicad/Linetracer2-Lite_pcb.step
+#   Gerber + drill   hardware/gerber/  (+ zip in hardware/)     lite/hardware/gerber/  (+ zip in lite/hardware/)
+#   BOM csv          hardware/kicad/bom/                        lite/hardware/kicad/bom/
+#   ERC / DRC        hardware/kicad/reports/                    lite/hardware/kicad/reports/
+#   PDFs             docs/                                      lite/docs/
+#   3D renders       docs/images/                               lite/docs/
+#   3D STEP          hardware/kicad/Linetracer2_pcb.step        lite/hardware/kicad/Linetracer2-Lite_pcb.step
 set -e
 cd "$(dirname "$0")/.."
 ROOT=$(pwd)
 KC="$ROOT/scripts/kc"
 if [ "${LT2_VARIANT:-std}" = "lite" ]; then
   NAME=Linetracer2-Lite; REV=rev.L1
-  HW="$ROOT/hardware/lite"; DOCS="$ROOT/docs/lite"; IMG="$ROOT/docs/lite"
+  HW="$ROOT/lite/hardware"; DOCS="$ROOT/lite/docs"; IMG="$ROOT/lite/docs"
 else
   NAME=Linetracer2; REV=rev.A1
   HW="$ROOT/hardware"; DOCS="$ROOT/docs"; IMG="$ROOT/docs/images"
