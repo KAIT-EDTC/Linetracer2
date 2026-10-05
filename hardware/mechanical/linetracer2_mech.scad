@@ -12,7 +12,6 @@
 //   4 x M3x20 pan  : from the PCB bottom, through the PCB and the frame towers, into nuts in the deck
 //   2 x M3x8  flat : battery box floor -> deck (nuts in the deck)
 //   1 x M3x8  flat : skid (from the floor side) -> NYLON nut on the PCB top (next to sensor solder joints)
-//                    Lite board: the skid hole is 7 mm further back, a plain steel nut is fine there
 //
 // LITE = true : low-cost Lite board (3 sensors, skid at (50,11), printed TPU tyres instead of O-rings).
 //   openscad -D 'LITE=true' -D 'part="check_skid_sensor"' ...   All printed parts are the same for both boards.
@@ -81,6 +80,18 @@ SKID_XY = LITE ? [50, 11] : [50, 4];
 SENSOR_XS = LITE ? [38, 50, 62] : [20, 32, 44, 56, 68, 80];
 SKID_H = 4.0;                          // = PCB bottom .. floor  (print 3.5 / 4.0 / 4.5 to tune sensor height)
 SKID_D = 8.6;
+
+// snap-in skid (default since 2026-10-05: no screw, no nylon nut)
+CLIP_X0 = -1.2;                        // print face; the pin is flattened 0.3 mm here. body x = -1.2 .. 3.8
+CLIP_PIN_D = 3.0; CLIP_BARB_D = 3.75;  // PCB hole is 3.2 mm (drilled)
+CLIP_SLIT = 0.8; CLIP_POCKET_D = 4.2; CLIP_ROOT = 2.2;
+
+// claw deck (option): holds the battery box with 4 claws instead of 2 screws
+BOX_SHOULDER_H = 15.0;                 // height of the box's long wall at the claws (datasheet 15.0 +-0.5) - MEASURE YOUR BOX
+BOX_UCUT = [20.8, 36.6]; BOX_UCUT_H = 7.0;   // finger cut in the long walls (from the left end of the box)
+CLAW_X = [31, 65];                     // on the box "shoulders" (not on the U-cut, not over J1)
+CLAW_T = 1.4; CLAW_W = 6; CLAW_GAP = 0.15; CLAW_LIP = 0.7; CLAW_ROOT_Z = 16.5;
+PEG_D = 3.2; PEG_H = 1.2;              // pegs drop into the box's floor holes (3.5 mm) and locate it
 
 // ---------------------------------------------------------------- helpers
 module can_profile(r = CAN_R, h = CAN_H) {     // FA-130 cross-section in the y-z plane
@@ -194,29 +205,77 @@ module frame_right() { translate([100, 0, 0]) mirror([1, 0, 0]) frame_left(); }
 // and keeps them in their cradles.  Print UPSIDE DOWN (the battery side on the bed).
 function all_holes() = [for (h = HOLES) h, for (h = HOLES) [100 - h[0], h[1]]];
 
+module deck_body() {
+    translate([DECK_X0, DECK_FRONT[0], DECK_UNDER]) cube([DECK_X1 - DECK_X0, DECK_REAR[1] - DECK_FRONT[0], DECK_TOP - DECK_UNDER]);
+    for (yy = [DECK_FRONT, DECK_REAR])
+        translate([DECK_X0, yy[0], TOWER_TOP]) cube([DECK_X1 - DECK_X0, yy[1] - yy[0], DECK_TOP - TOWER_TOP]);
+}
+
+module deck_common_cuts() {
+    // M3x20 from below: lead-in cone, hole, nut pocket opening on the top (under the battery box)
+    for (h = all_holes()) translate([h[0], h[1], 0]) {
+        m3_hole();
+        translate([0, 0, TOWER_TOP - 0.01]) cylinder(d1 = 5.0, d2 = 3.3, h = 0.85);
+        translate([0, 0, TOWER_NUT_Z0]) nut_pocket(DECK_TOP - TOWER_NUT_Z0 + 1);
+    }
+    // windows over the motors (lighter, the motors can be seen)
+    for (x = [37, 56]) translate([x, 70, DECK_UNDER - 1]) cube([7, 12, 5]);
+    // "FRONT" arrow, engraved on the underside
+    translate([40, 62.5, TOWER_TOP - 0.01]) linear_extrude(0.6) polygon([[-2.5, 0], [2.5, 0], [0, -3]]);
+}
+
 module deck() {
     difference() {
-        union() {
-            translate([DECK_X0, DECK_FRONT[0], DECK_UNDER]) cube([DECK_X1 - DECK_X0, DECK_REAR[1] - DECK_FRONT[0], DECK_TOP - DECK_UNDER]);
-            for (yy = [DECK_FRONT, DECK_REAR])
-                translate([DECK_X0, yy[0], TOWER_TOP]) cube([DECK_X1 - DECK_X0, yy[1] - yy[0], DECK_TOP - TOWER_TOP]);
-        }
-        // M3x20 from below: lead-in cone, hole, nut pocket opening on the top (under the battery box)
-        for (h = all_holes()) translate([h[0], h[1], 0]) {
-            m3_hole();
-            translate([0, 0, TOWER_TOP - 0.01]) cylinder(d1 = 5.0, d2 = 3.3, h = 0.85);
-            translate([0, 0, TOWER_NUT_Z0]) nut_pocket(DECK_TOP - TOWER_NUT_Z0 + 1);
-        }
+        deck_body();
+        deck_common_cuts();
         // battery box screws (M3x8 flat from inside the box): hole + nut pocket from below
         for (h = BOX_HOLES) translate([h[0], h[1], 0]) {
             m3_hole();
             translate([0, 0, TOWER_TOP - 1]) nut_pocket(1 + NUT_H + 0.2);
         }
-        // windows over the motors (lighter, the motors can be seen)
-        for (x = [37, 56]) translate([x, 70, DECK_UNDER - 1]) cube([7, 12, 5]);
-        // "FRONT" arrow, engraved on the underside (visible when printing upside down)
-        translate([40, 62.5, TOWER_TOP - 0.01]) linear_extrude(0.6) polygon([[-2.5, 0], [2.5, 0], [0, -3]]);
     }
+}
+
+// ---------------------------------------------------------------- claw deck (option, print RIGHT SIDE UP)
+// The box is located by 2 pegs in its floor holes and held down by 4 claws on its long walls.
+BOX_FRONT_Y = BOX_C[1] - BOX_W / 2;     // 51.85
+BOX_REAR_Y  = BOX_C[1] + BOX_W / 2;     // 100.15
+function claw_lip_z() = DECK_TOP + BOX_SHOULDER_H + 0.6;   // box may lift 0.6 mm at most (pegs are 1.2 mm)
+
+module claw(x, face_y, dir) {          // dir = -1: in front of the box, +1: behind it
+    y_in = face_y + dir * CLAW_GAP;
+    y0 = dir < 0 ? y_in - CLAW_T : y_in;
+    zl = claw_lip_z();
+    translate([x - CLAW_W / 2, y0, TOWER_TOP]) cube([CLAW_W, CLAW_T, zl + 1.4 - TOWER_TOP]);   // arm
+    hull() {                                                                           // lip with lead-in slope
+        translate([x - CLAW_W / 2, y0, zl]) cube([CLAW_W, CLAW_T, 1.4]);
+        translate([x - CLAW_W / 2, dir < 0 ? y_in : y_in - CLAW_LIP, zl]) cube([CLAW_W, CLAW_LIP, 0.3]);
+    }
+}
+
+module deck_clip() {
+    difference() {
+        union() {
+            deck_body();
+            for (x = CLAW_X) {
+                // front tab: supports the box front and carries the front claw root
+                translate([x - CLAW_W / 2, BOX_FRONT_Y - CLAW_GAP - CLAW_T, TOWER_TOP])
+                    cube([CLAW_W, DECK_FRONT[0] - (BOX_FRONT_Y - CLAW_GAP - CLAW_T) + 0.01, DECK_TOP - TOWER_TOP]);
+                // rear root
+                translate([x - CLAW_W / 2, DECK_REAR[0], TOWER_TOP])
+                    cube([CLAW_W, BOX_REAR_Y + CLAW_GAP + CLAW_T - DECK_REAR[0], CLAW_ROOT_Z - TOWER_TOP]);
+            }
+            for (h = BOX_HOLES) translate([h[0], h[1], DECK_TOP - 0.01])
+                cylinder(d1 = PEG_D, d2 = PEG_D - 0.6, h = PEG_H + 0.01);
+        }
+        deck_common_cuts();
+        // free length of the claw arms (0.3 mm slot between arm and deck above the root)
+        for (x = CLAW_X) {
+            translate([x - CLAW_W / 2 - 1, BOX_FRONT_Y - 3, CLAW_ROOT_Z]) cube([CLAW_W + 2, 3 + 0.15, 30]);
+            translate([x - CLAW_W / 2 - 1, BOX_REAR_Y - 0.15, CLAW_ROOT_Z]) cube([CLAW_W + 2, 5, 30]);
+        }
+    }
+    for (x = CLAW_X) { claw(x, BOX_FRONT_Y, -1); claw(x, BOX_REAR_Y, 1); }
 }
 
 // ---------------------------------------------------------------- 40T spur gear (printed)
@@ -278,12 +337,43 @@ module skid(H = SKID_H) {
     }
 }
 
+// ---------------------------------------------------------------- skid with a snap pin (default)
+// Same coordinates as skid(): z = 0 on the PCB bottom, floor at z = H, the pin goes to -z (up through the PCB).
+// A sled (rounded in y = driving direction) with a split pin + barb that snaps through the 3.2 mm hole.
+// Print LYING ON ITS SIDE (part "skid_clip"): the prongs then bend along the layers (strong).
+module skid_clip(H = SKID_H) {
+    T = PCB_T + 0.15;                  // barb starts 0.15 mm above the PCB top
+    R = 8;                             // sled radius (contact right under the hole = sensor line)
+    difference() {
+        union() {
+            translate([CLIP_X0, 0, 0]) rotate([90, 0, 90]) linear_extrude(5.0)
+                polygon(concat([[-3.5, 0], [4.5, 0]],
+                               [for (yy = [4.5 : -0.25 : -3.5]) [yy, H - (R - sqrt(R * R - yy * yy))]]));
+            translate([0, 0, -T]) cylinder(d = CLIP_PIN_D, h = T + CLIP_ROOT + 0.01);
+            translate([0, 0, -T - 1.3]) cylinder(d1 = 2.5, d2 = CLIP_BARB_D, h = 1.3);
+        }
+        difference() {                 // pocket so the pin halves can bend inside the body
+            translate([0, 0, -0.01]) cylinder(d = CLIP_POCKET_D, h = CLIP_ROOT + 0.01);
+            translate([0, 0, -1]) cylinder(d = CLIP_PIN_D, h = CLIP_ROOT + 2);
+        }
+        translate([-2.2, -CLIP_SLIT / 2, -T - 2]) cube([4.4, CLIP_SLIT, T + 2 + CLIP_ROOT]);   // slit
+        translate([CLIP_X0 - 10, -10, -10]) cube([10, 20, 20]);                                 // print face
+    }
+}
+
 // ---------------------------------------------------------------- simple models for the assembly / checks
 module battery_box() {
+    x0 = BOX_C[0] - BOX_L / 2;
     color("dimgray", 0.7) difference() {
-        translate([BOX_C[0] - BOX_L / 2, BOX_C[1] - BOX_W / 2, DECK_TOP]) cube([BOX_L, BOX_W, BOX_H]);
-        for (s = [-1, 0, 1]) translate([BOX_C[0] - BOX_L / 2 + 1.5, BOX_C[1] + s * 15.3, DECK_TOP + 1.5 + 7.25])
+        translate([x0, BOX_FRONT_Y, DECK_TOP]) cube([BOX_L, BOX_W, BOX_H]);
+        for (s = [-1, 0, 1]) translate([x0 + 1.5, BOX_C[1] + s * 15.3, DECK_TOP + 1.5 + 7.25])
             rotate([0, 90, 0]) cylinder(d = 14.6, h = BOX_L - 3);
+        // long walls: 15.0 mm "shoulders" between the corner posts, 7.0 mm finger cut in the middle
+        for (yy = [BOX_FRONT_Y - 1, BOX_REAR_Y - 3]) {
+            translate([x0 + 4.2, yy, DECK_TOP + BOX_SHOULDER_H]) cube([BOX_L - 8.3, 4, 10]);
+            translate([x0 + BOX_UCUT[0], yy, DECK_TOP + BOX_UCUT_H]) cube([BOX_UCUT[1] - BOX_UCUT[0], 4, 20]);
+        }
+        for (h = BOX_HOLES) translate([h[0], h[1], DECK_TOP - 1]) cylinder(d = 3.5, h = 4);
     }
 }
 
@@ -313,6 +403,7 @@ module drive_side() {              // left side: gears, axle, wheel, tyre
             rotate_extrude() translate([(23.7 + 3.5) / 2, 0]) circle(d = 3.5);
 }
 
+DECK_VARIANT = "screw";                // "screw" | "clip"
 module assembly() {
     pcb();
     color("orange") frame_left();
@@ -321,9 +412,9 @@ module assembly() {
     translate([100, 0, 0]) mirror([1, 0, 0]) motor_left();
     drive_side();
     translate([100, 0, 0]) mirror([1, 0, 0]) drive_side();
-    color("deepskyblue") deck();
+    if (DECK_VARIANT == "clip") color("deepskyblue") deck_clip(); else color("deepskyblue") deck();
     battery_box();
-    color("white") translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) skid();
+    color("white") translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) skid_clip();
     sensors();
 }
 
@@ -335,9 +426,7 @@ module nut(c = "silver") { color(c) difference() { cylinder(d = 6.35, h = 2.4, $
 EX = [0, 28, 56, 80];
 module exploded() {
     pcb(); sensors();
-    color("white") translate([SKID_XY[0], SKID_XY[1], -PCB_T - 6]) mirror([0, 0, 1]) skid();
-    translate([SKID_XY[0], SKID_XY[1], -PCB_T - 13]) mirror([0, 0, 1]) screw_flat(8);
-    translate([SKID_XY[0], SKID_XY[1], 3]) nut(LITE ? "silver" : "white");
+    color("white") translate([SKID_XY[0], SKID_XY[1], -PCB_T - 8]) mirror([0, 0, 1]) skid_clip();
     translate([0, 0, EX[1]]) {
         color("orange") frame_left(); color("orange") frame_right();
         motors(); drive_side(); translate([100, 0, 0]) mirror([1, 0, 0]) drive_side();
@@ -365,6 +454,14 @@ else if (part == "gear40") gear40();
 else if (part == "wheel") wheel();
 else if (part == "tire_tpu") tire_tpu();
 else if (part == "skid") skid();
+else if (part == "skid_clip") translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) skid_clip();   // lying on its side
+else if (part == "deck_clip") translate([0, 0, -TOWER_TOP]) deck_clip();                     // right side up
+else if (part == "check_skidclip_sensor") intersection() { translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) skid_clip(); sensors(); }
+else if (part == "check_skidclip_pcb") intersection() { translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) skid_clip(); pcb(); }
+else if (part == "check_deckclip_motor") intersection() { deck_clip(); motors(); }
+else if (part == "check_deckclip_frame") intersection() { deck_clip(); translate([0, 0, -0.01]) frames(); }
+else if (part == "check_deckclip_box") intersection() { deck_clip(); translate([0, 0, 0.01]) battery_box(); }
+else if (part == "check_deck_box") intersection() { deck(); translate([0, 0, 0.01]) battery_box(); }
 else if (part == "check_deck_motor") intersection() { deck(); motors(); }
 else if (part == "check_deck_frame") intersection() { deck(); translate([0, 0, -0.01]) frames(); }
 else if (part == "check_frame_motor") intersection() { frames(); motors(); }
@@ -373,4 +470,5 @@ else if (part == "check_skid_sensor") intersection() { translate([SKID_XY[0], SK
 else if (part == "check_gear_frame") intersection() { translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40(); frame_left(); }
 else if (part == "check_wheel_frame") intersection() { translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel(); frame_left(); }
 else if (part == "exploded") exploded();
+else if (part == "none") { }                    // for include <> from other files
 else assembly();

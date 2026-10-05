@@ -15289,7 +15289,7 @@
 	(zone
 		(layer "F.Cu")
 		(uuid "a64ff62f-5711-4745-a188-b1ce4c9d47da")
-		(name "skid nut")
+		(name "skid pin")
 		(hatch edge 0.5)
 		(connect_pads
 			(clearance 0)

@@ -6,7 +6,7 @@ all 3D printed parts (frames, deck, gears, wheels, skid) are shared.  Difference
   * Pico soldered flat: 1 mm closer to the left edge so the USB plug body clears the board edge
   * 3 sensors at x = 38 / 50 / 62 (12 mm apart, centred)
   * the skid moves from (50, 4) to (50, 11): the centre sensor sits where the skid used to be
-  * keep-outs (no tracks / vias) under the steel screw heads and the skid nut
+  * keep-outs (no tracks / vias) under the steel screw heads and around the skid's snap pin
 """
 import math
 import os
@@ -93,10 +93,10 @@ def add_keepout(board, cx, cy, r, layer, name):
 def main():
     G.main()
     b = pcbnew.LoadBoard(G.PCB)
-    # steel pan heads (5.5 mm) of the M3x20 sit on the bottom; the skid's steel nut sits on the top
+    # steel pan heads (5.5 mm) of the M3x20 sit on the bottom; the snap pin of the skid comes out on the top
     for x, y in FRAME_HOLES:
         add_keepout(b, x, y, 3.5, pcbnew.B_Cu, "screw head")
-    add_keepout(b, SKID_HOLE[0], SKID_HOLE[1], 3.6, pcbnew.F_Cu, "skid nut")
+    add_keepout(b, SKID_HOLE[0], SKID_HOLE[1], 3.6, pcbnew.F_Cu, "skid pin")
     # J2 is holes only in the kit: hide its pin-header 3D model so the renders show the real board
     for fp in b.GetFootprints():
         if fp.GetReference() == "J2":
