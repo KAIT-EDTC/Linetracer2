@@ -2,9 +2,12 @@
 #
 #   START short press : 1st time = auto calibration (robot spins on the line)
 #                       after that = run.  Press START again to stop.
-#   START long press  : change speed level 1..3 (hold until the Pico's LED lights, then let go;
+#   START long press  : change speed level 1..3 (hold until the red LED goes out, then let go;
 #                       the red LED blinks the new level)
 #   red LED on        : ready (the Lite board has no power LED)
+#
+# The board can not measure the battery: when the cells run down the robot gets slower, and when they are
+# nearly empty the XIAO restarts as the motors start (red LED goes out) -> put in new cells.
 #
 # Put the robot on the line before pressing START.
 
@@ -61,13 +64,7 @@ def run_course(base, kp, kd):
 
 
 robot.blink(1)
-ok, v = robot.battery_ok()
-if robot.battery.usb():
-    print("USB connected (battery not measured). Motors run only with the battery switch ON.")
-else:
-    print("battery %.2f V" % v)
-if not ok:
-    robot.blink(5, 60)                      # low battery
+print("Linetracer2 Lite (XIAO ESP32C6). Motors run only with the battery switch ON.")
 robot.led.value(1)                          # ready
 
 while True:

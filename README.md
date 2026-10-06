@@ -21,20 +21,23 @@ Raspberry Pi Pico ＋ TC78H653FTG ＋ 130 モーター ×2 の、**全部足付�
 | 性能（計算値） | 最高速度 理論 5 m/s（ソフトで 1.5〜2.5 m/s に制限）、加速 4 m/s² でモーター電流 約 1.4 A |
 | コスト（1 台） | 全部新品 約 ¥2,370、**Pico を再利用すれば 約 ¥1,500**（`docs/05_bom.md`） |
 
-## 低コスト版「Linetracer2 Lite」（rev.L1）
+## 「Linetracer2 Lite」（rev.L2：XIAO ESP32C6 ＋ LBR-127HLD）
 
-標準版から部品を減らした版も用意した（詳しくは [lite/README.md](lite/README.md)）。**Lite のファイルはすべて `lite/` フォルダにまとめてあり、標準版のファイルとは混ざらない**。**3D プリント部品・ねじ・モーター・電池ボックスは標準版と共通**で、基板とソフトだけが違う。
+標準版から部品を減らした版も用意した（詳しくは [lite/README.md](lite/README.md)）。**Lite のファイルはすべて `lite/` フォルダにまとめてあり、標準版のファイルとは混ざらない**。**枠・デッキ・平歯車・車輪の 3D プリント部品、ねじ、モーター、電池ボックスは標準版と共通**で、基板・ソフト・スキッドが違う。
+rev.L2（2026-10-05）でマイコンを **Seeed Studio XIAO ESP32C6**、センサーを **LBR-127HLD** に変えた（前の rev.L1 は Pico ＋ LBR-123F、git の `1db5a53` に残っている）。
 
-| | 標準版 rev.A1 | Lite rev.L1 |
+| | 標準版 rev.A1 | Lite rev.L2 |
 |---|---|---|
-| Pico | ピンヘッダで付ける | **基板にじかにはんだ付け**（ヘッダなし） |
-| センサー | 6 個 ＋ マルチプレクサ TC4051BP | **3 個を ADC に直結**（マルチプレクサなし） |
-| ボタン / LED / ブザー | 2 / 3 / オプション | **1 / 1 / なし**（Pico の緑 LED も使える） |
-| タイヤ | O リング P-24 | **TPU の印刷タイヤ** |
-| はんだ付け | 約 230 か所 | **約 130 か所** |
-| **1 台の部品代（全部新品）** | 約 ¥2,370 | **約 ¥2,060（−¥310、−13%）** |
+| マイコン | Pico をピンヘッダで付ける | **XIAO ESP32C6 を基板にじかにはんだ付け**（ヘッダなし。Wi-Fi / Bluetooth 付き） |
+| センサー | LBR-123F 6 個 ＋ マルチプレクサ TC4051BP | **LBR-127HLD 3 個を ADC に直結**（マルチプレクサなし） |
+| ボタン / LED / ブザー | 2 / 3 / オプション | **1 / 1 / なし**（XIAO の黄 LED も使える） |
+| タイヤ / スキッド | O リング P-24 / 4.0 mm | **TPU の印刷タイヤ / 7.5 mm**（センサーが背高なので前を上げる） |
+| 電池電圧の測定 | あり | **なし**（XIAO の ADC 3 本をセンサーで使い切る） |
+| はんだ付け | 約 230 か所 | **約 100 か所** |
+| 基板 / シルク | 100 × 100 mm / 英語中心 | **65 × 100 mm** / **記号だけ**（つくる順番の数字・＋・抵抗の色）。説明は手順書 `lite/docs/assembly.md` |
+| **1 台の部品代（全部新品）** | 約 ¥2,370 | **約 ¥2,480（+¥110）**（rev.L1 は約 ¥2,060） |
 
-> ⚠ Lite は Pico をはんだ付けしてしまうので、**Pico を回収して再利用する運用（標準版 約 ¥1,540）はできない**。子どもが持ち帰る講座なら Lite が安い。
+> ⚠ Lite はマイコンをはんだ付けしてしまうので、**マイコンを回収して再利用する運用（標準版 約 ¥1,540）はできない**。
 
 ![Lite PCB](lite/docs/pcb_iso.png)
 
@@ -50,7 +53,7 @@ Raspberry Pi Pico ＋ TC78H653FTG ＋ 130 モーター ×2 の、**全部足付�
 | [docs/06_assembly.md](docs/06_assembly.md) | 組み立て手順書（はんだ付けの順番・チェック・ねじ止め・トラブル） |
 | [docs/07_firmware.md](docs/07_firmware.md) | ソフトウェア（MicroPython のセットアップ、ライブラリ、PD 制御の調整） |
 | [docs/08_knowledge.md](docs/08_knowledge.md) | 知見メモ（部品のクセ、買い方、KiCad/Freerouting/OpenSCAD のハマりどころ、設計判断） |
-| [lite/README.md](lite/README.md) | **低コスト版 Lite**（変更点と理由、コスト比較、回路・基板・部品表・組み立て・ソフトの違い） |
+| [lite/README.md](lite/README.md) | **Lite rev.L2**（XIAO ESP32C6 ＋ LBR-127HLD。変更点と理由、コスト比較、回路・基板・部品表・組み立て・ソフトの違い） |
 | [hardware/mechanical/README.md](hardware/mechanical/README.md) | 3D プリント部品と P1S の印刷設定、ねじの一覧 |
 | [hardware/mechanical/assembly.stl](hardware/mechanical/assembly.stl) | 全体を組み立てた 3D（STL、ブラウザで回して見られる） |
 | [hardware/kicad/Linetracer2_pcb.step](hardware/kicad/Linetracer2_pcb.step) | 部品付き基板の 3D（STEP、Fusion 等の CAD 用） |
@@ -71,14 +74,14 @@ Linetracer2/
 │   │   └── reports/          ERC / DRC レポート、ネットリスト
 │   ├── gerber/               製造用 Gerber・ドリル
 │   ├── Linetracer2_rev.A1_gerber.zip   ← 基板メーカーにそのまま渡す
-│   └── mechanical/           3D プリント部品（OpenSCAD 元データ、STL、組み立て図。両方の版で共通）
+│   └── mechanical/           3D プリント部品（OpenSCAD 元データ、STL、組み立て図。両方の版で共通。Lite はスキッドだけ 7.5 mm）
 ├── firmware/micropython/     ライブラリ・標準プログラム・授業用サンプル
 ├── scripts/                  回路図・基板を生成するスクリプト（再生成用。LT2_VARIANT=lite で Lite も作る）
-└── lite/                     ★ 低コスト版 Lite 一式（標準版とは別フォルダ）
+└── lite/                     ★ Lite 一式（rev.L2: XIAO ESP32C6 版。標準版とは別フォルダ）
     ├── README.md             Lite の設計書（変更点・コスト比較・組み立て・ソフト）
     ├── docs/                 回路図/組立図 PDF、3D 画像
-    ├── hardware/             KiCad プロジェクト、Gerber（Linetracer2-Lite_rev.L1_gerber.zip）
-    ├── firmware/micropython/ Lite 用ソフト（センサー 3 個・ボタン 1 個・LED 1 個）
+    ├── hardware/             KiCad プロジェクト、Gerber（Linetracer2-Lite_rev.L2_gerber.zip）
+    ├── firmware/micropython/ Lite 用ソフト（XIAO ESP32C6 用 MicroPython。センサー 3 個・ボタン 1 個・LED 1 個）
     └── scripts/              Lite 専用の生成スクリプト（回路図・配置・シルク）
 ```
 
@@ -93,4 +96,5 @@ Linetracer2/
 - [ ] **試作 1 台目の製作と実測**（センサーの感度、ギヤのかみ合い、PD ゲイン、電池の持ち）
 - [ ] 試作結果を反映した rev.B（`docs/04_pcb.md` §7）
 - [x] 低コスト版 Lite rev.L1 の回路図・基板（ERC 0・DRC 0・警告 0）・部品表・ソフト（2026-10-05）
-- [ ] Lite の試作（Pico 直付けのしやすさ、3 センサーでの走り、`lite/README.md` §10）
+- [x] Lite rev.L2（XIAO ESP32C6 ＋ LBR-127HLD）の回路図・基板・部品表・ソフト・スキッド 7.5 mm（2026-10-05）
+- [ ] Lite の試作（XIAO 直付けのしやすさ、LBR-127HLD の高さ、3 センサーでの走り、`lite/README.md` §10）

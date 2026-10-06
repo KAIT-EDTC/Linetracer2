@@ -1,7 +1,7 @@
 #!/bin/sh
 # Export everything needed for fabrication and documentation from the KiCad project.
 #   ./export_outputs.sh                      standard board (rev.A1)
-#   LT2_VARIANT=lite ./export_outputs.sh     Lite board (rev.L1)
+#   LT2_VARIANT=lite ./export_outputs.sh     Lite board (rev.L2)
 #
 #                    standard                                   Lite
 #   Gerber + drill   hardware/gerber/  (+ zip in hardware/)     lite/hardware/gerber/  (+ zip in lite/hardware/)
@@ -15,7 +15,7 @@ cd "$(dirname "$0")/.."
 ROOT=$(pwd)
 KC="$ROOT/scripts/kc"
 if [ "${LT2_VARIANT:-std}" = "lite" ]; then
-  NAME=Linetracer2-Lite; REV=rev.L1
+  NAME=Linetracer2-Lite; REV=rev.L2
   HW="$ROOT/lite/hardware"; DOCS="$ROOT/lite/docs"; IMG="$ROOT/lite/docs"
 else
   NAME=Linetracer2; REV=rev.A1
@@ -53,6 +53,26 @@ $KC pcb export pdf -o "$DOCS/${NAME}_assembly_top.pdf" --mode-single --black-and
     --sketch-pads-on-fab-layers --layers "F.Fab,Edge.Cuts" --include-border-title "$PCB" | tail -1
 $KC pcb export pdf -o "$DOCS/${NAME}_assembly_bottom.pdf" --mode-single --black-and-white --mirror \
     --sketch-pads-on-fab-layers --layers "B.Fab,Edge.Cuts" --include-border-title "$PCB" | tail -1
+
+if [ "${LT2_VARIANT:-std}" = "lite" ] && command -v pdftoppm >/dev/null; then
+  echo "== silkscreen pictures (what the kids read: top, and the back seen from below)"
+  T=$(mktemp -d "$HOME/.cache/lt2silk.XXXXXX")
+  $KC pcb export pdf -o "$T/top.pdf" --mode-single --black-and-white \
+      --layers "F.Silkscreen,F.Mask,Edge.Cuts" "$PCB" >/dev/null
+  $KC pcb export pdf -o "$T/bot.pdf" --mode-single --black-and-white --mirror \
+      --layers "B.Silkscreen,B.Mask,Edge.Cuts" "$PCB" >/dev/null
+  for s in top bot; do pdftoppm -r 200 -png -cropbox -singlefile "$T/$s.pdf" "$T/$s"; done
+  python3 - "$T" "$IMG" <<'PYEOF'
+import sys
+from PIL import Image, ImageOps
+t, out = sys.argv[1], sys.argv[2]
+for s, name in (("top", "silk_top.png"), ("bot", "silk_bottom.png")):
+    im = Image.open("%s/%s.png" % (t, s)).convert("L")
+    bb = ImageOps.invert(im).getbbox()
+    im.crop((bb[0] - 20, bb[1] - 20, bb[2] + 20, bb[3] + 20)).save("%s/%s" % (out, name))
+PYEOF
+  rm -rf "$T"
+fi
 
 echo "== 3D STEP (board with parts, for CAD)"
 $KC pcb export step --no-dnp --force -o "$K/${NAME}_pcb.step" "$PCB" 2>&1 | tail -1

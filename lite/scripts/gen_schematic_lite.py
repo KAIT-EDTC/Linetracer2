@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Generate lite/hardware/kicad/Linetracer2-Lite.kicad_sch (low-cost Lite board, single A3 sheet).
+"""Generate lite/hardware/kicad/Linetracer2-Lite.kicad_sch (Lite board rev.L2, single A3 sheet).
 
     cd scripts && LT2_VARIANT=lite python3 ../lite/scripts/gen_schematic_lite.py
 
 Differences from the standard board (gen_schematic.py):
-  * Pico soldered flat on the board (no pin headers), footprint Linetracer2:RaspberryPi_Pico_DirectSolder
-  * 3 sensors straight into ADC0..2 (no 4051 multiplexer)
-  * battery voltage = VSYS/3 inside the Pico (GP29/ADC3), no divider R13/R14/C3
-  * 1 button, 1 LED, no buzzer, no power LED, no EXT header (I2C holes kept, not fitted)
+  * Seeed Studio XIAO ESP32C6 soldered flat on the board (no pin headers),
+    footprint Linetracer2:XIAO_ESP32C6_DirectSolder; powered through its 5V pin (= USB VBUS) behind D1
+  * 3 x LBR-127HLD sensors straight into the XIAO's three ADC pins (no 4051 multiplexer)
+  * no battery measurement (the XIAO has only 3 ADC pins; all of them are used by the sensors)
+  * 1 button, 1 LED, no buzzer, no power LED, no expansion header (every XIAO pin is used)
 """
 import os
 import sys
@@ -23,7 +24,7 @@ C_FP = "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm"
 CP_FP = "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm"
 LED_FP = "LED_THT:LED_D3.0mm"
 
-s = Sch("Linetracer2 Lite - low-cost kids line tracer")
+s = Sch("Linetracer2 Lite rev.L2 - XIAO ESP32C6 kids line tracer")
 
 # Akizuki (akizukidenshi.com) 通販コード for parts that are placed many times (checked 2026-10-05)
 AKIZUKI = {
@@ -45,9 +46,9 @@ def _place_with_code(lib_id, ref, value, *args, **kw):
 s.place = _place_with_code
 
 # ----------------------------------------------------------------- headings
-s.text("Linetracer2 Lite  :  low-cost version (Pico without pin headers, 3 sensors, 1 button, 1 LED)", 20.32, 17.78, 3, True)
-s.text("Power: AA x3 (alkaline 4.5V / NiMH 3.6V) -> VBAT (motors) ; VBAT -> D1 Schottky -> VSYS (Pico). "
-       "USB 5V can not back-feed the batteries. Never use 4 cells (Pico VSYS max 5.5V).", 20.32, 24.13, 1.5)
+s.text("Linetracer2 Lite rev.L2  :  XIAO ESP32C6 without pin headers, 3 x LBR-127HLD, 1 button, 1 LED", 20.32, 17.78, 3, True)
+s.text("Power: AA x3 (alkaline 4.5V recommended / NiMH 3.6V) -> VBAT (motors) ; VBAT -> D1 Schottky -> VSYS -> XIAO 5V pin. "
+       "USB 5V can not back-feed the batteries. Never use 4 cells (the XIAO's 5V input clamps above about 6 V).", 20.32, 24.13, 1.5)
 
 # ================================================================= POWER block
 s.rect(17.78, 30.48, 172.72, 99.06)
@@ -80,15 +81,21 @@ s.lab(d1, "2", "VBAT")      # A
 s.lab(d1, "1", "VSYS")      # K
 
 c2 = s.place("Device:C_Polarized", "C2", "470uF 16V", 106.68, 55.88, 0, footprint=CP_FP,
-             fields={"Note": "hold-up for Pico when motors pull the battery down"})
+             fields={"Note": "hold-up for the XIAO when motors pull the battery down"})
 s.lab(c2, "1", "VSYS")
 s.pwr(c2, "2", "GND")
 s.power("PWR_FLAG", 116.84, 43.18, "up")
 s.wire(116.84, 43.18, 116.84, 45.72)
 s.label("VSYS", 116.84, 45.72, "down")
 
-s.text("Battery voltage: no divider on this board. The Pico measures VSYS/3 on GP29 (ADC3) internally;", 127.0, 50.8, 1.27)
-s.text("VBAT = VSYS + about 0.3 V (D1).  GP24 = 1 while USB is plugged in.", 127.0, 54.61, 1.27)
+# GND: nothing on this board is a power output for GND (the XIAO's GND pin is a power input)
+s.power("PWR_FLAG", 139.7, 68.58, "up")
+s.wire(139.7, 68.58, 139.7, 71.12)
+s.power("GND", 139.7, 71.12, "down")
+
+s.text("XIAO 5V pin = USB VBUS: an external supply needs a diode (D1), otherwise USB 5V charges the AA cells.", 127.0, 50.8, 1.27)
+s.text("Battery voltage is NOT measured: the XIAO has 3 ADC pins only (D0..D2) and the sensors use all of them.", 127.0, 54.61, 1.27)
+s.text("Inside the XIAO: 5V pin -> Schottky -> buck regulator -> 3V3 (3V3 stays up while VBAT > about 4 V).", 127.0, 58.42, 1.27)
 
 # ---- mechanical (mounting holes, kept in the schematic for PCB parity)
 s.text("MECHANICAL: H1-H4 = gearbox frame M3 (x30/x70, y62/y96), H5 = front skid M3 (x50, y11: behind the centre sensor)",
@@ -100,33 +107,33 @@ for i in range(5):
 
 # ================================================================= MCU block
 s.rect(119.38, 101.6, 264.16, 193.04)
-s.text("2. MCU  Raspberry Pi Pico / Pico 2  (soldered flat, no pin headers)", 121.92, 106.68, 2, True)
-u1 = s.place("Linetracer2:RaspberryPi_Pico_THT", "U1", "Raspberry Pi Pico", 190.5, 149.86, 0,
-             footprint="Linetracer2:RaspberryPi_Pico_DirectSolder",
-             fields={"Akizuki": "116132 (Pico, Pico 2 also OK; not Pico W)",
+s.text("2. MCU  Seeed Studio XIAO ESP32C6  (soldered flat, no pin headers)", 121.92, 106.68, 2, True)
+u1 = s.place("Linetracer2:XIAO_ESP32C6", "U1", "XIAO ESP32C6", 190.5, 144.78, 0,
+             footprint="Linetracer2:XIAO_ESP32C6_DirectSolder",
+             fields={"Akizuki": "129481 (Seeed Studio XIAO ESP32C6)",
                      "Note": "solder the castellated edge straight onto the pads, no pin header"},
-             ref_off=(-17.78, -27.94), val_off=(-17.78, -25.4))
-left = {"1": None, "2": "SENS_LED_EN", "4": None, "5": None, "6": "I2C_SDA", "7": "I2C_SCL",
-        "9": None, "10": None, "11": None, "12": None, "14": None, "15": "MOT_STBY",
-        "16": "MOT_IN1", "17": "MOT_IN2", "19": "MOT_IN3", "20": "MOT_IN4", "30": None, "37": None}
-# ADC pins chosen so the three sensor lines do not cross on the board (GP28 is the leftmost of the three)
-right = {"21": "SW1", "22": None, "24": "LED1", "25": None, "26": None,
-         "27": None, "29": None, "31": "SENS3", "32": "SENS2", "34": "SENS1", "35": None}
-for num, net in list(left.items()) + list(right.items()):
-    if net is None:
-        s.nc(u1, num)
-    else:
-        s.lab(u1, num, net)
-s.pwr(u1, "33", "GND")      # AGND
-s.pwr(u1, "36", "+3V3")
-xv, yv, _ = u1.pin("39")
-s.path((xv, yv), (xv, yv - 2.54), (xv - 10.16, yv - 2.54))
-s.label("VSYS", xv - 10.16, yv - 2.54, "left")
-s.nc(u1, "40")              # VBUS (USB 5V, not used on the board)
-s.pwr(u1, "3", "GND")
-s.text("GP25 = on-board LED (a 2nd indicator for free).  GP29/ADC3 = VSYS/3, GP24 = VBUS sense (inside Pico).",
+             ref_off=(-20.32, -19.05), val_off=(-20.32, -16.51))
+# D0..D2 are the only ADC pins: sensors, in the order that keeps the three lines from crossing on the board.
+# IN1..IN4 + button on GPIO18..23: weak pull-up only while the chip is held in reset, then floating.
+# STBY on RX (GPIO17): floating during reset (-> the driver's 150k pull-down = standby), pulled up after reset
+# when IN1..IN4 already float low (= coast).  Either way the motors can not start before the program runs.
+# TX / RX carry the boot log and the UART REPL: only outputs there (red LED, STBY), never the button.
+# The XIAO's rear row (D7..D10) feeds only the motor driver behind it; everything else leaves from the front row.
+pins = {"1": "SENS3", "2": "SENS2", "3": "SENS1", "4": "SW1", "5": "SENS_LED_EN", "6": "MOT_IN2",
+        "7": "LED1", "8": "MOT_STBY", "9": "MOT_IN4", "10": "MOT_IN3", "11": "MOT_IN1"}
+for num, net in pins.items():
+    s.lab(u1, num, net)
+s.pwr(u1, "12", "+3V3")
+s.pwr(u1, "13", "GND")
+s.lab(u1, "14", "VSYS")
+s.text("GPIO15 = yellow user LED on the XIAO (on = 0), a 2nd indicator for free.  "
+       "BOOT / RESET buttons are on the XIAO.", 121.92, 171.45, 1.27)
+s.text("Reset state (ESP32-C6 datasheet): GPIO18-23 weak pull-up during reset, then floating;", 121.92, 175.26, 1.27)
+s.text("GPIO16 (TX) / GPIO17 (RX) pull-up after reset + boot log / UART REPL -> no button and no motor input there.",
+       121.92, 179.07, 1.27)
+s.text("Bottom of the XIAO: bare test pads (BAT+, 3V3, BOOT, EN, JTAG) -> copper keep-out under them on the PCB.",
        121.92, 182.88, 1.27)
-s.text("Pico W / Pico 2 W: GP29 and GP25 belong to the radio chip -> battery reading does not work, not recommended.",
+s.text("Never solder a Li-ion cell to the XIAO's BAT pads on this robot (AA cells are on the 5V pin).",
        121.92, 186.69, 1.27)
 
 # ================================================================= MOTOR block
@@ -153,8 +160,10 @@ s.pwr(u2, "10", "GND")
 s.pwr(u2, "9", "GND")
 
 # motors drawn horizontally: pin 1 (+) left, pin 2 (-) right
+# M2: + on OUT4 (the driver's OUT3/OUT4 pins come out in the opposite order to M2's pads on the board;
+# swapping them here keeps the motor tracks from crossing.  linetracer.py: RIGHT_INVERT = False)
 for ref, val, cref, ya, yb, yc in (("M1", "LEFT motor  FA-130RA", "C3", 1, 2, 44.45),
-                                   ("M2", "RIGHT motor FA-130RA", "C4", 3, 4, 69.85)):
+                                   ("M2", "RIGHT motor FA-130RA", "C4", 4, 3, 69.85)):
     m = s.place("Motor:Motor_DC", ref, val, 375.92, yc, 90,
                 footprint="Linetracer2:MotorPads_2P_Relief", fields={"Akizuki": "106437"},
                 ref_off=(-3.81, -6.35), val_off=(1.27, -6.35))
@@ -165,12 +174,12 @@ for ref, val, cref, ya, yb, yc in (("M1", "LEFT motor  FA-130RA", "C3", 1, 2, 44
     s.lab(c, "1", "MOT_OUT%d" % ya)
     s.lab(c, "2", "MOT_OUT%d" % yb)
 s.text("LARGE=L : small mode (2 motors, 2A/ch)    MODE=L : IN/IN control", 271.78, 85.09, 1.27)
-s.text("IN1/IN2 -> OUT1/OUT2 = LEFT motor,   IN3/IN4 -> OUT3/OUT4 = RIGHT motor", 271.78, 88.9, 1.27)
+s.text("IN1/IN2 -> OUT1/OUT2 = LEFT motor,   IN3/IN4 -> OUT3/OUT4 = RIGHT motor (+ = OUT4)", 271.78, 88.9, 1.27)
 s.text("H/L fwd, L/H rev, H/H brake, L/L coast.  Over-current (ISD) latches OFF:", 271.78, 92.71, 1.27)
 s.text("toggle STBY L->H to recover (done by the library).", 271.78, 96.52, 1.27)
 
 # ================================================================= UI block
-s.rect(269.24, 101.6, 340.36, 190.5)
+s.rect(269.24, 101.6, 408.94, 190.5)
 s.text("4. BUTTON / LED", 271.78, 106.68, 2, True)
 sw1 = s.place("Switch:SW_Push", "SW1", "START", 294.64, 116.84, 0, footprint="Button_Switch_THT:SW_PUSH_6mm",
               fields={"Akizuki": "108075"}, ref_off=(-2.54, -3.81), val_off=(-2.54, 3.81))
@@ -186,31 +195,21 @@ d2 = s.place("Device:LED", "D2", "LED red", 302.26, 147.32, 180,
 s.lab(r8, "1", "LED1")
 s.connect(r8, "2", d2, "2")
 s.pwr(d2, "1", "GND")
-s.text("no buzzer, no power LED on the Lite board", 279.4, 165.1, 1.27)
-
-# ================================================================= EXPANSION block
-s.rect(345.44, 101.6, 408.94, 190.5)
-s.text("5. EXPANSION (holes only)", 347.98, 106.68, 2, True)
-j2 = s.place("Connector_Generic:Conn_01x04", "J2", "I2C (0.96in OLED order)", 386.08, 124.46, 0,
-             footprint="Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
-             fields={"Note": "not fitted in the kit (no pin header). Solder a 1x4 header to add an OLED"},
-             in_bom=False, dnp=True, ref_off=(-2.54, -6.35), val_off=(-7.62, 8.89))
-s.pwr(j2, "1", "GND")
-s.pwr(j2, "2", "+3V3", length=10.16)
-s.lab(j2, "3", "I2C_SCL")
-s.lab(j2, "4", "I2C_SDA")
+s.text("no buzzer, no power LED on the Lite board.  2nd indicator: the yellow user LED of the XIAO (GPIO15)", 279.4, 165.1, 1.27)
 
 # ================================================================= SENSOR block
 s.rect(17.78, 195.58, 299.72, 281.94)
-s.text("6. LINE SENSORS  3 x LBR-123F (mount on the BOTTOM side, lens to the floor, 2-3 mm gap), 12 mm apart",
+s.text("5. LINE SENSORS  3 x LBR-127HLD (mount on the BOTTOM side, lens to the floor), 12 mm apart",
        20.32, 200.66, 2, True)
-s.text("IR LED: (3.3V - 1.25V) / 100 ohm = about 19 mA each.  Q1 switches all LEDs (ambient light cancel).  "
+s.text("IR LED: (3.3V - 1.2V - 0.1V) / 100 ohm = about 20 mA each.  Q1 switches all LEDs (ambient light cancel).  "
        "Photo transistor: 10k pull-up -> white = low voltage, black = high voltage", 20.32, 205.74, 1.27)
+s.text("The body is 5.6 mm tall: the front of the robot is lifted by a 7.5 mm skid (lens about 2.3 mm above the floor)",
+       20.32, 209.55, 1.27)
 by = 238.76
 for i in range(3):
     bx = 38.1 + i * 60.96
-    ps = s.place("Linetracer2:LBR-123F", "PS%d" % (i + 1), "LBR-123F", bx, by, 0,
-                 fields={"Akizuki": "116455"}, ref_off=(-3.81, -6.35), val_off=(-3.81, 7.62))
+    ps = s.place("Linetracer2:LBR-127HLD", "PS%d" % (i + 1), "LBR-127HLD", bx, by, 0,
+                 fields={"Akizuki": "104500"}, ref_off=(-3.81, -6.35), val_off=(-3.81, 7.62))
     rl = s.place("Device:R", "R%d" % (i + 1), "100", bx - 12.7, by - 12.7, 0, footprint=R_FP,
                  ref_off=(-6.35, -1.27), val_off=(-6.35, 1.27))
     rp = s.place("Device:R", "R%d" % (i + 4), "10k", bx + 12.7, by - 12.7, 0, footprint=R_FP,
@@ -235,7 +234,7 @@ for i in range(3):
     xe, ye, _ = ps.pin("3")
     s.path((xe, ye), (xe + 2.54, ye), (xe + 2.54, ye + 2.54))
     s.power("GND", xe + 2.54, ye + 2.54, "down")
-s.text("PS1 = LEFT -> GP28/ADC2,  PS2 = CENTRE -> GP27/ADC1,  PS3 = RIGHT -> GP26/ADC0  "
+s.text("PS1 = LEFT -> D2 (GPIO2/ADC),  PS2 = CENTRE -> D1 (GPIO1/ADC),  PS3 = RIGHT -> D0 (GPIO0/ADC)  "
        "(seen from above, robot moving up the page)", 20.32, 276.86, 1.27)
 
 # LED switch
@@ -251,10 +250,10 @@ s.connect(r7, "2", q1, qb)
 s.lab(r7, "1", "SENS_LED_EN")
 s.lab(q1, qc, "LED_K")
 s.pwr(q1, qe, "GND")
-s.text("Q1: all IR LEDs on when SENS_LED_EN = 1 (about 57 mA)", 200.66, 270.51, 1.27)
+s.text("Q1: all IR LEDs on when SENS_LED_EN = 1 (about 60 mA)", 200.66, 270.51, 1.27)
 
 out = os.path.join(KDIR, PROJ + ".kicad_sch")
-s.save(out, date="2026-10-05", rev="L1",
-       comments=("All parts through-hole. Pico soldered flat (castellated edge)",
-                 "Pico + Akizuki AE-TC78H653FTG module + 3 x LBR-123F",
+s.save(out, date="2026-10-05", rev="L2",
+       comments=("All parts through-hole. XIAO soldered flat (castellated edge)",
+                 "XIAO ESP32C6 + Akizuki AE-TC78H653FTG module + 3 x LBR-127HLD",
                  "Design notes: lite/README.md"))

@@ -7,7 +7,6 @@ import time
 
 robot = Robot()
 m = robot.motors
-print("battery: %.2f V" % robot.battery.read(8))
 
 for name, l, r in (("forward", 40, 40), ("back", -40, -40), ("turn right", 40, -40), ("turn left", -40, 40)):
     print(name)
