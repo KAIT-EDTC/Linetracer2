@@ -1,26 +1,26 @@
 (export
 	(version "E")
 	(design
-		(source "/home/aonuma/Desktop/EDTC/Linetracer2/.claude/worktrees/low-cost-version-design-bc1652/lite/hardware/kicad/Linetracer2-Lite.kicad_sch")
-		(date "2026-10-05T11:40:11")
+		(source "/home/aonuma/Desktop/EDTC/Linetracer2/.claude/worktrees/esp32c6-photoreflector-spec-95e549/lite/hardware/kicad/Linetracer2-Lite.kicad_sch")
+		(date "2026-10-05T20:29:23")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")
 			(name "/")
 			(tstamps "/")
 			(title_block
-				(title "Linetracer2 Lite - low-cost kids line tracer")
+				(title "Linetracer2 Lite rev.L2 - XIAO ESP32C6 kids line tracer")
 				(company "EDTC")
-				(rev "L1")
+				(rev "L2")
 				(date "2026-10-05")
 				(source "Linetracer2-Lite.kicad_sch")
 				(comment
 					(number "1")
-					(value "All parts through-hole. Pico soldered flat (castellated edge)")
+					(value "All parts through-hole. XIAO soldered flat (castellated edge)")
 				)
 				(comment
 					(number "2")
-					(value "Pico + Akizuki AE-TC78H653FTG module + 3 x LBR-123F")
+					(value "XIAO ESP32C6 + Akizuki AE-TC78H653FTG module + 3 x LBR-127HLD")
 				)
 				(comment
 					(number "3")
@@ -127,7 +127,7 @@
 			(description "Polarized capacitor")
 			(fields
 				(field
-					(name "Note") "hold-up for Pico when motors pull the battery down")
+					(name "Note") "hold-up for the XIAO when motors pull the battery down")
 				(field
 					(name "Akizuki") "108426 (Rubycon 16WXA470MEFC 8x9)")
 				(field
@@ -145,7 +145,7 @@
 			)
 			(property
 				(name "Note")
-				(value "hold-up for Pico when motors pull the battery down")
+				(value "hold-up for the XIAO when motors pull the battery down")
 			)
 			(property
 				(name "Akizuki")
@@ -749,78 +749,6 @@
 			)
 		)
 		(comp
-			(ref "J2")
-			(value "I2C (0.96in OLED order)")
-			(footprint "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical")
-			(description "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			(fields
-				(field
-					(name "Note") "not fitted in the kit (no pin header). Solder a 1x4 header to add an OLED")
-				(field
-					(name "Footprint") "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			)
-			(libsource
-				(lib "Connector_Generic")
-				(part "Conn_01x04")
-				(description "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			)
-			(property
-				(name "Note")
-				(value "not fitted in the kit (no pin header). Solder a 1x4 header to add an OLED")
-			)
-			(property
-				(name "Sheetname")
-				(value "Linetracer2-Lite")
-			)
-			(property
-				(name "Sheetfile")
-				(value "Linetracer2-Lite.kicad_sch")
-			)
-			(property
-				(name "exclude_from_bom")
-			)
-			(property
-				(name "dnp")
-			)
-			(property
-				(name "ki_keywords")
-				(value "connector")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "Connector*:*_1x??_*")
-			)
-			(sheetpath
-				(names "/")
-				(tstamps "/")
-			)
-			(tstamps "ce8b651b-9cf4-51d0-a370-edecf9861514")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-						(pin
-							(num "3")
-						)
-						(pin
-							(num "4")
-						)
-					)
-				)
-			)
-		)
-		(comp
 			(ref "M1")
 			(value "LEFT motor  FA-130RA")
 			(footprint "Linetracer2:MotorPads_2P_Relief")
@@ -942,28 +870,28 @@
 		)
 		(comp
 			(ref "PS1")
-			(value "LBR-123F")
-			(footprint "Linetracer2:LBR-123F")
-			(datasheet "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
-			(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			(value "LBR-127HLD")
+			(footprint "Linetracer2:LBR-127HLD")
+			(datasheet "https://akizukidenshi.com/goodsaffix/lbr127hld.pdf")
+			(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
 			(fields
 				(field
-					(name "Akizuki") "116455")
+					(name "Akizuki") "104500")
 				(field
-					(name "Footprint") "Linetracer2:LBR-123F")
+					(name "Footprint") "Linetracer2:LBR-127HLD")
 				(field
-					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/lbr127hld.pdf")
 				(field
-					(name "Description") "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+					(name "Description") "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
 			)
 			(libsource
 				(lib "Linetracer2")
-				(part "LBR-123F")
-				(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+				(part "LBR-127HLD")
+				(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
 			)
 			(property
 				(name "Akizuki")
-				(value "116455")
+				(value "104500")
 			)
 			(property
 				(name "Sheetname")
@@ -1000,28 +928,28 @@
 		)
 		(comp
 			(ref "PS2")
-			(value "LBR-123F")
-			(footprint "Linetracer2:LBR-123F")
-			(datasheet "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
-			(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			(value "LBR-127HLD")
+			(footprint "Linetracer2:LBR-127HLD")
+			(datasheet "https://akizukidenshi.com/goodsaffix/lbr127hld.pdf")
+			(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
 			(fields
 				(field
-					(name "Akizuki") "116455")
+					(name "Akizuki") "104500")
 				(field
-					(name "Footprint") "Linetracer2:LBR-123F")
+					(name "Footprint") "Linetracer2:LBR-127HLD")
 				(field
-					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/lbr127hld.pdf")
 				(field
-					(name "Description") "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+					(name "Description") "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
 			)
 			(libsource
 				(lib "Linetracer2")
-				(part "LBR-123F")
-				(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+				(part "LBR-127HLD")
+				(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
 			)
 			(property
 				(name "Akizuki")
-				(value "116455")
+				(value "104500")
 			)
 			(property
 				(name "Sheetname")
@@ -1058,28 +986,28 @@
 		)
 		(comp
 			(ref "PS3")
-			(value "LBR-123F")
-			(footprint "Linetracer2:LBR-123F")
-			(datasheet "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
-			(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+			(value "LBR-127HLD")
+			(footprint "Linetracer2:LBR-127HLD")
+			(datasheet "https://akizukidenshi.com/goodsaffix/lbr127hld.pdf")
+			(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
 			(fields
 				(field
-					(name "Akizuki") "116455")
+					(name "Akizuki") "104500")
 				(field
-					(name "Footprint") "Linetracer2:LBR-123F")
+					(name "Footprint") "Linetracer2:LBR-127HLD")
 				(field
-					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/lbr127hld.pdf")
 				(field
-					(name "Description") "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+					(name "Description") "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
 			)
 			(libsource
 				(lib "Linetracer2")
-				(part "LBR-123F")
-				(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+				(part "LBR-127HLD")
+				(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
 			)
 			(property
 				(name "Akizuki")
-				(value "116455")
+				(value "104500")
 			)
 			(property
 				(name "Sheetname")
@@ -1715,30 +1643,30 @@
 		)
 		(comp
 			(ref "U1")
-			(value "Raspberry Pi Pico")
-			(footprint "Linetracer2:RaspberryPi_Pico_DirectSolder")
-			(datasheet "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf")
-			(description "Raspberry Pi Pico / Pico 2 (through-hole, soldered with 2.54mm pin headers). AGND set to passive.")
+			(value "XIAO ESP32C6")
+			(footprint "Linetracer2:XIAO_ESP32C6_DirectSolder")
+			(datasheet "https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/")
+			(description "Seeed Studio XIAO ESP32C6 (ESP32-C6, Wi-Fi 6 / BLE 5 / 802.15.4). 5V pin = USB VBUS = power input (through an external diode), 3V3 = output of the on-board regulator")
 			(fields
 				(field
-					(name "Akizuki") "116132 (Pico, Pico 2 also OK; not Pico W)")
+					(name "Akizuki") "129481 (Seeed Studio XIAO ESP32C6)")
 				(field
 					(name "Note") "solder the castellated edge straight onto the pads, no pin header")
 				(field
-					(name "Footprint") "Linetracer2:RaspberryPi_Pico_DirectSolder")
+					(name "Footprint") "Linetracer2:XIAO_ESP32C6_DirectSolder")
 				(field
-					(name "Datasheet") "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf")
+					(name "Datasheet") "https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/")
 				(field
-					(name "Description") "Raspberry Pi Pico / Pico 2 (through-hole, soldered with 2.54mm pin headers). AGND set to passive.")
+					(name "Description") "Seeed Studio XIAO ESP32C6 (ESP32-C6, Wi-Fi 6 / BLE 5 / 802.15.4). 5V pin = USB VBUS = power input (through an external diode), 3V3 = output of the on-board regulator")
 			)
 			(libsource
 				(lib "Linetracer2")
-				(part "RaspberryPi_Pico_THT")
-				(description "Raspberry Pi Pico / Pico 2 (through-hole, soldered with 2.54mm pin headers). AGND set to passive.")
+				(part "XIAO_ESP32C6")
+				(description "Seeed Studio XIAO ESP32C6 (ESP32-C6, Wi-Fi 6 / BLE 5 / 802.15.4). 5V pin = USB VBUS = power input (through an external diode), 3V3 = output of the on-board regulator")
 			)
 			(property
 				(name "Akizuki")
-				(value "116132 (Pico, Pico 2 also OK; not Pico W)")
+				(value "129481 (Seeed Studio XIAO ESP32C6)")
 			)
 			(property
 				(name "Note")
@@ -1754,11 +1682,7 @@
 			)
 			(property
 				(name "ki_keywords")
-				(value "RP2350A M33 RISC-V Hazard3 usb")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "RaspberryPi?Pico?Common* RaspberryPi?Pico?SMD*")
+				(value "XIAO ESP32C6 Seeed module castellated")
 			)
 			(sheetpath
 				(names "/")
@@ -1770,16 +1694,13 @@
 					(name "A")
 					(pins
 						(pin
-							(num "30")
-						)
-						(pin
-							(num "37")
-						)
-						(pin
 							(num "1")
 						)
 						(pin
 							(num "2")
+						)
+						(pin
+							(num "3")
 						)
 						(pin
 							(num "4")
@@ -1794,100 +1715,25 @@
 							(num "7")
 						)
 						(pin
-							(num "9")
-						)
-						(pin
-							(num "10")
-						)
-						(pin
-							(num "11")
-						)
-						(pin
-							(num "12")
-						)
-						(pin
 							(num "14")
-						)
-						(pin
-							(num "15")
-						)
-						(pin
-							(num "16")
-						)
-						(pin
-							(num "17")
-						)
-						(pin
-							(num "19")
-						)
-						(pin
-							(num "20")
-						)
-						(pin
-							(num "39")
-						)
-						(pin
-							(num "40")
-						)
-						(pin
-							(num "23")
-						)
-						(pin
-							(num "3")
-						)
-						(pin
-							(num "8")
-						)
-						(pin
-							(num "38")
 						)
 						(pin
 							(num "13")
 						)
 						(pin
-							(num "28")
+							(num "12")
 						)
 						(pin
-							(num "18")
+							(num "11")
 						)
 						(pin
-							(num "36")
+							(num "10")
 						)
 						(pin
-							(num "21")
+							(num "9")
 						)
 						(pin
-							(num "22")
-						)
-						(pin
-							(num "24")
-						)
-						(pin
-							(num "25")
-						)
-						(pin
-							(num "26")
-						)
-						(pin
-							(num "27")
-						)
-						(pin
-							(num "29")
-						)
-						(pin
-							(num "35")
-						)
-						(pin
-							(num "31")
-						)
-						(pin
-							(num "32")
-						)
-						(pin
-							(num "34")
-						)
-						(pin
-							(num "33")
+							(num "8")
 						)
 					)
 				)
@@ -2031,50 +1877,6 @@
 				(pin
 					(num "2")
 					(name "Pin_2")
-					(type "passive")
-				)
-			)
-		)
-		(libpart
-			(lib "Connector_Generic")
-			(part "Conn_01x04")
-			(description "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			(footprints
-				(fp "Connector*:*_1x??_*")
-			)
-			(fields
-				(field
-					(name "Reference") "J")
-				(field
-					(name "Value") "Conn_01x04")
-				(field
-					(name "Footprint")
-				)
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)")
-			)
-			(pins
-				(pin
-					(num "1")
-					(name "Pin_1")
-					(type "passive")
-				)
-				(pin
-					(num "2")
-					(name "Pin_2")
-					(type "passive")
-				)
-				(pin
-					(num "3")
-					(name "Pin_3")
-					(type "passive")
-				)
-				(pin
-					(num "4")
-					(name "Pin_4")
 					(type "passive")
 				)
 			)
@@ -2358,20 +2160,20 @@
 		)
 		(libpart
 			(lib "Linetracer2")
-			(part "LBR-123F")
-			(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
-			(docs "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+			(part "LBR-127HLD")
+			(description "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
+			(docs "https://akizukidenshi.com/goodsaffix/lbr127hld.pdf")
 			(fields
 				(field
 					(name "Reference") "PS")
 				(field
-					(name "Value") "LBR-123F")
+					(name "Value") "LBR-127HLD")
 				(field
-					(name "Footprint") "Linetracer2:LBR-123F")
+					(name "Footprint") "Linetracer2:LBR-127HLD")
 				(field
-					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf")
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/lbr127hld.pdf")
 				(field
-					(name "Description") "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)")
+					(name "Description") "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
 			)
 			(pins
 				(pin
@@ -2398,225 +2200,91 @@
 		)
 		(libpart
 			(lib "Linetracer2")
-			(part "RaspberryPi_Pico_THT")
-			(description "Raspberry Pi Pico / Pico 2 (through-hole, soldered with 2.54mm pin headers). AGND set to passive.")
-			(docs "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf")
-			(footprints
-				(fp "RaspberryPi?Pico?Common*")
-				(fp "RaspberryPi?Pico?SMD*")
-			)
+			(part "XIAO_ESP32C6")
+			(description "Seeed Studio XIAO ESP32C6 (ESP32-C6, Wi-Fi 6 / BLE 5 / 802.15.4). 5V pin = USB VBUS = power input (through an external diode), 3V3 = output of the on-board regulator")
+			(docs "https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/")
 			(fields
 				(field
-					(name "Reference") "A")
+					(name "Reference") "U")
 				(field
-					(name "Value") "RaspberryPi_Pico")
+					(name "Value") "XIAO_ESP32C6")
 				(field
-					(name "Footprint") "Module:RaspberryPi_Pico_Common_THT")
+					(name "Footprint") "Linetracer2:XIAO_ESP32C6_DirectSolder")
 				(field
-					(name "Datasheet") "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf")
+					(name "Datasheet") "https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/")
 				(field
-					(name "Description") "Raspberry Pi Pico / Pico 2 (through-hole, soldered with 2.54mm pin headers). AGND set to passive.")
+					(name "Description") "Seeed Studio XIAO ESP32C6 (ESP32-C6, Wi-Fi 6 / BLE 5 / 802.15.4). 5V pin = USB VBUS = power input (through an external diode), 3V3 = output of the on-board regulator")
 			)
 			(pins
 				(pin
 					(num "1")
-					(name "GPIO0")
+					(name "GPIO0/A0/D0")
 					(type "bidirectional")
 				)
 				(pin
 					(num "2")
-					(name "GPIO1")
+					(name "GPIO1/A1/D1")
 					(type "bidirectional")
 				)
 				(pin
 					(num "3")
-					(name "GND")
-					(type "power_out")
+					(name "GPIO2/A2/D2")
+					(type "bidirectional")
 				)
 				(pin
 					(num "4")
-					(name "GPIO2")
+					(name "GPIO21/D3")
 					(type "bidirectional")
 				)
 				(pin
 					(num "5")
-					(name "GPIO3")
+					(name "GPIO22/SDA/D4")
 					(type "bidirectional")
 				)
 				(pin
 					(num "6")
-					(name "GPIO4")
+					(name "GPIO23/SCL/D5")
 					(type "bidirectional")
 				)
 				(pin
 					(num "7")
-					(name "GPIO5")
+					(name "GPIO16/TX/D6")
 					(type "bidirectional")
 				)
 				(pin
 					(num "8")
-					(name "GND")
-					(type "passive")
+					(name "GPIO17/RX/D7")
+					(type "bidirectional")
 				)
 				(pin
 					(num "9")
-					(name "GPIO6")
+					(name "GPIO19/SCK/D8")
 					(type "bidirectional")
 				)
 				(pin
 					(num "10")
-					(name "GPIO7")
+					(name "GPIO20/MISO/D9")
 					(type "bidirectional")
 				)
 				(pin
 					(num "11")
-					(name "GPIO8")
+					(name "GPIO18/MOSI/D10")
 					(type "bidirectional")
 				)
 				(pin
 					(num "12")
-					(name "GPIO9")
-					(type "bidirectional")
-				)
-				(pin
-					(num "13")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "14")
-					(name "GPIO10")
-					(type "bidirectional")
-				)
-				(pin
-					(num "15")
-					(name "GPIO11")
-					(type "bidirectional")
-				)
-				(pin
-					(num "16")
-					(name "GPIO12")
-					(type "bidirectional")
-				)
-				(pin
-					(num "17")
-					(name "GPIO13")
-					(type "bidirectional")
-				)
-				(pin
-					(num "18")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "19")
-					(name "GPIO14")
-					(type "bidirectional")
-				)
-				(pin
-					(num "20")
-					(name "GPIO15")
-					(type "bidirectional")
-				)
-				(pin
-					(num "21")
-					(name "GPIO16")
-					(type "bidirectional")
-				)
-				(pin
-					(num "22")
-					(name "GPIO17")
-					(type "bidirectional")
-				)
-				(pin
-					(num "23")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "24")
-					(name "GPIO18")
-					(type "bidirectional")
-				)
-				(pin
-					(num "25")
-					(name "GPIO19")
-					(type "bidirectional")
-				)
-				(pin
-					(num "26")
-					(name "GPIO20")
-					(type "bidirectional")
-				)
-				(pin
-					(num "27")
-					(name "GPIO21")
-					(type "bidirectional")
-				)
-				(pin
-					(num "28")
-					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "29")
-					(name "GPIO22")
-					(type "bidirectional")
-				)
-				(pin
-					(num "30")
-					(name "RUN")
-					(type "passive")
-				)
-				(pin
-					(num "31")
-					(name "GPIO26_ADC0")
-					(type "bidirectional")
-				)
-				(pin
-					(num "32")
-					(name "GPIO27_ADC1")
-					(type "bidirectional")
-				)
-				(pin
-					(num "33")
-					(name "AGND")
-					(type "passive")
-				)
-				(pin
-					(num "34")
-					(name "GPIO28_ADC2")
-					(type "bidirectional")
-				)
-				(pin
-					(num "35")
-					(name "ADC_VREF")
-					(type "power_in")
-				)
-				(pin
-					(num "36")
 					(name "3V3")
 					(type "power_out")
 				)
 				(pin
-					(num "37")
-					(name "3V3_EN")
-					(type "passive")
-				)
-				(pin
-					(num "38")
+					(num "13")
 					(name "GND")
-					(type "passive")
-				)
-				(pin
-					(num "39")
-					(name "VSYS")
 					(type "power_in")
 				)
 				(pin
-					(num "40")
-					(name "VBUS")
-					(type "power_out")
+					(num "14")
+					(name "5V")
+					(type "power_in")
 				)
 			)
 		)
@@ -2787,12 +2455,6 @@
 			(name "+3V3")
 			(class "Power")
 			(node
-				(ref "J2")
-				(pin "2")
-				(pinfunction "Pin_2_2")
-				(pintype "passive")
-			)
-			(node
 				(ref "R1")
 				(pin "1")
 				(pintype "passive")
@@ -2824,47 +2486,13 @@
 			)
 			(node
 				(ref "U1")
-				(pin "36")
-				(pinfunction "3V3_36")
+				(pin "12")
+				(pinfunction "3V3_12")
 				(pintype "power_out")
 			)
 		)
 		(net
 			(code "2")
-			(name "/I2C_SCL")
-			(class "Default")
-			(node
-				(ref "J2")
-				(pin "3")
-				(pinfunction "Pin_3_3")
-				(pintype "passive")
-			)
-			(node
-				(ref "U1")
-				(pin "7")
-				(pinfunction "GPIO5_7")
-				(pintype "bidirectional")
-			)
-		)
-		(net
-			(code "3")
-			(name "/I2C_SDA")
-			(class "Default")
-			(node
-				(ref "J2")
-				(pin "4")
-				(pinfunction "Pin_4_4")
-				(pintype "passive")
-			)
-			(node
-				(ref "U1")
-				(pin "6")
-				(pinfunction "GPIO4_6")
-				(pintype "bidirectional")
-			)
-		)
-		(net
-			(code "4")
 			(name "/LED1")
 			(class "Default")
 			(node
@@ -2874,13 +2502,13 @@
 			)
 			(node
 				(ref "U1")
-				(pin "24")
-				(pinfunction "GPIO18_24")
+				(pin "7")
+				(pinfunction "GPIO16/TX/D6_7")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "5")
+			(code "3")
 			(name "/LED_K")
 			(class "Power")
 			(node
@@ -2909,13 +2537,13 @@
 			)
 		)
 		(net
-			(code "6")
+			(code "4")
 			(name "/MOT_IN1")
 			(class "Default")
 			(node
 				(ref "U1")
-				(pin "16")
-				(pinfunction "GPIO12_16")
+				(pin "11")
+				(pinfunction "GPIO18/MOSI/D10_11")
 				(pintype "bidirectional")
 			)
 			(node
@@ -2926,13 +2554,13 @@
 			)
 		)
 		(net
-			(code "7")
+			(code "5")
 			(name "/MOT_IN2")
 			(class "Default")
 			(node
 				(ref "U1")
-				(pin "17")
-				(pinfunction "GPIO13_17")
+				(pin "6")
+				(pinfunction "GPIO23/SCL/D5_6")
 				(pintype "bidirectional")
 			)
 			(node
@@ -2943,13 +2571,13 @@
 			)
 		)
 		(net
-			(code "8")
+			(code "6")
 			(name "/MOT_IN3")
 			(class "Default")
 			(node
 				(ref "U1")
-				(pin "19")
-				(pinfunction "GPIO14_19")
+				(pin "10")
+				(pinfunction "GPIO20/MISO/D9_10")
 				(pintype "bidirectional")
 			)
 			(node
@@ -2960,13 +2588,13 @@
 			)
 		)
 		(net
-			(code "9")
+			(code "7")
 			(name "/MOT_IN4")
 			(class "Default")
 			(node
 				(ref "U1")
-				(pin "20")
-				(pinfunction "GPIO15_20")
+				(pin "9")
+				(pinfunction "GPIO19/SCK/D8_9")
 				(pintype "bidirectional")
 			)
 			(node
@@ -2977,7 +2605,7 @@
 			)
 		)
 		(net
-			(code "10")
+			(code "8")
 			(name "/MOT_OUT1")
 			(class "Motor")
 			(node
@@ -2999,7 +2627,7 @@
 			)
 		)
 		(net
-			(code "11")
+			(code "9")
 			(name "/MOT_OUT2")
 			(class "Motor")
 			(node
@@ -3021,30 +2649,8 @@
 			)
 		)
 		(net
-			(code "12")
+			(code "10")
 			(name "/MOT_OUT3")
-			(class "Motor")
-			(node
-				(ref "C4")
-				(pin "1")
-				(pintype "passive")
-			)
-			(node
-				(ref "M2")
-				(pin "1")
-				(pinfunction "+_1")
-				(pintype "passive")
-			)
-			(node
-				(ref "U2")
-				(pin "13")
-				(pinfunction "OUT3_13")
-				(pintype "output")
-			)
-		)
-		(net
-			(code "13")
-			(name "/MOT_OUT4")
 			(class "Motor")
 			(node
 				(ref "C4")
@@ -3059,19 +2665,41 @@
 			)
 			(node
 				(ref "U2")
+				(pin "13")
+				(pinfunction "OUT3_13")
+				(pintype "output")
+			)
+		)
+		(net
+			(code "11")
+			(name "/MOT_OUT4")
+			(class "Motor")
+			(node
+				(ref "C4")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
+				(ref "M2")
+				(pin "1")
+				(pinfunction "+_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "U2")
 				(pin "14")
 				(pinfunction "OUT4_14")
 				(pintype "output")
 			)
 		)
 		(net
-			(code "14")
+			(code "12")
 			(name "/MOT_STBY")
 			(class "Default")
 			(node
 				(ref "U1")
-				(pin "15")
-				(pinfunction "GPIO11_15")
+				(pin "8")
+				(pinfunction "GPIO17/RX/D7_8")
 				(pintype "bidirectional")
 			)
 			(node
@@ -3082,7 +2710,7 @@
 			)
 		)
 		(net
-			(code "15")
+			(code "13")
 			(name "/SENS1")
 			(class "Default")
 			(node
@@ -3098,13 +2726,13 @@
 			)
 			(node
 				(ref "U1")
-				(pin "34")
-				(pinfunction "GPIO28_ADC2_34")
+				(pin "3")
+				(pinfunction "GPIO2/A2/D2_3")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "16")
+			(code "14")
 			(name "/SENS2")
 			(class "Default")
 			(node
@@ -3120,13 +2748,13 @@
 			)
 			(node
 				(ref "U1")
-				(pin "32")
-				(pinfunction "GPIO27_ADC1_32")
+				(pin "2")
+				(pinfunction "GPIO1/A1/D1_2")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "17")
+			(code "15")
 			(name "/SENS3")
 			(class "Default")
 			(node
@@ -3142,13 +2770,13 @@
 			)
 			(node
 				(ref "U1")
-				(pin "31")
-				(pinfunction "GPIO26_ADC0_31")
+				(pin "1")
+				(pinfunction "GPIO0/A0/D0_1")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "18")
+			(code "16")
 			(name "/SENS_LED_EN")
 			(class "Default")
 			(node
@@ -3158,13 +2786,13 @@
 			)
 			(node
 				(ref "U1")
-				(pin "2")
-				(pinfunction "GPIO1_2")
+				(pin "5")
+				(pinfunction "GPIO22/SDA/D4_5")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "19")
+			(code "17")
 			(name "/SW1")
 			(class "Default")
 			(node
@@ -3175,13 +2803,13 @@
 			)
 			(node
 				(ref "U1")
-				(pin "21")
-				(pinfunction "GPIO16_21")
+				(pin "4")
+				(pinfunction "GPIO21/D3_4")
 				(pintype "bidirectional")
 			)
 		)
 		(net
-			(code "20")
+			(code "18")
 			(name "/VBAT")
 			(class "Motor")
 			(node
@@ -3215,7 +2843,7 @@
 			)
 		)
 		(net
-			(code "21")
+			(code "19")
 			(name "/VSYS")
 			(class "Power")
 			(node
@@ -3231,13 +2859,13 @@
 			)
 			(node
 				(ref "U1")
-				(pin "39")
-				(pinfunction "VSYS_39")
+				(pin "14")
+				(pinfunction "5V_14")
 				(pintype "power_in")
 			)
 		)
 		(net
-			(code "22")
+			(code "20")
 			(name "GND")
 			(class "Ground")
 			(node
@@ -3260,12 +2888,6 @@
 				(ref "J1")
 				(pin "2")
 				(pinfunction "Pin_2_2")
-				(pintype "passive")
-			)
-			(node
-				(ref "J2")
-				(pin "1")
-				(pinfunction "Pin_1_1")
 				(pintype "passive")
 			)
 			(node
@@ -3302,49 +2924,7 @@
 				(ref "U1")
 				(pin "13")
 				(pinfunction "GND_13")
-				(pintype "passive")
-			)
-			(node
-				(ref "U1")
-				(pin "18")
-				(pinfunction "GND_18")
-				(pintype "passive")
-			)
-			(node
-				(ref "U1")
-				(pin "23")
-				(pinfunction "GND_23")
-				(pintype "passive")
-			)
-			(node
-				(ref "U1")
-				(pin "28")
-				(pinfunction "GND_28")
-				(pintype "passive")
-			)
-			(node
-				(ref "U1")
-				(pin "3")
-				(pinfunction "GND_3")
-				(pintype "power_out")
-			)
-			(node
-				(ref "U1")
-				(pin "33")
-				(pinfunction "AGND_33")
-				(pintype "passive")
-			)
-			(node
-				(ref "U1")
-				(pin "38")
-				(pinfunction "GND_38")
-				(pintype "passive")
-			)
-			(node
-				(ref "U1")
-				(pin "8")
-				(pinfunction "GND_8")
-				(pintype "passive")
+				(pintype "power_in")
 			)
 			(node
 				(ref "U2")
@@ -3378,7 +2958,7 @@
 			)
 		)
 		(net
-			(code "23")
+			(code "21")
 			(name "Net-(D2-A)")
 			(class "Default")
 			(node
@@ -3394,7 +2974,7 @@
 			)
 		)
 		(net
-			(code "24")
+			(code "22")
 			(name "Net-(PS1-A)")
 			(class "Default")
 			(node
@@ -3410,7 +2990,7 @@
 			)
 		)
 		(net
-			(code "25")
+			(code "23")
 			(name "Net-(PS2-A)")
 			(class "Default")
 			(node
@@ -3426,7 +3006,7 @@
 			)
 		)
 		(net
-			(code "26")
+			(code "24")
 			(name "Net-(PS3-A)")
 			(class "Default")
 			(node
@@ -3442,7 +3022,7 @@
 			)
 		)
 		(net
-			(code "27")
+			(code "25")
 			(name "Net-(Q1-B)")
 			(class "Default")
 			(node
@@ -3455,193 +3035,6 @@
 				(ref "R7")
 				(pin "2")
 				(pintype "passive")
-			)
-		)
-		(net
-			(code "28")
-			(name "unconnected-(U1-3V3_EN-Pad37)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "37")
-				(pinfunction "3V3_EN_37")
-				(pintype "passive+no_connect")
-			)
-		)
-		(net
-			(code "29")
-			(name "unconnected-(U1-ADC_VREF-Pad35)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "35")
-				(pinfunction "ADC_VREF_35")
-				(pintype "power_in+no_connect")
-			)
-		)
-		(net
-			(code "30")
-			(name "unconnected-(U1-GPIO0-Pad1)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "1")
-				(pinfunction "GPIO0_1")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "31")
-			(name "unconnected-(U1-GPIO2-Pad4)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "4")
-				(pinfunction "GPIO2_4")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "32")
-			(name "unconnected-(U1-GPIO3-Pad5)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "5")
-				(pinfunction "GPIO3_5")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "33")
-			(name "unconnected-(U1-GPIO6-Pad9)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "9")
-				(pinfunction "GPIO6_9")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "34")
-			(name "unconnected-(U1-GPIO7-Pad10)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "10")
-				(pinfunction "GPIO7_10")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "35")
-			(name "unconnected-(U1-GPIO8-Pad11)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "11")
-				(pinfunction "GPIO8_11")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "36")
-			(name "unconnected-(U1-GPIO9-Pad12)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "12")
-				(pinfunction "GPIO9_12")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "37")
-			(name "unconnected-(U1-GPIO10-Pad14)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "14")
-				(pinfunction "GPIO10_14")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "38")
-			(name "unconnected-(U1-GPIO17-Pad22)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "22")
-				(pinfunction "GPIO17_22")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "39")
-			(name "unconnected-(U1-GPIO19-Pad25)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "25")
-				(pinfunction "GPIO19_25")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "40")
-			(name "unconnected-(U1-GPIO20-Pad26)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "26")
-				(pinfunction "GPIO20_26")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "41")
-			(name "unconnected-(U1-GPIO21-Pad27)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "27")
-				(pinfunction "GPIO21_27")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "42")
-			(name "unconnected-(U1-GPIO22-Pad29)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "29")
-				(pinfunction "GPIO22_29")
-				(pintype "bidirectional+no_connect")
-			)
-		)
-		(net
-			(code "43")
-			(name "unconnected-(U1-RUN-Pad30)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "30")
-				(pinfunction "RUN_30")
-				(pintype "passive+no_connect")
-			)
-		)
-		(net
-			(code "44")
-			(name "unconnected-(U1-VBUS-Pad40)")
-			(class "Default")
-			(node
-				(ref "U1")
-				(pin "40")
-				(pinfunction "VBUS_40")
-				(pintype "power_out+no_connect")
 			)
 		)
 	)

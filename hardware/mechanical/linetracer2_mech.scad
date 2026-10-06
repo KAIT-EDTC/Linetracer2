@@ -14,8 +14,11 @@
 //   2 x M3x8  flat : battery box floor -> deck (nuts in the deck)
 //   1 x M3x8  flat : skid (from the floor side) -> NYLON nut on the PCB top (next to sensor solder joints)
 //
-// LITE = true : low-cost Lite board (3 sensors, skid at (50,11), printed TPU tyres instead of O-rings).
-//   openscad -D 'LITE=true' -D 'part="check_skid_sensor"' ...   All printed parts are the same for both boards.
+// LITE = true : Lite board rev.L2 (65 x 100 mm board, 3 x LBR-127HLD, skid at (50,11), printed TPU tyres instead of O-rings).
+//   openscad -D 'LITE=true' -D 'part="check_skid_sensor"' ...   Frames, deck, gears and wheels are the same for
+//   both boards; the Lite needs a TALLER skid (7.5 mm) because the LBR-127HLD is 5.6 mm tall: the front of the
+//   robot is lifted and the board leans back about 3 deg (the wheels set the height at the rear).
+//   openscad -D 'LITE=true' -o x.echo ...  prints the tilt, the sensor-to-floor gap and the clearances.
 
 part = "assembly";
 LITE = false;
@@ -79,7 +82,12 @@ BOX_HOLES = [[50, 61], [50, 91]];
 // Lite: H5 = (50,11), 7 mm behind the centre sensor (its body ends at y = 5.7, the skid starts at y = 6.7)
 SKID_XY = LITE ? [50, 11] : [50, 4];
 SENSOR_XS = LITE ? [38, 50, 62] : [20, 32, 44, 56, 68, 80];
-SKID_H = 4.0;                          // = PCB bottom .. floor  (print 3.5 / 4.0 / 4.5 to tune sensor height)
+// sensor body on the PCB bottom: LBR-123F 2.7 x 3.4 x 1.5 (standard), LBR-127HLD 8.7 x 4.5 x 5.6 (Lite rev.L2)
+SENSOR_BODY = LITE ? [8.7, 4.5, 5.6] : [2.7, 3.4, 1.5];
+SENSOR_Y = 4;
+// = PCB bottom .. floor under the skid (standard: print 3.5 / 4.0 / 4.5; Lite: 7.0 / 7.5 / 8.0 to tune the sensor height)
+SKID_H = LITE ? 7.5 : 4.0;
+TYRE_R = LITE ? 15.6 : 15.7;           // TPU tyre 31.2 mm / O-ring P-24 about 31.4 mm
 SKID_D = 8.6;
 
 // snap-in skid (default since 2026-10-05: no screw, no nylon nut)
@@ -461,16 +469,33 @@ module battery_box() {
     }
 }
 
-module sensors() {                 // LBR-123F bodies on the PCB bottom (2.7 x 3.4 x 1.5), PS1..PS6 (Lite: PS1..PS3)
+module sensors() {                 // sensor bodies on the PCB bottom, PS1..PS6 (Lite: PS1..PS3)
     for (x = SENSOR_XS)
-        color("black") translate([x - 1.35, 4 - 1.7, -PCB_T - 1.5]) cube([2.7, 3.4, 1.5]);
+        color("black") translate([x - SENSOR_BODY[0] / 2, SENSOR_Y - SENSOR_BODY[1] / 2, -PCB_T - SENSOR_BODY[2]])
+            cube(SENSOR_BODY);
 }
 
-module pcb() {
+// ---------------------------------------------------------------- floor contact (side view, y-z plane)
+// The robot stands on the two tyres (axle line) and on the skid.  The floor is a line through the skid contact
+// at distance TYRE_R from the axle; tilt > 0 = nose up.  gap(p) = height of point p = [y, z] above the floor.
+function tilt(H = SKID_H) = let (a = AXLE_Y - SKID_XY[1], b = AXIS_Z + PCB_T + H)
+    acos(TYRE_R / sqrt(a * a + b * b)) - atan2(a, b);
+function gap(p, H = SKID_H) = let (t = tilt(H))
+    -sin(t) * (p[0] - SKID_XY[1]) + cos(t) * (p[1] + PCB_T + H);
+echo(str("floor: skid ", SKID_H, " mm, tilt ", round(tilt() * 100) / 100, " deg, sensor lens ",
+         round(gap([SENSOR_Y, -PCB_T - SENSOR_BODY[2]]) * 100) / 100, " mm above the floor, PCB front edge ",
+         round(gap([0, -PCB_T]) * 100) / 100, " mm, rear screw heads (y 96) ",
+         round(gap([96, -PCB_T - 2.1]) * 100) / 100, " mm"));
+
+module pcb() {                     // standard: 100 x 100 with the rear notches; Lite: 65 x 100 rectangle (x 17.5 .. 82.5)
     color("darkgreen", 0.8) translate([0, 0, -PCB_T]) linear_extrude(PCB_T) difference() {
-        offset(r = 2) offset(delta = -2) square([100, 100]);
-        translate([-1, 70]) square([NOTCH_X + 1, 31]);
-        translate([100 - NOTCH_X, 70]) square([NOTCH_X + 1, 31]);
+        if (LITE)
+            translate([NOTCH_X, 0]) offset(r = 2) offset(delta = -2) square([100 - 2 * NOTCH_X, 100]);
+        else difference() {
+            offset(r = 2) offset(delta = -2) square([100, 100]);
+            translate([-1, 70]) square([NOTCH_X + 1, 31]);
+            translate([100 - NOTCH_X, 70]) square([NOTCH_X + 1, 31]);
+        }
         for (h = concat(all_holes(), [SKID_XY])) translate(h) circle(d = 3.2);
     }
 }

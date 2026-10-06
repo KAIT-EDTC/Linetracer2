@@ -18,6 +18,8 @@
 | `wheel.stl` | 車輪（O リング P-24 をはめる） | 2 | PLA | 0.16 mm、壁 3、インフィル 40%。ハブが上 | 3.4 cm³ ×2 |
 | `skid_clip_h40.stl` | **スキッド（ツメで差し込む、高さ 4.0 mm、標準）** | 1 | PETG（PLA も可） | 0.12 mm、壁 3、インフィル 40%。**横倒し**で書き出し済み（ツメが層に沿って曲がるので折れにくい） | 0.14 cm³ |
 | `skid_clip_h35.stl` / `skid_clip_h45.stl` | 同（センサー高さ調整用 3.5 / 4.5 mm） | 予備 | 同上 | 同上 | |
+| `skid_clip_h75.stl` | **Lite rev.L2 用スキッド（高さ 7.5 mm）**。センサー LBR-127HLD が 5.6 mm と背が高いので前を持ち上げる（ロボットは後ろに 2.9° 傾く、センサーと床 約 2.25 mm） | 1（Lite のみ） | 同上 | 同上 | |
+| `skid_clip_h70.stl` / `skid_clip_h80.stl` | 同（Lite のセンサー高さ調整用 7.0 / 8.0 mm → 床から 約 1.7 / 2.8 mm） | 予備 | 同上 | 同上 | |
 | `skid_screw_h40.stl` | スキッド（ねじ止め版。ツメが折れたときの予備：M3×8 皿＋ナイロンナット） | (1) | 同上 | 0.12 mm、平らな面がベッド | 0.2 cm³ |
 | `caster_print_h40.stl` | **ボールキャスター（試作・任意）: 玉ごと一度に印刷**（スキッドの代わり。玉は φ4、中で転がる） | (1) | PETG（PLA も可） | 0.12 mm、壁 3、インフィル 40%。**横倒し**で書き出し済み。玉と受けは最初から別々（はがす作業なし） | 0.23 cm³ |
 | `caster_bead_h40.stl` | **ボールキャスター（試作・任意）: 受けだけ印刷、玉はダイソーのパール調ビーズ φ6** | (1) | PETG（PLA も可） | 同上 | 0.24 cm³ |
@@ -150,16 +152,32 @@ $OS -D 'part="skid"' -D 'SKID_H=4.0' -o skid_h40.stl linetracer2_mech.scad
 $OS -D 'part="caster_bead"' -D 'BALL_D=6.0' -o caster_bead_h40.stl linetracer2_mech.scad
 ```
 
-## 5. 低コスト版 Lite で使うとき
+## 5. Lite（rev.L2）で使うとき
 
-**印刷する部品（STL）は標準版とまったく同じ**（ツメ式スキッド `skid_clip_h40.stl` も同じ）。違うのは次の 2 つだけ（`lite/README.md`）。
+**枠・デッキ・平歯車・車輪は標準版とまったく同じ STL**。違うのは次の 3 つだけ（`lite/README.md`）。Lite の基板は 65 × 100 mm の長方形（標準版の後ろの部分と同じ幅）で、車輪・平歯車・枠の外側の軸受けは標準版の切り欠きと同じく基板の外に出る（`-D LITE=true` で基板の形も Lite になる）。
 
-| | 標準版 | Lite |
+| | 標準版 | Lite rev.L2 |
 |---|---|---|
 | タイヤ | O リング P-24（TPU タイヤも可） | **`tire_tpu.stl`（TPU 95A）を 2 個印刷** |
 | スキッドを差す穴 | (50, 4)、センサー PS3・PS4 の間 | **(50, 11)**、真ん中のセンサーの 7 mm 後ろ |
+| スキッド | `skid_clip_h40.stl`（4.0 mm） | **`skid_clip_h75.stl`（7.5 mm）**。センサー LBR-127HLD が 5.6 mm と背が高いため |
 
-干渉チェックは `-D LITE=true` を付けて上と同じ一覧を実行する（2026-10-05、ツメ式スキッドを含め標準版・Lite とも全部「空」を確認。Lite でスキッドをわざと 4 mm 前の (50, 7) に置くと重なりを検出することも確認）。
+- ボールキャスター（§2.3、試作）は標準版用（穴 (50, 4)、高さ 4.0 mm）。Lite（穴 (50, 11)、高さ 7.5 mm）ではまだ形を検討していないので、Lite はツメのスキッド `skid_clip_h75.stl` を使う。
+- スキッドを高くするので、**Lite は基板が後ろに約 2.9° 傾く**（後ろは車輪で高さが決まる）。`linetracer2_mech.scad` を `-D LITE=true` で開くと、傾き・センサーと床のすき間・後ろのねじ頭と床のすき間を echo で表示する:
+
+| スキッド | 傾き | センサーと床 | 基板の前の端と床 | 後ろのねじ頭（y 96）と床 |
+|---|---|---|---|---|
+| `skid_clip_h70.stl` | 2.5° | 1.7 mm | 7.5 mm | 1.2 mm |
+| **`skid_clip_h75.stl`** | **2.9°** | **2.25 mm** | 8.0 mm | 1.1 mm |
+| `skid_clip_h80.stl` | 3.3° | 2.8 mm | 8.6 mm | 1.1 mm |
+| （参考: 標準版 `skid_clip_h40.stl`） | 0.2° | 2.5 mm（LBR-123F） | 4.0 mm | 1.6 mm |
+
+```bash
+$OS -D 'LITE=true' -D 'SKID_H=7.5' -D 'part="none"' -o x.echo linetracer2_mech.scad     # 数値だけ見る
+$OS -D 'LITE=true' -D 'SKID_H=7.5' -D 'part="skid_clip"' -o skid_clip_h75.stl linetracer2_mech.scad
+```
+
+干渉チェックは `-D LITE=true` を付けて上と同じ一覧を実行する（2026-10-05、rev.L2 のセンサー（8.7×4.5×5.6 mm）で全部「空」を確認。スキッドをわざと 2 mm 前の (50, 9) に置くと重なりを検出することも確認）。
 
 ```bash
 $OS -D 'LITE=true' -D 'part="check_skidclip_sensor"' -o /tmp/c.stl linetracer2_mech.scad

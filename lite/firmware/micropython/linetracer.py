@@ -1,9 +1,10 @@
-# linetracer.py  -  Linetracer2 Lite library for MicroPython (Raspberry Pi Pico / Pico 2)
+# linetracer.py  -  Linetracer2 Lite library for MicroPython (Seeed Studio XIAO ESP32C6)
 #
-# For the low-cost Lite board (rev.L1): 3 sensors, 1 button, 1 LED, no buzzer.
+# For the Lite board rev.L2: XIAO ESP32C6, 3 x LBR-127HLD, 1 button, 1 LED, no buzzer.
+# MicroPython: the official "ESP32_GENERIC_C6" firmware (micropython.org).
 # (The standard rev.A1 board has its own library in firmware/micropython/ at the top of the repo.)
 #
-# Copy this file to the Pico (Thonny: "Upload to /").  Then:
+# Copy this file to the XIAO (Thonny: "Upload to /").  Then:
 #
 #     from linetracer import Robot
 #     robot = Robot()
@@ -14,61 +15,32 @@
 from machine import Pin, PWM, ADC
 import time
 
-# ----------------------------------------------------------------- pins (PCB rev.L1)
-PIN_SENS_LED = 1          # 1 = IR LEDs on (through Q1)
-PIN_SDA, PIN_SCL = 4, 5   # J2 (I2C0, holes only)
-PIN_STBY = 11             # TC78H653 STBY
-PIN_IN1, PIN_IN2 = 12, 13  # LEFT  motor (PWM slice 6 A/B)
-PIN_IN3, PIN_IN4 = 14, 15  # RIGHT motor (PWM slice 7 A/B)
-PIN_SW = 16                # START (pressed = 0)
-PIN_LED = 18               # red LED
-ADC_SENS = (28, 27, 26)    # S1 (left), S2 (centre), S3 (right)  -> ADC2, ADC1, ADC0
-ADC_VSYS = 29              # inside the Pico: VSYS / 3
-PIN_VBUS = 24              # inside the Pico: 1 while USB is plugged in
+# ----------------------------------------------------------------- pins (PCB rev.L2)
+# GPIO numbers of the ESP32-C6 (XIAO pin names in the comments)
+PIN_SENS_LED = 22          # D4   1 = IR LEDs on (through Q1)
+PIN_STBY = 17              # D7 (RX)  TC78H653 STBY
+PIN_IN1, PIN_IN2 = 18, 23  # D10, D5  LEFT  motor
+PIN_IN3, PIN_IN4 = 20, 19  # D9, D8   RIGHT motor
+PIN_SW = 21                # D3   START (pressed = 0)
+PIN_LED = 16               # D6 (TX)  red LED (flickers with the boot log)
+PIN_LED_XIAO = 15          # yellow user LED on the XIAO itself (0 = on)
+ADC_SENS = (2, 1, 0)       # S1 (left), S2 (centre), S3 (right)  -> D2, D1, D0 (the XIAO's only ADC pins)
 
 SENSOR_PITCH_MM = 12
 
 # ----------------------------------------------------------------- settings
-MAX_MOTOR_VOLT = 3.0      # FA-130RA-2270 is rated 1.5-3.0 V. 100 % = this voltage
+MAX_MOTOR_VOLT = 3.0      # FA-130RA-2270 is rated 1.5-3.0 V. 100 % = this voltage (with BATTERY_VOLT)
+BATTERY_VOLT = 4.2        # the board can NOT measure the battery (no ADC pin left): AA alkaline x3 while
+                          # driving is about 4.2 V.  NiMH x3: set 3.7.  The robot gets slower as the cells run down.
 PWM_FREQ = 20000          # 20 kHz (not audible)
 RAMP_PER_CALL = 0.04      # max change of duty per run() call (soft start, avoids ISD trip)
 LEFT_INVERT = False       # set True if the left wheel turns backwards on run(30, 30)
-RIGHT_INVERT = True       # the two motors face opposite directions
-VSYS_SCALE = 3.0 * 3.3 / 65535   # Pico board divider: VSYS / 3
-D1_DROP = 0.3             # Schottky D1 between the battery and VSYS (about 0.3 V)
+RIGHT_INVERT = False      # the motors face opposite directions, but M2's + pad is on OUT4 (wired reversed)
 LONG_PRESS_MS = 800       # button held this long = "long press"
 
 
 def _clamp(x, lo, hi):
     return lo if x < lo else hi if x > hi else x
-
-
-class Battery:
-    """Battery voltage = VSYS (measured inside the Pico on GP29) + the drop of D1.
-
-    The Lite board has no divider of its own.  While USB is plugged in, VSYS comes from USB
-    (about 4.7 V), so the value is not the battery: check usb() first."""
-
-    def __init__(self):
-        self.adc = ADC(Pin(ADC_VSYS))
-        self.vbus = Pin(PIN_VBUS, Pin.IN)
-        self.volt = self.read(16)
-
-    def usb(self):
-        return self.vbus.value() == 1
-
-    def read(self, n=4):
-        s = 0
-        for _ in range(n):
-            s += self.adc.read_u16()
-        self.volt = s / n * VSYS_SCALE + D1_DROP
-        return self.volt
-
-    def update(self):
-        """Low-pass filtered reading (call often while driving; motors make it noisy)."""
-        v = self.adc.read_u16() * VSYS_SCALE + D1_DROP
-        self.volt += (v - self.volt) * 0.2
-        return self.volt
 
 
 class Motor:
@@ -80,10 +52,9 @@ class Motor:
     """
 
     def __init__(self, pin_a, pin_b, invert=False):
-        self.a = PWM(Pin(pin_a))
-        self.b = PWM(Pin(pin_b))
-        self.a.freq(PWM_FREQ)
-        self.b.freq(PWM_FREQ)
+        # (on the ESP32 a new PWM starts at 50 % unless a duty is given)
+        self.a = PWM(Pin(pin_a), freq=PWM_FREQ, duty_u16=0)
+        self.b = PWM(Pin(pin_b), freq=PWM_FREQ, duty_u16=0)
         self.invert = invert
         self.brake = True
         self.duty = 0.0
@@ -122,12 +93,12 @@ class Motor:
 class Motors:
     """Both motors.  run(left, right) takes -100..100 % of MAX_MOTOR_VOLT."""
 
-    def __init__(self, battery):
-        self.bat = battery
+    def __init__(self):
         self.stby = Pin(PIN_STBY, Pin.OUT, value=0)
         self.left = Motor(PIN_IN1, PIN_IN2, LEFT_INVERT)
         self.right = Motor(PIN_IN3, PIN_IN4, RIGHT_INVERT)
         self.max_volt = MAX_MOTOR_VOLT
+        self.battery_volt = BATTERY_VOLT
         self._t_recover = time.ticks_ms()
         self.stby.value(1)
 
@@ -139,8 +110,7 @@ class Motors:
         self.stby.value(1)
 
     def _target(self, pct):
-        vb = self.bat.volt if self.bat.volt > 1.0 else 4.5
-        return _clamp(pct / 100.0 * self.max_volt / vb, -1.0, 1.0)
+        return _clamp(pct / 100.0 * self.max_volt / self.battery_volt, -1.0, 1.0)
 
     def run(self, left_pct, right_pct, ramp=RAMP_PER_CALL):
         for m, pct in ((self.left, left_pct), (self.right, right_pct)):
@@ -154,7 +124,6 @@ class Motors:
         now = time.ticks_ms()
         if time.ticks_diff(now, self._t_recover) > 100:
             self._t_recover = now
-            self.bat.update()                # keeps the voltage compensation up to date
             if self.left.duty or self.right.duty:
                 self.recover()
 
@@ -168,7 +137,7 @@ class Motors:
 
 
 class LineSensors:
-    """3 x LBR-123F, each on its own ADC pin (no multiplexer on the Lite board).
+    """3 x LBR-127HLD, each on its own ADC pin (no multiplexer on the Lite board).
 
     read_raw()        -> reflection of each sensor (bigger = brighter / whiter)
     calibrate()       -> learn white/black for each sensor (move the sensors over the line!)
@@ -179,7 +148,8 @@ class LineSensors:
     N = 3
 
     def __init__(self):
-        self.adc = [ADC(Pin(p)) for p in ADC_SENS]
+        # 11 dB attenuation: measures 0 .. about 3.1 V (the sensor output swings 0.3 .. 3.3 V)
+        self.adc = [ADC(Pin(p), atten=ADC.ATTN_11DB) for p in ADC_SENS]
         self.led = Pin(PIN_SENS_LED, Pin.OUT, value=0)
         self.ambient_cancel = True
         self.settle_us = 300
@@ -248,12 +218,15 @@ class LineSensors:
 
 class Robot:
     def __init__(self):
-        self.battery = Battery()
-        self.motors = Motors(self.battery)
+        self.motors = Motors()
         self.sensors = LineSensors()
         self.sw = Pin(PIN_SW, Pin.IN, Pin.PULL_UP)
         self.led = Pin(PIN_LED, Pin.OUT, value=0)
-        self.led_pico = Pin("LED", Pin.OUT, value=0)   # the green LED on the Pico itself (free 2nd LED)
+        self._led_xiao = Pin(PIN_LED_XIAO, Pin.OUT, value=1)   # yellow LED on the XIAO (free 2nd LED, 0 = on)
+
+    def led_xiao(self, on):
+        """The small yellow LED on the XIAO itself (it lights when the pin is 0)."""
+        self._led_xiao.value(0 if on else 1)
 
     # button ----------------------------------------------------------------
     def start_pressed(self):
@@ -266,17 +239,21 @@ class Robot:
 
     def wait_press(self):
         """Wait for one press.  Returns 'short' or 'long' (held LONG_PRESS_MS or more).
-        The Pico's LED lights up when the press becomes 'long', so you know when to let go."""
+        When the press becomes 'long' the red LED goes out (and the XIAO's yellow LED lights),
+        so you know when to let go."""
         while not self.start_pressed():
             time.sleep_ms(10)
         t0 = time.ticks_ms()
+        was = self.led.value()
         kind = "short"
         while self.start_pressed():
             if kind == "short" and time.ticks_diff(time.ticks_ms(), t0) >= LONG_PRESS_MS:
                 kind = "long"
-                self.led_pico.value(1)
+                self.led.value(0)
+                self.led_xiao(True)
             time.sleep_ms(10)
-        self.led_pico.value(0)
+        self.led_xiao(False)
+        self.led.value(was)
         time.sleep_ms(30)
         return kind
 
@@ -292,13 +269,6 @@ class Robot:
         self.led.value(was)
 
     # helpers ---------------------------------------------------------------
-    def battery_ok(self, low=3.3):
-        """(ok, volt).  With USB plugged in the battery can not be measured: ok = True."""
-        v = self.battery.read(8)
-        if self.battery.usb():
-            return True, v
-        return v >= low, v
-
     def auto_calibrate(self, ms=2400, speed=25):
         """Spin left and right over the line while learning white/black."""
         n = LineSensors.N

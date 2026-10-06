@@ -2,8 +2,8 @@
 from machine import Pin
 import time
 
-sw = Pin(16, Pin.IN, Pin.PULL_UP)   # 押すと 0 になる
-led = Pin(18, Pin.OUT)
+sw = Pin(21, Pin.IN, Pin.PULL_UP)   # 押すと 0 になる
+led = Pin(16, Pin.OUT)
 
 count = 0
 before = 1
