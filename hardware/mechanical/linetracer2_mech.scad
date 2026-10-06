@@ -1,8 +1,11 @@
 // Linetracer2 - 3D printable mechanical parts (OpenSCAD 2021.01), rev.A1
 //
 //   part = "frame_left" | "frame_right" | "deck" | "gear40" | "wheel" | "tire_tpu" | "skid" | "skid_clip"
-//        | "deck_clip" | "caster_print" | "caster_bead"
+//        | "deck_clip" | "caster_print" | "caster_bead" | "caster_lite_print" | "caster_lite_bead" (-D LITE=true)
 //        | "assembly" | "check_*" (interference checks, must be empty)
+//   assembly: SKID_VARIANT (standard) / LITE_SUPPORT = "skid" | "caster_print" | "caster_bead" (Lite) choose the front support.
+// Child safety (2026-10-07): outer vertical edges of frames and deck rounded, wheel rim/hub chamfered, skid sled
+// rounded; no interface (holes, axle, gears, snaps, towers, deck heights) changed.  See README "子ども向けの安全".
 //   openscad -D 'part="frame_left"' -o frame_left.stl linetracer2_mech.scad
 //
 // Coordinates = PCB coordinates (mm): x -> right, y -> rear, z = 0 on the PCB TOP surface.
@@ -126,6 +129,12 @@ module gear_disc(teeth, x0, x1, y, col) {
         cylinder(d = MOD * (teeth + 2), h = x1 - x0);
 }
 
+// box with rounded VERTICAL edges (child safety: no pointed corners; prints without supports because the
+// rounding is in the x-y plane).  Same size as cube(s) at p.
+module rbox(p, s, r) {
+    translate(p) hull() for (i = [r, s[0] - r], j = [r, s[1] - r]) translate([i, j, 0]) cylinder(r = r, h = s[2], $fn = 24);
+}
+
 module m3_hole(h = 40) { translate([0, 0, -h / 2]) cylinder(d = 3.3, h = h); }
 module nut_pocket(depth) { cylinder(d = NUT_POCKET_AF / cos(30), h = depth, $fn = 6); }
 
@@ -158,30 +167,35 @@ module tower(h) {
     }
 }
 
-module frame_left() {
+// "L" / "R" engraved 0.4 mm into the top of the base plate (rear corner, free of the motor and the towers), so
+// children can match the frames with "MOTOR L" / "MOTOR R" on the board.  Engraving on a top face: no supports.
+FRAME_LABEL_XY = [40.5, 94.5];
+module frame_label(t, x) translate([x, FRAME_LABEL_XY[1], BASE_T - 0.4]) linear_extrude(1)
+    text(t, size = 6, font = "Liberation Sans:style=Bold", halign = "center", valign = "center");
+
+module frame_left(lbl = true) {
     difference() {
         union() {
             // base plate on the PCB
-            translate([NOTCH_X + 0.5, 58.0, 0]) cube([CAN_X1 + 0.7 - (NOTCH_X + 0.5), 100.5 - 58.0, BASE_T]);
+            rbox([NOTCH_X + 0.5, 58.0, 0], [CAN_X1 + 0.7 - (NOTCH_X + 0.5), 100.5 - 58.0, BASE_T], 1.5);
             // cradle walls that hug the can (snap fit, 2.2 mm above the axis)
             translate([CAN_X0 + 0.5, 0, 0]) difference() {
-                translate([0, MOTOR_Y - CAN_R - WALL, 0])
-                    cube([CAN_X1 - CAN_X0 - 1.0, CAN_W + 2 * WALL, AXIS_Z + 2.2]);
+                rbox([0, MOTOR_Y - CAN_R - WALL, 0], [CAN_X1 - CAN_X0 - 1.0, CAN_W + 2 * WALL, AXIS_Z + 2.2], 0.9);
                 translate([-1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) rotate([0, 0, 90])
                     linear_extrude(CAN_X1 - CAN_X0 + 2) offset(delta = 0.1) can_profile();
                 // open top so the motor can be pressed in
                 translate([-1, MOTOR_Y - CAN_R + 0.45, AXIS_Z + 2.2 - 0.01]) cube([CAN_X1, CAN_W - 0.9, 20]);
             }
             // motor face plate (boss goes into it) + inner axle bearing
-            translate([PLATE_X0, 64.0, 0]) cube([CAN_X0 - PLATE_X0, 100.5 - 64.0, AXIS_Z + 9]);
+            rbox([PLATE_X0, 64.0, 0], [CAN_X0 - PLATE_X0, 100.5 - 64.0, AXIS_Z + 9], 1.0);
             translate([NOTCH_X - 0.5, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 6, h = FRONT_X0 - NOTCH_X + 0.5);
             // outer axle wall (in the wheel notch) with spacer bosses on both faces
-            translate([OUTER_X0, 73.0, HANG_Z]) cube([OUTER_X1 - OUTER_X0, 100.5 - 73.0, AXIS_Z + 4 - HANG_Z]);
+            rbox([OUTER_X0, 73.0, HANG_Z], [OUTER_X1 - OUTER_X0, 100.5 - 73.0, AXIS_Z + 4 - HANG_Z], 0.9);
             translate([WHEEL_X1 + 0.3, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 6, h = OUTER_X0 - WHEEL_X1 - 0.3 + 0.01);
             translate([OUTER_X1 - 0.01, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 6, h = GEAR_X0 - 0.2 - OUTER_X1 + 0.01);
             // lower front bar under the pinion, rear bar behind the spur gear
-            translate([OUTER_X0, 72.5, HANG_Z]) cube([FRONT_X0 - OUTER_X0, 4.5, 6.0 - HANG_Z]);
-            translate([OUTER_X0, 99.0, HANG_Z]) cube([FRONT_X0 + BOSS_L - OUTER_X0, 1.5, AXIS_Z + 9 - HANG_Z]);
+            rbox([OUTER_X0, 72.5, HANG_Z], [FRONT_X0 - OUTER_X0, 4.5, 6.0 - HANG_Z], 1.0);
+            rbox([OUTER_X0, 99.0, HANG_Z], [FRONT_X0 + BOSS_L - OUTER_X0, 1.5, AXIS_Z + 9 - HANG_Z], 0.7);
             // towers: the M3x20 screws go through them; the deck sits on top
             for (h = HOLES) tower(h);
         }
@@ -204,10 +218,14 @@ module frame_left() {
         translate([37.5, 57.0, -1]) cube([12, 10.5, 10]);
         // M3 screw holes (screw from the PCB bottom; the nut is in the deck)
         for (h = HOLES) translate([h[0], h[1], 0]) m3_hole();
+        if (lbl) frame_label("L", FRAME_LABEL_XY[0]);
     }
 }
 
-module frame_right() { translate([100, 0, 0]) mirror([1, 0, 0]) frame_left(); }
+module frame_right() difference() {
+    translate([100, 0, 0]) mirror([1, 0, 0]) frame_left(lbl = false);
+    frame_label("R", 100 - FRAME_LABEL_XY[0]);
+}
 
 // ---------------------------------------------------------------- deck (battery box carrier)
 // Sits on the 4 towers.  Bars (front/rear) carry the nuts; the thin plate clears the motors by 0.1 mm
@@ -215,9 +233,14 @@ module frame_right() { translate([100, 0, 0]) mirror([1, 0, 0]) frame_left(); }
 function all_holes() = [for (h = HOLES) h, for (h = HOLES) [100 - h[0], h[1]]];
 
 module deck_body() {
-    translate([DECK_X0, DECK_FRONT[0], DECK_UNDER]) cube([DECK_X1 - DECK_X0, DECK_REAR[1] - DECK_FRONT[0], DECK_TOP - DECK_UNDER]);
-    for (yy = [DECK_FRONT, DECK_REAR])
-        translate([DECK_X0, yy[0], TOWER_TOP]) cube([DECK_X1 - DECK_X0, yy[1] - yy[0], DECK_TOP - TOWER_TOP]);
+    intersection() {                   // child safety: the 4 outer corners are rounded (r 2, vertical edges)
+        union() {
+            translate([DECK_X0, DECK_FRONT[0], DECK_UNDER]) cube([DECK_X1 - DECK_X0, DECK_REAR[1] - DECK_FRONT[0], DECK_TOP - DECK_UNDER]);
+            for (yy = [DECK_FRONT, DECK_REAR])
+                translate([DECK_X0, yy[0], TOWER_TOP]) cube([DECK_X1 - DECK_X0, yy[1] - yy[0], DECK_TOP - TOWER_TOP]);
+        }
+        rbox([DECK_X0, DECK_FRONT[0], TOWER_TOP - 1], [DECK_X1 - DECK_X0, DECK_REAR[1] - DECK_FRONT[0], DECK_TOP - TOWER_TOP + 2], 2.0);
+    }
 }
 
 module deck_common_cuts() {
@@ -255,10 +278,11 @@ module claw(x, face_y, dir) {          // dir = -1: in front of the box, +1: beh
     y_in = face_y + dir * CLAW_GAP;
     y0 = dir < 0 ? y_in - CLAW_T : y_in;
     zl = claw_lip_z();
-    translate([x - CLAW_W / 2, y0, TOWER_TOP]) cube([CLAW_W, CLAW_T, zl + 1.4 - TOWER_TOP]);   // arm
+    // vertical edges rounded (child safety: the claws stand up 22 mm); thickness, lip and gap unchanged
+    rbox([x - CLAW_W / 2, y0, TOWER_TOP], [CLAW_W, CLAW_T, zl + 1.4 - TOWER_TOP], 0.5);       // arm
     hull() {                                                                           // lip with lead-in slope
-        translate([x - CLAW_W / 2, y0, zl]) cube([CLAW_W, CLAW_T, 1.4]);
-        translate([x - CLAW_W / 2, dir < 0 ? y_in : y_in - CLAW_LIP, zl]) cube([CLAW_W, CLAW_LIP, 0.3]);
+        rbox([x - CLAW_W / 2, y0, zl], [CLAW_W, CLAW_T, 1.4], 0.5);
+        rbox([x - CLAW_W / 2, dir < 0 ? y_in : y_in - CLAW_LIP, zl], [CLAW_W, CLAW_LIP, 0.3], 0.3);
     }
 }
 
@@ -307,8 +331,11 @@ module wheel() {
     GROOVE_D = 24.4; RIM_D = 29.6; GROOVE_W = 3.7;
     difference() {
         union() {
-            cylinder(d = RIM_D, h = WHEEL_W);
-            cylinder(d = 8, h = WHEEL_W + 2);                     // hub (outer side)
+            // rim with 0.5 mm chamfers on both outer edges (child safety; the tyre groove is not touched)
+            rotate_extrude() polygon([[0, 0], [RIM_D / 2 - 0.5, 0], [RIM_D / 2, 0.5], [RIM_D / 2, WHEEL_W - 0.5],
+                                      [RIM_D / 2 - 0.5, WHEEL_W], [0, WHEEL_W]]);
+            cylinder(d = 8, h = WHEEL_W + 2 - 0.5);               // hub (outer side), chamfered end
+            translate([0, 0, WHEEL_W + 2 - 0.5]) cylinder(d1 = 8, d2 = 7, h = 0.5);
         }
         translate([0, 0, (WHEEL_W - GROOVE_W) / 2]) difference() {
             cylinder(d = RIM_D + 1, h = GROOVE_W);
@@ -355,9 +382,7 @@ module skid_clip(H = SKID_H) {
     R = 8;                             // sled radius (contact right under the hole = sensor line)
     difference() {
         union() {
-            translate([CLIP_X0, 0, 0]) rotate([90, 0, 90]) linear_extrude(5.0)
-                polygon(concat([[-3.5, 0], [4.5, 0]],
-                               [for (yy = [4.5 : -0.25 : -3.5]) [yy, H - (R - sqrt(R * R - yy * yy))]]));
+            skid_clip_sled(H, R);
             translate([0, 0, -T]) cylinder(d = CLIP_PIN_D, h = T + CLIP_ROOT + 0.01);
             translate([0, 0, -T - 1.3]) cylinder(d1 = 2.5, d2 = CLIP_BARB_D, h = 1.3);
         }
@@ -370,8 +395,23 @@ module skid_clip(H = SKID_H) {
     }
 }
 
+// sled body of skid_clip(): y-z profile extruded along x (5 mm).  Child safety: profile corners rounded (r 0.6),
+// edges of the print-top face (x = CLIP_X0 + 5) chamfered 0.5 mm.  The contact point (y = 0, z = H) is unchanged.
+module skid_clip_sled(H, R = 8) {
+    module prof(d) offset(r = 0.6) offset(delta = -0.6 - d)
+        polygon(concat([[-3.5, 0], [4.5, 0]], [for (yy = [4.5 : -0.25 : -3.5]) [yy, H - (R - sqrt(R * R - yy * yy))]]));
+    hull() {                           // the profile is convex, so hull() only adds the 45 deg chamfer
+        translate([CLIP_X0, 0, 0]) rotate([90, 0, 90]) linear_extrude(4.5) prof(0);
+        translate([CLIP_X0, 0, 0]) rotate([90, 0, 90]) linear_extrude(5.0) prof(0.5);
+    }
+}
+
 // ---------------------------------------------------------------- ball caster (trial, instead of the skid)
+// STANDARD BOARD (hole (50, 4)); the Lite has its own caster below (caster_lite_*).
 // Same mount as skid_clip() (split pin in the 3.2 mm hole), same coordinates (z = 0 PCB bottom, floor z = H).
+// NOTE: the ball centre here is for the ball in the MIDDLE of its cavity.  Under the robot's weight the ball is
+// pushed up by BALL_CLR (0.35), so the board sits about 0.35 mm lower and the housing is closer to the floor than
+// the README numbers (print: 0.55 -> about 0.2 mm).  The Lite caster below is designed for the loaded state.
 // A ball plus its housing does not fit between the PCB and the floor (4.0 mm), so the ball sits just IN FRONT of
 // the board edge; a sled-shaped arm under the PCB carries the pin.
 //   caster_print(): 4 mm ball printed in place inside the housing (one part).  The housing stays below the PCB top
@@ -453,6 +493,80 @@ module bead(H = SKID_H) translate([caster_xb(BALL_D), caster_yb(H, BALL_D), cast
 module caster_print(H = SKID_H) { caster_housing(H); caster_ball(H); }
 module caster_bead(H = SKID_H)  { caster_housing(H, BALL_D, BALL_LIP, slit = true); }
 
+// ---------------------------------------------------------------- Lite ball caster (rev.L2, in the skid hole (50, 11))
+// The Lite board is 7.5 mm above the floor at the skid hole, so the ball fits UNDER the board, right below the pin.
+// Same split pin as skid_clip(), same coordinates (z = 0 PCB bottom, z = H floor under the hole), printed LYING ON ITS
+// SIDE like skid_clip (pin flat and ball flat on the bed).
+//   * PCB layout agreement (2026-10-07): on the PCB bottom the caster stays inside LITE_ZONE (no solder joints there,
+//     >= 0.3 mm from the centre sensor), on the PCB top the barb stays within LITE_TOP_R of the hole.  The zone is
+//     too short (y) to put the ball behind the pin, so it sits directly under the pin pocket.
+//   * The ball centre is set for the LOADED state: the robot's weight pushes the ball up against the roof of its
+//     cavity (it moves up by the clearance).  The ball then touches the same floor line as a skid of height H
+//     (same tilt, same sensor gap; uses tilt()).  As printed, the ball is in the middle of the cavity (clr all round).
+//   * roof between the pin pocket (z <= CLIP_ROOT) and the cavity >= CASTER_WALL -> ball D = H - 3.0:
+//     4.0 (H 7.0) / 4.5 (H 7.5) / 5.0 (H 8.0).  (6 mm does not fit: it would need the ball 5.5 mm behind the pin.)
+LITE_ZONE  = [45.0, 55.0, 6.5, 16.0];    // x0, x1, y0, y1 allowed on the PCB bottom (PCB coordinates)
+LITE_TOP_R = 2.4;                         // pin / barb on the PCB top: within this radius of the hole
+LITE_BEAD_D = 4.0;                        // bead version: 4 mm ball (bearing steel ball or bead) - MEASURE IT
+LITE_BEAD_CLR = 0.25;                     // bead version: not printed in place, so a smaller gap is enough
+LC_TOP = [CLIP_X0, CLIP_X0 + 5.0, -3.3, 3.3];   // contact face on the PCB bottom (x0, x1, y0, y1), local: 5 x 6.6 mm
+                                          // (>= 0.7 mm wall around the pin pocket under the 0.5 mm chamfer)
+LC_DEBUG_ROT = 0;                         // checks only: turn the caster about the pin (180 = put in the wrong way)
+LC_DEBUG_SHIFT = [0, 0, 0];               // checks only: move the caster (positive controls)
+
+function lc_zb(H, D) = H - (D / 2) / cos(tilt(H));                 // loaded ball centre (ball under the hole, y = 0)
+function lc_zc(H, D, clr) = lc_zb(H, D) + clr;                      // cavity centre = ball centre as printed
+function lc_roof(H, D) = lc_zb(H, D) - D / 2 - CLIP_ROOT;           // pocket bottom .. cavity top
+function lc_print_d(H) = [for (d = [6.0, 5.5, 5.0, 4.5, 4.0, 3.5, 3.0]) if (lc_roof(H, d) >= CASTER_WALL - 0.01) d][0];
+function lc_zl(H, D, clr, lip) = lc_zc(H, D, clr) + sqrt(pow(D / 2 + clr, 2) - pow((D - lip) / 2, 2));   // housing bottom
+function lc_xmax(D, clr) = caster_xb(D) + BALL_TOP_CLR + D / 2 + clr + CASTER_WALL;
+
+module caster_lite_housing(H = SKID_H, D = lc_print_d(SKID_H), clr = BALL_CLR, lip = PRINT_LIP, slit = false) {
+    xb = caster_xb(D); zc = lc_zc(H, D, clr); zl = lc_zl(H, D, clr, lip);
+    rc = D / 2 + clr; ro = rc + CASTER_WALL;
+    T = PCB_T + 0.15;
+    module top_face(d) translate([0, 0, d]) linear_extrude(0.01) offset(r = 1.0) offset(delta = -1.0 - (0.5 - d))
+        translate([LC_TOP[0], LC_TOP[2]]) square([LC_TOP[1] - LC_TOP[0], LC_TOP[3] - LC_TOP[2]]);
+    difference() {
+        union() {
+            intersection() {
+                hull() {               // rounded block: flat face on the PCB (0.5 mm chamfer) down to the ball housing
+                    top_face(0); top_face(0.5);
+                    for (dx = [0, BALL_TOP_CLR]) translate([xb + dx, 0, zc]) sphere(r = ro, $fn = 48);
+                }
+                // bottom: a flat cone that rises 30 deg outward from the ball opening (radius (D - lip) / 2), so
+                // the lowest point is the opening edge (the robot leans back) and the outer edge is blunt
+                translate([xb, 0, zl]) mirror([0, 0, 1]) cylinder(h = zl, r1 = (D - lip) / 2, r2 = (D - lip) / 2 + zl / tan(30));
+            }
+            translate([0, 0, -T]) cylinder(d = CLIP_PIN_D, h = T + CLIP_ROOT + 0.01);       // pin + barb: as skid_clip
+            translate([0, 0, -T - 1.3]) cylinder(d1 = 2.5, d2 = CLIP_BARB_D, h = 1.3);
+        }
+        hull() for (dx = [0, BALL_TOP_CLR]) translate([xb + dx, 0, zc]) sphere(r = rc, $fn = 48);   // ball cavity
+        difference() {                 // pin pocket + slit: same as skid_clip()
+            translate([0, 0, -0.01]) cylinder(d = CLIP_POCKET_D, h = CLIP_ROOT + 0.01);
+            translate([0, 0, -1]) cylinder(d = CLIP_PIN_D, h = CLIP_ROOT + 2);
+        }
+        translate([-2.2, -CLIP_SLIT / 2, -T - 2]) cube([4.4, CLIP_SLIT, T + 2 + CLIP_ROOT]);
+        translate([CLIP_X0 - 10, -10, -10]) cube([10, 20, 30]);                    // print face (pin + ball flats)
+        // bead version: a slit splits the lower half of the housing into a front and a rear finger, which bend apart
+        // (in the layer plane) when the bead is pushed in from the floor side
+        if (slit) translate([CLIP_X0 - 1, -BEAD_SLIT / 2, zc - D / 4]) cube([20, BEAD_SLIT, 20]);
+    }
+}
+
+// ball: loaded = pushed up against the roof (assembly, floor checks); otherwise as printed (centre of the cavity)
+module caster_lite_ball(H = SKID_H, D = lc_print_d(SKID_H), clr = BALL_CLR, loaded = false) {
+    intersection() {
+        translate([caster_xb(D), 0, loaded ? lc_zb(H, D) : lc_zc(H, D, clr)]) sphere(d = D, $fn = 48);
+        translate([CLIP_X0, -50, -50]) cube([100, 100, 100]);                     // the flat on the bed
+    }
+}
+module caster_lite_print(H = SKID_H) { caster_lite_housing(H); caster_lite_ball(H); }
+module caster_lite_bead(H = SKID_H) { caster_lite_housing(H, LITE_BEAD_D, LITE_BEAD_CLR, BALL_LIP, slit = true); }
+module lite_bead(H = SKID_H, loaded = false)
+    translate([caster_xb(LITE_BEAD_D), 0, loaded ? lc_zb(H, LITE_BEAD_D) : lc_zc(H, LITE_BEAD_D, LITE_BEAD_CLR)])
+        sphere(d = LITE_BEAD_D, $fn = 48);
+
 // ---------------------------------------------------------------- simple models for the assembly / checks
 module battery_box() {
     x0 = BOX_C[0] - BOX_L / 2;
@@ -487,6 +601,43 @@ echo(str("floor: skid ", SKID_H, " mm, tilt ", round(tilt() * 100) / 100, " deg,
          round(gap([0, -PCB_T]) * 100) / 100, " mm, rear screw heads (y 96) ",
          round(gap([96, -PCB_T - 2.1]) * 100) / 100, " mm"));
 
+// floor as a solid (everything below the floor line), PCB coordinates; up > 0 raises it (positive controls)
+CHECK_FLOOR_UP = 0;
+module floor_below(up = 0, H = SKID_H)
+    translate([0, SKID_XY[1], -PCB_T - H]) rotate([tilt(H), 0, 0]) translate([-100, -300, -30 + up]) cube([300, 600, 30]);
+
+// Lite caster in place (PCB coordinates).  LC_DEBUG_* only for the positive controls of the checks.
+module lc_at() translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) translate(LC_DEBUG_SHIFT) rotate([0, 0, LC_DEBUG_ROT]) children();
+// everything outside the area agreed with the PCB layout (LITE_ZONE under the board, r = LITE_TOP_R above it)
+module lite_zone_outside() difference() {
+    translate([-50, -50, -60]) cube([200, 200, 100]);
+    translate([LITE_ZONE[0], LITE_ZONE[2], -60]) cube([LITE_ZONE[1] - LITE_ZONE[0], LITE_ZONE[3] - LITE_ZONE[2], 60 - PCB_T + 0.01]);
+    translate([SKID_XY[0], SKID_XY[1], -PCB_T - 0.01]) cylinder(r = LITE_TOP_R, h = 30);
+}
+module sensors_grown(g) for (x = SENSOR_XS)     // sensor bodies + keep-out distance g
+    translate([x - SENSOR_BODY[0] / 2 - g, SENSOR_Y - SENSOR_BODY[1] / 2 - g, -PCB_T - SENSOR_BODY[2] - g])
+        cube(SENSOR_BODY + [2 * g, 2 * g, g]);
+
+// independent check of the floor contact of a ball: common tangent of the tyre circle and the ball circle (side view)
+function tilt_ball(yb, zb, r) = let (a = AXLE_Y - yb, b = AXIS_Z - zb)
+    acos((TYRE_R - r) / sqrt(a * a + b * b)) - atan2(a, b);
+function gap_ball(p, yb, zb, r) = let (t = tilt_ball(yb, zb, r)) -sin(t) * (p[0] - yb) + cos(t) * (p[1] - zb) + r;
+function r2(v) = round(v * 100) / 100;
+if (LITE) {
+    D = lc_print_d(SKID_H);
+    for (v = [["caster_lite_print", D, BALL_CLR, PRINT_LIP], ["caster_lite_bead", LITE_BEAD_D, LITE_BEAD_CLR, BALL_LIP]])
+        let (d = v[1], clr = v[2], lip = v[3], zb = lc_zb(SKID_H, d), zl = lc_zl(SKID_H, d, clr, lip),
+             ro = d / 2 + clr + CASTER_WALL, yo = (d - lip) / 2,
+             yB = SKID_XY[1], zB = -PCB_T - zb)
+        echo(str(v[0], " (H ", SKID_H, "): ball ", d, " mm, roof over the pin pocket ", r2(lc_roof(SKID_H, d)),
+                 " mm, loaded ball below the housing ", r2(zb + d / 2 - zl), " mm, housing (rear edge of the opening) above the floor ",
+                 r2(-sin(tilt()) * yo + cos(tilt()) * (SKID_H - zl)), " mm; check by tangent: tilt ",
+                 r2(tilt_ball(yB, zB, d / 2)), " deg, sensor lens ",
+                 r2(gap_ball([SENSOR_Y, -PCB_T - SENSOR_BODY[2]], yB, zB, d / 2)), " mm; on the PCB bottom x ",
+                 r2(SKID_XY[0] + CLIP_X0), " .. ", r2(SKID_XY[0] + max(LC_TOP[1], lc_xmax(d, clr))), ", y ",
+                 r2(SKID_XY[1] - max(-LC_TOP[2], ro)), " .. ", r2(SKID_XY[1] + max(LC_TOP[3], ro))));
+}
+
 module pcb() {                     // standard: 100 x 100 with the rear notches; Lite: 65 x 100 rectangle (x 17.5 .. 82.5)
     color("darkgreen", 0.8) translate([0, 0, -PCB_T]) linear_extrude(PCB_T) difference() {
         if (LITE)
@@ -513,10 +664,16 @@ module drive_side() {              // left side: gears, axle, wheel, tyre
 }
 
 DECK_VARIANT = "screw";                // "screw" | "clip"
-SKID_VARIANT = "clip";                 // "clip" | "caster_print" | "caster_bead"  (front support)
-module front_support() {                // casters: standard board only (on Lite the arm would cover the centre sensor)
-    assert(SKID_VARIANT == "clip" || !LITE, "ball casters are for the standard board (skid hole 4 mm from the edge)");
-    translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) {
+SKID_VARIANT = "clip";                 // standard board: "clip" | "caster_print" | "caster_bead"  (front support)
+LITE_SUPPORT = "skid";                 // Lite board:     "skid" | "caster_print" | "caster_bead"
+module front_support() {
+    assert(SKID_VARIANT == "clip" || !LITE, "Lite: choose the front support with LITE_SUPPORT");
+    if (LITE) translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) {      // balls shown pushed up (loaded)
+        if (LITE_SUPPORT == "caster_print") { color("white") caster_lite_housing(); color("orange") caster_lite_ball(loaded = true); }
+        else if (LITE_SUPPORT == "caster_bead") { color("white") caster_lite_bead(); color("silver") lite_bead(loaded = true); }
+        else color("white") skid_clip();
+    }
+    else translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) {
         if (SKID_VARIANT == "caster_print") { color("white") caster_housing(); color("orange") caster_ball(); }
         else if (SKID_VARIANT == "caster_bead") {
             color("white") caster_bead();
@@ -578,10 +735,29 @@ else if (part == "skid") skid();
 else if (part == "skid_clip") translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) skid_clip();   // lying on its side
 else if (part == "caster_print") translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) caster_print();  // lying on its side
 else if (part == "caster_bead") translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) caster_bead();
+// check_caster_* test the caster of the board that is selected: standard -> caster_print/_bead at (50, 4),
+// LITE=true -> caster_lite_print/_bead at (50, 11) (same as the check_caster_lite_* below)
+else if (part == "check_caster_sensor" && LITE) intersection() { lc_at() caster_lite_print(); sensors_grown(0.3); }
+else if (part == "check_caster_pcb" && LITE) intersection() { translate([0, 0, -0.01]) lc_at() caster_lite_print(); pcb(); }
+else if (part == "check_caster_ball" && LITE) intersection() { caster_lite_housing(); caster_lite_ball(); }
+else if (part == "check_casterbead_ball" && LITE) intersection() { caster_lite_bead(); lite_bead(); }
 else if (part == "check_caster_sensor") intersection() { translate([50, 4, -PCB_T]) mirror([0, 0, 1]) caster_print(); sensors(); }
 else if (part == "check_caster_pcb") intersection() { translate([50, 4, -PCB_T - 0.01]) mirror([0, 0, 1]) caster_print(); pcb(); }
 else if (part == "check_caster_ball") intersection() { caster_housing(); caster_ball(); }
 else if (part == "check_casterbead_ball") intersection() { caster_bead(); bead(); }
+// Lite ball caster (run with -D LITE=true).  sensor: 0.3 mm keep-out around the sensor bodies.
+else if (part == "caster_lite_print") { assert(LITE, "run with -D LITE=true"); translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) caster_lite_print(); }
+else if (part == "caster_lite_bead") { assert(LITE, "run with -D LITE=true"); translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) caster_lite_bead(); }
+else if (part == "check_caster_lite_sensor") intersection() { lc_at() caster_lite_print(); sensors_grown(0.3); }
+else if (part == "check_caster_lite_bead_sensor") intersection() { lc_at() { caster_lite_bead(); lite_bead(); } sensors_grown(0.3); }
+else if (part == "check_caster_lite_pcb") intersection() { translate([0, 0, -0.01]) lc_at() { caster_lite_print(); caster_lite_bead(); } pcb(); }
+else if (part == "check_caster_lite_ball") intersection() { caster_lite_housing(); caster_lite_ball(); }
+else if (part == "check_caster_lite_bead_ball") intersection() { caster_lite_bead(); lite_bead(); }
+else if (part == "check_caster_lite_floor") intersection() { lc_at() { caster_lite_housing(); caster_lite_bead(); } floor_below(CHECK_FLOOR_UP); }
+else if (part == "check_caster_lite_ballfloor") intersection() {      // loaded balls do not go below the floor
+    lc_at() { caster_lite_ball(loaded = true); lite_bead(loaded = true); } floor_below(CHECK_FLOOR_UP - 0.02); }
+else if (part == "check_caster_lite_zone") intersection() { lc_at() { caster_lite_print(); caster_lite_bead(); } lite_zone_outside(); }
+else if (part == "check_skidclip_lite_zone") intersection() { lc_at() skid_clip(); lite_zone_outside(); }
 else if (part == "deck_clip") translate([0, 0, -TOWER_TOP]) deck_clip();                     // right side up
 else if (part == "check_skidclip_sensor") intersection() { translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) skid_clip(); sensors(); }
 else if (part == "check_skidclip_pcb") intersection() { translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) skid_clip(); pcb(); }
