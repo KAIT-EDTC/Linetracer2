@@ -1,6 +1,6 @@
 # linetracer.py  -  Linetracer2 Lite library for MicroPython (Seeed Studio XIAO ESP32C6)
 #
-# For the Lite board rev.L2: XIAO ESP32C6, 3 x LBR-127HLD, 1 button, 1 LED, no buzzer.
+# For the Lite board rev.L3: XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button, 1 LED + a buzzer on the same pin.
 # MicroPython: the official "ESP32_GENERIC_C6" firmware (micropython.org).
 # (The standard rev.A1 board has its own library in firmware/micropython/ at the top of the repo.)
 #
@@ -15,14 +15,15 @@
 from machine import Pin, PWM, ADC
 import time
 
-# ----------------------------------------------------------------- pins (PCB rev.L2)
-# GPIO numbers of the ESP32-C6 (XIAO pin names in the comments)
-PIN_SENS_LED = 22          # D4   1 = IR LEDs on (through Q1)
+# ----------------------------------------------------------------- pins (PCB rev.L3)
+# GPIO numbers of the ESP32-C6 (XIAO pin names in the comments).
+# rev.L3 swapped D3/D4 and D8/D10 against rev.L2 (so that no tracks cross on the board).
+PIN_SENS_LED = 21          # D3   1 = IR LEDs on (through Q1)
 PIN_STBY = 17              # D7 (RX)  TC78H653 STBY
-PIN_IN1, PIN_IN2 = 18, 23  # D10, D5  LEFT  motor
-PIN_IN3, PIN_IN4 = 20, 19  # D9, D8   RIGHT motor
-PIN_SW = 21                # D3   START (pressed = 0)
-PIN_LED = 16               # D6 (TX)  red LED (flickers with the boot log)
+PIN_IN1, PIN_IN2 = 19, 23  # D8, D5   LEFT  motor
+PIN_IN3, PIN_IN4 = 20, 18  # D9, D10  RIGHT motor
+PIN_SW = 22                # D4   START (pressed = 0)
+PIN_LED = 16               # D6 (TX)  red LED + buzzer (both flicker / click with the boot log)
 PIN_LED_XIAO = 15          # yellow user LED on the XIAO itself (0 = on)
 ADC_SENS = (2, 1, 0)       # S1 (left), S2 (centre), S3 (right)  -> D2, D1, D0 (the XIAO's only ADC pins)
 
@@ -37,6 +38,7 @@ RAMP_PER_CALL = 0.04      # max change of duty per run() call (soft start, avoid
 LEFT_INVERT = False       # set True if the left wheel turns backwards on run(30, 30)
 RIGHT_INVERT = False      # the motors face opposite directions, but M2's + pad is on OUT4 (wired reversed)
 LONG_PRESS_MS = 800       # button held this long = "long press"
+BEEP_FREQ = 4000          # the piezo (PKM13EPYH4000) is loudest around 4 kHz
 
 
 def _clamp(x, lo, hi):
@@ -257,7 +259,7 @@ class Robot:
         time.sleep_ms(30)
         return kind
 
-    # LED (instead of a buzzer) ---------------------------------------------
+    # LED --------------------------------------------------------------------
     def blink(self, n=1, ms=120):
         """Blink the red LED n times, then leave it as it was."""
         was = self.led.value()
@@ -267,6 +269,26 @@ class Robot:
             self.led.value(0)
             time.sleep_ms(ms)
         self.led.value(was)
+
+    # buzzer (on the LED's pin: a steady 1 only lights the LED, a tone sounds the buzzer) ---------------------
+    def beep(self, freq=BEEP_FREQ, ms=100):
+        """Sound the buzzer.  freq in Hz (0 = a rest), ms = length.  The red LED glows while it sounds."""
+        was = self.led.value()
+        if freq > 0:
+            pwm = PWM(self.led, freq=int(freq), duty_u16=32768)
+            time.sleep_ms(ms)
+            pwm.deinit()
+            self.led.init(Pin.OUT)
+        else:
+            self.led.value(0)
+            time.sleep_ms(ms)
+        self.led.value(was)
+
+    def melody(self, notes, gap_ms=20):
+        """Play [(freq, ms), ...]  e.g.  robot.melody([(1047, 150), (1319, 150), (1568, 300)])"""
+        for freq, ms in notes:
+            self.beep(freq, ms)
+            time.sleep_ms(gap_ms)
 
     # helpers ---------------------------------------------------------------
     def auto_calibrate(self, ms=2400, speed=25):

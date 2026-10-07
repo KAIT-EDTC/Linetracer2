@@ -3,8 +3,9 @@
 #   START short press : 1st time = auto calibration (robot spins on the line)
 #                       after that = run.  Press START again to stop.
 #   START long press  : change speed level 1..3 (hold until the red LED goes out, then let go;
-#                       the red LED blinks the new level)
+#                       the buzzer beeps / the red LED blinks the new level)
 #   red LED on        : ready (the Lite board has no power LED)
+#   buzzer            : a short tune at power-on, "pi-pi-pi-PI" before it starts, a low tone when something failed
 #
 # The board can not measure the battery: when the cells run down the robot gets slower, and when they are
 # nearly empty the XIAO restarts as the motors start (red LED goes out) -> put in new cells.
@@ -63,7 +64,7 @@ def run_course(base, kp, kd):
     robot.led.value(1)
 
 
-robot.blink(1)
+robot.melody([(1047, 120), (1319, 120), (1568, 200)])     # hello
 print("Linetracer2 Lite (XIAO ESP32C6). Motors run only with the battery switch ON.")
 robot.led.value(1)                          # ready
 
@@ -75,7 +76,9 @@ while True:
         time.sleep_ms(300)
         robot.led.value(0)
         time.sleep_ms(300)
-        robot.blink(level, 200)
+        for _ in range(level):
+            robot.beep(2000, 120)
+            time.sleep_ms(150)
         robot.led.value(1)
         continue
     if not s.calibrated():
@@ -83,10 +86,15 @@ while True:
         ok = robot.auto_calibrate()
         print("calibrated" if ok else "calibration failed", s.lo, s.hi)
         if not ok:
+            robot.beep(400, 600)            # low tone = failed
             robot.blink(4, 300)
+        else:
+            robot.melody([(1568, 100), (2093, 200)])
         robot.led.value(1)
         continue
-    robot.blink(3, 80)                      # ready...
+    for f in (2000, 2000, 2000, 4000):      # pi-pi-pi-PI ... go!
+        robot.beep(f, 80 if f < 4000 else 250)
+        time.sleep_ms(250)
     base, kp, kd = LEVELS[level]
     run_course(base, kp, kd)
     robot.wait_release()
