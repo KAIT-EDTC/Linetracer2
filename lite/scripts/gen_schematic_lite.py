@@ -98,7 +98,7 @@ s.text("Battery voltage is NOT measured: the XIAO has 3 ADC pins only (D0..D2) a
 s.text("Inside the XIAO: 5V pin -> Schottky -> buck regulator -> 3V3 (3V3 stays up while VBAT > about 4 V).", 127.0, 58.42, 1.27)
 
 # ---- mechanical (mounting holes, kept in the schematic for PCB parity)
-s.text("MECHANICAL: H1-H4 = gearbox frame M3 (x30/x70, y62/y96), H5 = front skid M3 (x50, y11: behind the centre sensor)",
+s.text("MECHANICAL: H1-H4 = gearbox frame M3 (x30/x70, y62/y96), H5 = front ball caster / skid, snap-in (x50, y11: behind the centre sensor)",
        20.32, 83.82, 1.27)
 for i in range(5):
     s.place("Mechanical:MountingHole", "H%d" % (i + 1), "M3" if i < 4 else "SKID M3", 27.94 + i * 22.86, 91.44, 0,
@@ -216,7 +216,7 @@ s.text("5. LINE SENSORS  3 x LBR-127HLD (mount on the BOTTOM side, lens to the f
        20.32, 200.66, 2, True)
 s.text("IR LED: (3.3V - 1.2V - 0.1V) / 100 ohm = about 20 mA each.  Q1 switches all LEDs (ambient light cancel).  "
        "Photo transistor: 10k pull-up -> white = low voltage, black = high voltage", 20.32, 205.74, 1.27)
-s.text("The body is 5.6 mm tall: the front of the robot is lifted by a 7.5 mm skid (lens about 2.3 mm above the floor)",
+s.text("The body is 5.6 mm tall: the front of the robot is lifted by the 7.5 mm ball caster or skid (lens about 2.25 mm above the floor)",
        20.32, 209.55, 1.27)
 by = 238.76
 for i in range(3):

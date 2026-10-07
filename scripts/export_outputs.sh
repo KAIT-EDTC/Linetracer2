@@ -71,6 +71,30 @@ for s, name in (("top", "silk_top.png"), ("bot", "silk_bottom.png")):
     bb = ImageOps.invert(im).getbbox()
     im.crop((bb[0] - 20, bb[1] - 20, bb[2] + 20, bb[3] + 20)).save("%s/%s" % (out, name))
 PYEOF
+  echo "== schematic picture, routing picture (tracks only: the GND pours are left out so the tracks show)"
+  pdftoppm -r 110 -png -singlefile "$DOCS/${NAME}_schematic.pdf" "$IMG/schematic"
+  ./kpy -c "
+import pcbnew
+b = pcbnew.LoadBoard('$PCB')
+for z in list(b.Zones()):
+    if not z.GetIsRuleArea():
+        b.Remove(z)
+pcbnew.SaveBoard('$K/reports/nozone.kicad_pcb', b)
+import os; os._exit(0)
+" >/dev/null 2>&1
+  $KC pcb export pdf -o "$T/route.pdf" --mode-single --layers "F.Cu,B.Cu,Edge.Cuts,F.Fab" \
+      "$K/reports/nozone.kicad_pcb" >/dev/null
+  rm -f "$K/reports/nozone.kicad_pcb" "$K/reports/nozone.kicad_prl" "$K/reports/nozone.kicad_pro"
+  pdftoppm -r 420 -png -cropbox -singlefile "$T/route.pdf" "$T/route"
+  python3 - "$T" "$IMG" <<'PYEOF'
+import sys
+from PIL import Image, ImageOps
+t, out = sys.argv[1], sys.argv[2]
+im = Image.open("%s/route.png" % t).convert("RGB")
+bb = ImageOps.invert(im.convert("L")).getbbox()
+im = im.crop((bb[0] - 20, bb[1] - 20, bb[2] + 20, bb[3] + 20))
+im.crop((0, 0, im.width, int(im.height * 0.70))).save("%s/routing.png" % out)   # the rear 30 mm has no tracks
+PYEOF
   rm -rf "$T"
 fi
 
