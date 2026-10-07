@@ -2,21 +2,21 @@
 	(version "E")
 	(design
 		(source "/home/aonuma/Desktop/EDTC/Linetracer2/.claude/worktrees/esp32c6-photoreflector-spec-95e549/lite/hardware/kicad/Linetracer2-Lite.kicad_sch")
-		(date "2026-10-05T20:29:23")
+		(date "2026-10-07T08:06:36")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")
 			(name "/")
 			(tstamps "/")
 			(title_block
-				(title "Linetracer2 Lite rev.L2 - XIAO ESP32C6 kids line tracer")
+				(title "Linetracer2 Lite rev.L3 - XIAO ESP32C6 kids line tracer")
 				(company "EDTC")
-				(rev "L2")
-				(date "2026-10-05")
+				(rev "L3")
+				(date "2026-10-07")
 				(source "Linetracer2-Lite.kicad_sch")
 				(comment
 					(number "1")
-					(value "All parts through-hole. XIAO soldered flat (castellated edge)")
+					(value "All parts through-hole. XIAO on two 1x7 pin headers")
 				)
 				(comment
 					(number "2")
@@ -54,6 +54,72 @@
 		)
 	)
 	(components
+		(comp
+			(ref "BZ1")
+			(value "piezo 13mm")
+			(footprint "Linetracer2:Buzzer_PKM13_P5.0")
+			(description "Buzzer, polarized")
+			(fields
+				(field
+					(name "Akizuki") "104118 (Murata PKM13EPYH4000-A0)")
+				(field
+					(name "Note") "passive piezo, + on the square pad")
+				(field
+					(name "Footprint") "Linetracer2:Buzzer_PKM13_P5.0")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Buzzer, polarized")
+			)
+			(libsource
+				(lib "Device")
+				(part "Buzzer")
+				(description "Buzzer, polarized")
+			)
+			(property
+				(name "Akizuki")
+				(value "104118 (Murata PKM13EPYH4000-A0)")
+			)
+			(property
+				(name "Note")
+				(value "passive piezo, + on the square pad")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "quartz resonator ceramic")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "*Buzzer*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "1a5d506a-827b-57cb-b98d-b18872eb0a20")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
 		(comp
 			(ref "C1")
 			(value "470uF 16V")
@@ -1586,6 +1652,66 @@
 			)
 		)
 		(comp
+			(ref "R9")
+			(value "100")
+			(footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Akizuki") "125101 (100pcs)")
+				(field
+					(name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Akizuki")
+				(value "125101 (100pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "7901c49e-8c40-511a-bd83-57fa7afc451b")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
 			(ref "SW1")
 			(value "START")
 			(footprint "Button_Switch_THT:SW_PUSH_6mm")
@@ -1644,16 +1770,16 @@
 		(comp
 			(ref "U1")
 			(value "XIAO ESP32C6")
-			(footprint "Linetracer2:XIAO_ESP32C6_DirectSolder")
+			(footprint "Linetracer2:XIAO_ESP32C6_Header")
 			(datasheet "https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/")
 			(description "Seeed Studio XIAO ESP32C6 (ESP32-C6, Wi-Fi 6 / BLE 5 / 802.15.4). 5V pin = USB VBUS = power input (through an external diode), 3V3 = output of the on-board regulator")
 			(fields
 				(field
-					(name "Akizuki") "129481 (Seeed Studio XIAO ESP32C6)")
+					(name "Akizuki") "129481 (Seeed Studio XIAO ESP32C6) + pin header 1x40 100167 (2 x 7 pins)")
 				(field
-					(name "Note") "solder the castellated edge straight onto the pads, no pin header")
+					(name "Note") "solder the XIAO on two 1x7 pin headers (cut from a 1x40 strip), then into the board")
 				(field
-					(name "Footprint") "Linetracer2:XIAO_ESP32C6_DirectSolder")
+					(name "Footprint") "Linetracer2:XIAO_ESP32C6_Header")
 				(field
 					(name "Datasheet") "https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/")
 				(field
@@ -1666,11 +1792,11 @@
 			)
 			(property
 				(name "Akizuki")
-				(value "129481 (Seeed Studio XIAO ESP32C6)")
+				(value "129481 (Seeed Studio XIAO ESP32C6) + pin header 1x40 100167 (2 x 7 pins)")
 			)
 			(property
 				(name "Note")
-				(value "solder the castellated edge straight onto the pads, no pin header")
+				(value "solder the XIAO on two 1x7 pin headers (cut from a 1x40 strip), then into the board")
 			)
 			(property
 				(name "Sheetname")
@@ -1877,6 +2003,40 @@
 				(pin
 					(num "2")
 					(name "Pin_2")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
+			(part "Buzzer")
+			(description "Buzzer, polarized")
+			(footprints
+				(fp "*Buzzer*")
+			)
+			(fields
+				(field
+					(name "Reference") "BZ")
+				(field
+					(name "Value") "Buzzer")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Buzzer, polarized")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "+")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "-")
 					(type "passive")
 				)
 			)
@@ -2209,7 +2369,7 @@
 				(field
 					(name "Value") "XIAO_ESP32C6")
 				(field
-					(name "Footprint") "Linetracer2:XIAO_ESP32C6_DirectSolder")
+					(name "Footprint") "Linetracer2:XIAO_ESP32C6_Header")
 				(field
 					(name "Datasheet") "https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/")
 				(field
@@ -2501,6 +2661,11 @@
 				(pintype "passive")
 			)
 			(node
+				(ref "R9")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
 				(ref "U1")
 				(pin "7")
 				(pinfunction "GPIO16/TX/D6_7")
@@ -2542,8 +2707,8 @@
 			(class "Default")
 			(node
 				(ref "U1")
-				(pin "11")
-				(pinfunction "GPIO18/MOSI/D10_11")
+				(pin "9")
+				(pinfunction "GPIO19/SCK/D8_9")
 				(pintype "bidirectional")
 			)
 			(node
@@ -2593,8 +2758,8 @@
 			(class "Default")
 			(node
 				(ref "U1")
-				(pin "9")
-				(pinfunction "GPIO19/SCK/D8_9")
+				(pin "11")
+				(pinfunction "GPIO18/MOSI/D10_11")
 				(pintype "bidirectional")
 			)
 			(node
@@ -2786,8 +2951,8 @@
 			)
 			(node
 				(ref "U1")
-				(pin "5")
-				(pinfunction "GPIO22/SDA/D4_5")
+				(pin "4")
+				(pinfunction "GPIO21/D3_4")
 				(pintype "bidirectional")
 			)
 		)
@@ -2803,8 +2968,8 @@
 			)
 			(node
 				(ref "U1")
-				(pin "4")
-				(pinfunction "GPIO21/D3_4")
+				(pin "5")
+				(pinfunction "GPIO22/SDA/D4_5")
 				(pintype "bidirectional")
 			)
 		)
@@ -2868,6 +3033,12 @@
 			(code "20")
 			(name "GND")
 			(class "Ground")
+			(node
+				(ref "BZ1")
+				(pin "2")
+				(pinfunction "-_2")
+				(pintype "passive")
+			)
 			(node
 				(ref "C1")
 				(pin "2")
@@ -2959,6 +3130,22 @@
 		)
 		(net
 			(code "21")
+			(name "Net-(BZ1-+)")
+			(class "Default")
+			(node
+				(ref "BZ1")
+				(pin "1")
+				(pinfunction "+_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R9")
+				(pin "2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "22")
 			(name "Net-(D2-A)")
 			(class "Default")
 			(node
@@ -2974,7 +3161,7 @@
 			)
 		)
 		(net
-			(code "22")
+			(code "23")
 			(name "Net-(PS1-A)")
 			(class "Default")
 			(node
@@ -2990,7 +3177,7 @@
 			)
 		)
 		(net
-			(code "23")
+			(code "24")
 			(name "Net-(PS2-A)")
 			(class "Default")
 			(node
@@ -3006,7 +3193,7 @@
 			)
 		)
 		(net
-			(code "24")
+			(code "25")
 			(name "Net-(PS3-A)")
 			(class "Default")
 			(node
@@ -3022,7 +3209,7 @@
 			)
 		)
 		(net
-			(code "25")
+			(code "26")
 			(name "Net-(Q1-B)")
 			(class "Default")
 			(node

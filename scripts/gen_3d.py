@@ -21,6 +21,19 @@ def box(cx, cy, cz, sx, sy, sz, rgb):
                faces))
 
 
+def cylinder(cx, cy, cz, r, h, rgb, n=32):
+    """Vertical n-sided prism (looks round enough), standing on z = cz (mm)."""
+    import math
+    ring = [(cx + r * math.cos(2 * math.pi * k / n), cy + r * math.sin(2 * math.pi * k / n)) for k in range(n)]
+    pts = [(x, y, cz) for x, y in ring] + [(x, y, cz + h) for x, y in ring]
+    faces = [" ".join(str(k) for k in reversed(range(n))) + " -1", " ".join(str(n + k) for k in range(n)) + " -1"]
+    faces += ["%d %d %d %d -1" % (k, (k + 1) % n, n + (k + 1) % n, n + k) for k in range(n)]
+    return ("Shape { appearance Appearance { material Material { diffuseColor %.2f %.2f %.2f specularColor 0.2 0.2 0.2 } } "
+            "geometry IndexedFaceSet { coord Coordinate { point [ %s ] } coordIndex [ %s ] } }\n"
+            % (rgb[0], rgb[1], rgb[2], ", ".join("%.4f %.4f %.4f" % (x / 2.54, y / 2.54, z / 2.54) for x, y, z in pts),
+               " ".join(faces)))
+
+
 def write(name, shapes):
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, name + ".wrl"), "w") as f:
@@ -50,15 +63,22 @@ s = [box(0, 0, 0, 8.7, 4.5, 5.6, BLACK), box(1.8, 0, 5.6, 2.6, 2.6, 0.05, (0.3, 
 s += [box(sx * 2.05, sy * 1.27, -3.0, 0.5, 0.5, 3.0, GOLD) for sx in (-1, 1) for sy in (-1, 1)]
 write("LBR-127HLD", s)
 
-# Seeed XIAO ESP32C6 lying flat on the board (footprint origin = pin pattern centre, USB at footprint -y).
-# Positions from Seeed's KiCad design; 3D y = -footprint y.
+# Seeed XIAO ESP32C6 on two 1x7 pin headers (footprint origin = pin pattern centre, USB at footprint -y).
+# Header plastic 2.5 mm on the board, the module on top of it; positions from Seeed's KiCad design.
 SILVER, KHAKI, BLUE = (0.78, 0.78, 0.8), (0.76, 0.69, 0.5), (0.12, 0.16, 0.3)
-x = [box(0, 0.06, 0, 17.8, 20.98, 1.0, BLUE),
-     box(0, 8.4, 1.0, 8.94, 7.3, 3.2, SILVER),          # USB-C receptacle, 1.5 mm past the module end
-     box(2.93, -1.56, 1.0, 5.0, 5.0, 0.85, BLACK),      # ESP32-C6
-     box(3.12, -9.26, 1.0, 5.2, 2.0, 1.1, KHAKI)]       # chip antenna
-x += [box(sx * 8.5, -7.62 + 2.54 * i, 0, 0.8, 1.3, 1.02, GOLD) for sx in (-1, 1) for i in range(7)]   # castellations
-write("XIAO_ESP32C6_DirectSolder", x)
+z0 = 2.5                                                  # module bottom
+x = [box(sx * 7.62, 0, 0, 2.54, 17.78, 2.5, BLACK) for sx in (-1, 1)]                       # header plastic
+x += [box(sx * 7.62, -7.62 + 2.54 * i, -3.0, 0.64, 0.64, 3.0 + z0 + 1.0 + 1.5, GOLD)      # pins (cut 1.5 mm
+      for sx in (-1, 1) for i in range(7)]                                                 #  above the module)
+x += [box(0, 0.06, z0, 17.8, 20.98, 1.0, BLUE),
+      box(0, 8.4, z0 + 1.0, 8.94, 7.3, 3.2, SILVER),     # USB-C receptacle, 1.5 mm past the module end
+      box(2.93, -1.56, z0 + 1.0, 5.0, 5.0, 0.85, BLACK),  # ESP32-C6
+      box(3.12, -9.26, z0 + 1.0, 5.2, 2.0, 1.1, KHAKI)]   # chip antenna
+write("XIAO_ESP32C6_Header", x)
+
+# Murata PKM13EPYH4000-A0 piezo: 13 mm x 6.9 mm, pins 5.0 mm apart (pin 1 at the origin)
+write("Buzzer_PKM13_P5.0", [cylinder(2.5, 0, 0, 6.5, 6.9, BLACK), cylinder(2.5, 0, 6.9, 1.0, 0.05, WHITE)] +
+      [box(px, 0, -3.0, 0.5, 0.5, 3.0, GOLD) for px in (0, 5.0)])
 
 # JST XH 2P (B2B-XH-A) at pins (0,0) and (2.5,0); body y from -2.45 .. +3.3 in footprint coords
 x = [box(1.25, -0.425, 0, 7.4, 5.75, 7.0, WHITE)]

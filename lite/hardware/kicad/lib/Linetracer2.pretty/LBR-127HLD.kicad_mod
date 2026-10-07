@@ -8,7 +8,7 @@
 	(property "Reference" "REF**"
 		(at 0 -3.4 0)
 		(layer "F.SilkS")
-		(uuid "d1b9596c-f8f4-5422-b77d-000ec1d3f9aa")
+		(uuid "e861c0e2-5962-5bf7-a880-2a58217f9319")
 		(effects
 			(font
 				(size 1 1)
@@ -19,7 +19,7 @@
 	(property "Value" "LBR-127HLD"
 		(at 0 3.4 0)
 		(layer "F.Fab")
-		(uuid "adfc4288-7907-5f96-afaf-300dee9adde7")
+		(uuid "18635fe6-c814-5e7c-8308-6fe6d1ce05de")
 		(effects
 			(font
 				(size 1 1)
@@ -31,7 +31,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "e861c0e2-5962-5bf7-a880-2a58217f9319")
+		(uuid "5152af11-d6ea-5d94-af30-03d5bb7997a3")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -43,7 +43,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "18635fe6-c814-5e7c-8308-6fe6d1ce05de")
+		(uuid "49ffe4cb-dd90-5e4d-805b-aa647bfd7786")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -104,26 +104,49 @@
 		(uuid "c1d02114-0cd6-5032-82c8-044b3f45ebd0")
 	)
 	(fp_circle
-		(center 5 -1.27)
-		(end 5.15 -1.27)
+		(center -3.5 0)
+		(end -3.05 0)
 		(stroke
-			(width 0.3)
+			(width 0.1)
+			(type solid)
+		)
+		(fill yes)
+		(layer "F.SilkS")
+		(uuid "b1efabef-5a19-516b-bf4e-2926da2ce27f")
+	)
+	(fp_circle
+		(center 3.5 0)
+		(end 3.92 0)
+		(stroke
+			(width 0.16)
 			(type solid)
 		)
 		(fill no)
 		(layer "F.SilkS")
+		(uuid "0a309749-e36d-5812-8179-90a21ebb7dec")
+	)
+	(fp_poly
+		(pts
+			(xy 4.65 -2.55) (xy 5.85 -2.55) (xy 4.65 -1.35)
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill yes)
+		(layer "F.SilkS")
 		(uuid "3f430a8c-7093-5c72-98b4-e1b05a38ce95")
 	)
 	(fp_rect
-		(start -4.6 -2.5)
-		(end 4.6 2.5)
+		(start -4.6 -2.8)
+		(end 6.1 2.5)
 		(stroke
 			(width 0.05)
 			(type solid)
 		)
 		(fill no)
 		(layer "F.CrtYd")
-		(uuid "8baf24ee-6611-58f6-9b4b-7783f75ae7a9")
+		(uuid "adfc4288-7907-5f96-afaf-300dee9adde7")
 	)
 	(fp_rect
 		(start -4.35 -2.25)
@@ -134,7 +157,7 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "b1efabef-5a19-516b-bf4e-2926da2ce27f")
+		(uuid "6226379d-7ad7-585a-ae17-8c2f3fa32ce4")
 	)
 	(fp_circle
 		(center -1.8 0)
@@ -145,7 +168,7 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "0a309749-e36d-5812-8179-90a21ebb7dec")
+		(uuid "162c6443-db3e-5214-86f6-a169c31cc553")
 	)
 	(fp_circle
 		(center 1.8 0)
@@ -156,12 +179,12 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "6226379d-7ad7-585a-ae17-8c2f3fa32ce4")
+		(uuid "3d18c123-a726-53ad-af62-e557543adafa")
 	)
 	(fp_text user "PT"
 		(at -1.8 0 0)
 		(layer "F.Fab")
-		(uuid "162c6443-db3e-5214-86f6-a169c31cc553")
+		(uuid "8baf24ee-6611-58f6-9b4b-7783f75ae7a9")
 		(effects
 			(font
 				(size 0.6 0.6)
@@ -172,7 +195,7 @@
 	(fp_text user "LED"
 		(at 1.8 0 0)
 		(layer "F.Fab")
-		(uuid "3d18c123-a726-53ad-af62-e557543adafa")
+		(uuid "d1b9596c-f8f4-5422-b77d-000ec1d3f9aa")
 		(effects
 			(font
 				(size 0.6 0.6)

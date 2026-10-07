@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Generate lite/hardware/kicad/Linetracer2-Lite.kicad_sch (Lite board rev.L2, single A3 sheet).
+"""Generate lite/hardware/kicad/Linetracer2-Lite.kicad_sch (Lite board rev.L3, single A3 sheet).
 
     cd scripts && LT2_VARIANT=lite python3 ../lite/scripts/gen_schematic_lite.py
 
 Differences from the standard board (gen_schematic.py):
-  * Seeed Studio XIAO ESP32C6 soldered flat on the board (no pin headers),
-    footprint Linetracer2:XIAO_ESP32C6_DirectSolder; powered through its 5V pin (= USB VBUS) behind D1
+  * Seeed Studio XIAO ESP32C6 on two 1x7 pin headers (footprint Linetracer2:XIAO_ESP32C6_Header);
+    powered through its 5V pin (= USB VBUS) behind D1
   * 3 x LBR-127HLD sensors straight into the XIAO's three ADC pins (no 4051 multiplexer)
   * no battery measurement (the XIAO has only 3 ADC pins; all of them are used by the sensors)
-  * 1 button, 1 LED, no buzzer, no power LED, no expansion header (every XIAO pin is used)
+  * 1 button, 1 LED + a passive piezo buzzer sharing the LED's pin, no power LED, no expansion header
 """
 import os
 import sys
@@ -24,7 +24,7 @@ C_FP = "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm"
 CP_FP = "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm"
 LED_FP = "LED_THT:LED_D3.0mm"
 
-s = Sch("Linetracer2 Lite rev.L2 - XIAO ESP32C6 kids line tracer")
+s = Sch("Linetracer2 Lite rev.L3 - XIAO ESP32C6 kids line tracer")
 
 # Akizuki (akizukidenshi.com) 通販コード for parts that are placed many times (checked 2026-10-05)
 AKIZUKI = {
@@ -46,7 +46,7 @@ def _place_with_code(lib_id, ref, value, *args, **kw):
 s.place = _place_with_code
 
 # ----------------------------------------------------------------- headings
-s.text("Linetracer2 Lite rev.L2  :  XIAO ESP32C6 without pin headers, 3 x LBR-127HLD, 1 button, 1 LED", 20.32, 17.78, 3, True)
+s.text("Linetracer2 Lite rev.L3  :  XIAO ESP32C6 on pin headers, 3 x LBR-127HLD, 1 button, 1 LED, 1 buzzer", 20.32, 17.78, 3, True)
 s.text("Power: AA x3 (alkaline 4.5V recommended / NiMH 3.6V) -> VBAT (motors) ; VBAT -> D1 Schottky -> VSYS -> XIAO 5V pin. "
        "USB 5V can not back-feed the batteries. Never use 4 cells (the XIAO's 5V input clamps above about 6 V).", 20.32, 24.13, 1.5)
 
@@ -107,11 +107,11 @@ for i in range(5):
 
 # ================================================================= MCU block
 s.rect(119.38, 101.6, 264.16, 193.04)
-s.text("2. MCU  Seeed Studio XIAO ESP32C6  (soldered flat, no pin headers)", 121.92, 106.68, 2, True)
+s.text("2. MCU  Seeed Studio XIAO ESP32C6  (on two 1x7 pin headers)", 121.92, 106.68, 2, True)
 u1 = s.place("Linetracer2:XIAO_ESP32C6", "U1", "XIAO ESP32C6", 190.5, 144.78, 0,
-             footprint="Linetracer2:XIAO_ESP32C6_DirectSolder",
-             fields={"Akizuki": "129481 (Seeed Studio XIAO ESP32C6)",
-                     "Note": "solder the castellated edge straight onto the pads, no pin header"},
+             footprint="Linetracer2:XIAO_ESP32C6_Header",
+             fields={"Akizuki": "129481 (Seeed Studio XIAO ESP32C6) + pin header 1x40 100167 (2 x 7 pins)",
+                     "Note": "solder the XIAO on two 1x7 pin headers (cut from a 1x40 strip), then into the board"},
              ref_off=(-20.32, -19.05), val_off=(-20.32, -16.51))
 # D0..D2 are the only ADC pins: sensors, in the order that keeps the three lines from crossing on the board.
 # IN1..IN4 + button on GPIO18..23: weak pull-up only while the chip is held in reset, then floating.
@@ -119,8 +119,9 @@ u1 = s.place("Linetracer2:XIAO_ESP32C6", "U1", "XIAO ESP32C6", 190.5, 144.78, 0,
 # when IN1..IN4 already float low (= coast).  Either way the motors can not start before the program runs.
 # TX / RX carry the boot log and the UART REPL: only outputs there (red LED, STBY), never the button.
 # The XIAO's rear row (D7..D10) feeds only the motor driver behind it; everything else leaves from the front row.
-pins = {"1": "SENS3", "2": "SENS2", "3": "SENS1", "4": "SW1", "5": "SENS_LED_EN", "6": "MOT_IN2",
-        "7": "LED1", "8": "MOT_STBY", "9": "MOT_IN4", "10": "MOT_IN3", "11": "MOT_IN1"}
+# rev.L3: D3/D4 and D8/D10 swapped against rev.L2 so that no two tracks cross on the top side (see layout_lite.py).
+pins = {"1": "SENS3", "2": "SENS2", "3": "SENS1", "4": "SENS_LED_EN", "5": "SW1", "6": "MOT_IN2",
+        "7": "LED1", "8": "MOT_STBY", "9": "MOT_IN1", "10": "MOT_IN3", "11": "MOT_IN4"}
 for num, net in pins.items():
     s.lab(u1, num, net)
 s.pwr(u1, "12", "+3V3")
@@ -131,7 +132,7 @@ s.text("GPIO15 = yellow user LED on the XIAO (on = 0), a 2nd indicator for free.
 s.text("Reset state (ESP32-C6 datasheet): GPIO18-23 weak pull-up during reset, then floating;", 121.92, 175.26, 1.27)
 s.text("GPIO16 (TX) / GPIO17 (RX) pull-up after reset + boot log / UART REPL -> no button and no motor input there.",
        121.92, 179.07, 1.27)
-s.text("Bottom of the XIAO: bare test pads (BAT+, 3V3, BOOT, EN, JTAG) -> copper keep-out under them on the PCB.",
+s.text("On pin headers the XIAO sits 2.5 mm above the board: its bare bottom test pads can not touch the tracks.",
        121.92, 182.88, 1.27)
 s.text("Never solder a Li-ion cell to the XIAO's BAT pads on this robot (AA cells are on the 5V pin).",
        121.92, 186.69, 1.27)
@@ -180,7 +181,7 @@ s.text("toggle STBY L->H to recover (done by the library).", 271.78, 96.52, 1.27
 
 # ================================================================= UI block
 s.rect(269.24, 101.6, 408.94, 190.5)
-s.text("4. BUTTON / LED", 271.78, 106.68, 2, True)
+s.text("4. BUTTON / LED / BUZZER", 271.78, 106.68, 2, True)
 sw1 = s.place("Switch:SW_Push", "SW1", "START", 294.64, 116.84, 0, footprint="Button_Switch_THT:SW_PUSH_6mm",
               fields={"Akizuki": "108075"}, ref_off=(-2.54, -3.81), val_off=(-2.54, 3.81))
 s.lab(sw1, "1", "SW1")
@@ -195,7 +196,19 @@ d2 = s.place("Device:LED", "D2", "LED red", 302.26, 147.32, 180,
 s.lab(r8, "1", "LED1")
 s.connect(r8, "2", d2, "2")
 s.pwr(d2, "1", "GND")
-s.text("no buzzer, no power LED on the Lite board.  2nd indicator: the yellow user LED of the XIAO (GPIO15)", 279.4, 165.1, 1.27)
+r9 = s.place("Device:R", "R9", "100", 287.02, 172.72, 90, footprint=R_FP,
+             ref_off=(-2.54, -2.54), val_off=(-1.27, 2.54))
+bz = s.place("Device:Buzzer", "BZ1", "piezo 13mm", 304.8, 175.26, 0,
+             footprint="Linetracer2:Buzzer_PKM13_P5.0",
+             fields={"Akizuki": "104118 (Murata PKM13EPYH4000-A0)", "Note": "passive piezo, + on the square pad"},
+             ref_off=(3.81, -2.54), val_off=(3.81, 2.54))
+s.lab(r9, "1", "LED1")
+s.connect(r9, "2", bz, "1")
+s.pwr(bz, "2", "GND", length=2.54)
+s.text("The buzzer shares D6 (LED1) with the red LED (no free XIAO pin): LED on = DC -> the piezo is silent;",
+       279.4, 182.88, 1.27)
+s.text("beep = PWM (1-4 kHz) -> the LED glows while it beeps.  No power LED.  2nd LED: the XIAO's yellow LED (GPIO15)",
+       279.4, 186.69, 1.27)
 
 # ================================================================= SENSOR block
 s.rect(17.78, 195.58, 299.72, 281.94)
@@ -253,7 +266,7 @@ s.pwr(q1, qe, "GND")
 s.text("Q1: all IR LEDs on when SENS_LED_EN = 1 (about 60 mA)", 200.66, 270.51, 1.27)
 
 out = os.path.join(KDIR, PROJ + ".kicad_sch")
-s.save(out, date="2026-10-05", rev="L2",
-       comments=("All parts through-hole. XIAO soldered flat (castellated edge)",
+s.save(out, date="2026-10-07", rev="L3",
+       comments=("All parts through-hole. XIAO on two 1x7 pin headers",
                  "XIAO ESP32C6 + Akizuki AE-TC78H653FTG module + 3 x LBR-127HLD",
                  "Design notes: lite/README.md"))

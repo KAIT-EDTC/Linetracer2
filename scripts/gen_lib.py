@@ -144,7 +144,7 @@ def sym_xiao():
 )""" % (
         prop("Reference", "U", 0, 15.24),
         prop("Value", "XIAO_ESP32C6", 0, -12.7),
-        prop("Footprint", "Linetracer2:XIAO_ESP32C6_DirectSolder", 0, -15.24, hide=True),
+        prop("Footprint", "Linetracer2:XIAO_ESP32C6_Header", 0, -15.24, hide=True),
         prop("Datasheet", "https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/", 0, -17.78, hide=True),
         prop("Description", "Seeed Studio XIAO ESP32C6 (ESP32-C6, Wi-Fi 6 / BLE 5 / 802.15.4). 5V pin = USB VBUS = power input "
              "(through an external diode), 3V3 = output of the on-board regulator", 0, -20.32, hide=True),
@@ -227,6 +227,10 @@ class FP:
     def arc(self, sx, sy, mx, my, ex, ey, layer="F.SilkS", w=0.12):
         self.items.append('(fp_arc (start %s %s) (mid %s %s) (end %s %s) (stroke (width %s) (type solid)) (layer "%s") (uuid "%s"))'
                           % (sx, sy, mx, my, ex, ey, w, layer, self._u()))
+
+    def poly(self, pts, layer="F.SilkS", w=0.1, fill=True):
+        self.items.append('(fp_poly (pts %s) (stroke (width %s) (type solid)) (fill %s) (layer "%s") (uuid "%s"))'
+                          % (" ".join("(xy %s %s)" % p for p in pts), w, "yes" if fill else "no", layer, self._u()))
 
     def text(self, s, x, y, layer="F.SilkS", size=1.0, thick=0.15, justify=None, rot=0):
         j = " (justify %s)" % justify if justify else ""
@@ -344,13 +348,19 @@ def fp_lbr127hld():
     f.line(4.35, -1.75, 4.35, 2.25)
     f.line(4.35, 2.25, -4.35, 2.25)
     f.line(-4.35, 2.25, -4.35, -2.25)
-    f.circle(5.0, -1.27, 0.15, w=0.3)    # pin-1 dot
+    # chamfered corner (= pin 1, LED side): a filled triangle pointing at it, just outside the body
+    f.poly([(4.65, -2.55), (5.85, -2.55), (4.65, -1.35)])
+    # lens colours, inside the outline at each end: the photo transistor has a BLACK lens (filled dot), the IR LED
+    # a CLEAR lens (open circle).  (Akizuki: the look can change between lots -> the chamfer / the long leads are
+    # the reliable marks, see the assembly manual.)  Kept 0.15 mm off the pad openings.
+    f.circle(-3.5, 0, 0.45, w=0.1, fill=True)   # filled = black lens (photo transistor)
+    f.circle(3.5, 0, 0.42, w=0.16)              # open = clear lens (IR LED)
     f.rect(-4.35, -2.25, 4.35, 2.25, layer="F.Fab", w=0.1)
     for x in (-1.8, 1.8):
         f.circle(x, 0, 1.45, layer="F.Fab", w=0.1)     # lens windows (diameter 2.9)
     f.text("PT", -1.8, 0, layer="F.Fab", size=0.6, thick=0.1)
     f.text("LED", 1.8, 0, layer="F.Fab", size=0.6, thick=0.1)
-    f.rect(-4.6, -2.5, 4.6, 2.5, layer="F.CrtYd", w=0.05)
+    f.rect(-4.6, -2.8, 6.1, 2.5, layer="F.CrtYd", w=0.05)
     f.write((0, -3.4), (0, 3.4))
 
 
@@ -405,49 +415,49 @@ def fp_buzzer():
     f.write((3.8, -7.4), (3.8, 7.6))
 
 
-def fp_xiao_direct():
-    """Seeed Studio XIAO ESP32C6 soldered FLAT on the board without pin headers (Lite board).
+def fp_buzzer_pkm13():
+    """Murata PKM13EPYH4000-A0 (Akizuki 104118): 13 mm passive piezo, 2 pins 5.0 mm apart, + marked on the
+    part.  Lite board: only this buzzer, so only its two holes (the standard board has a 3-hole footprint)."""
+    f = FP("Buzzer_PKM13_P5.0",
+           "Passive piezo sounder 13 mm Murata PKM13EPYH4000-A0, pin pitch 5.0 mm",
+           "buzzer piezo PKM13EPYH4000")
+    f.pad("1", 0, 0, "rect", 1.8, 1.8, 1.0)
+    f.pad("2", 5.0, 0, "circle", 1.8, 1.8, 1.0)
+    f.circle(2.5, 0, 6.6)                         # body (13 mm) on the silkscreen
+    f.circle(2.5, 0, 6.5, layer="F.Fab", w=0.1)
+    f.text("+", 0, -2.2, size=1.4, thick=0.25)
+    f.circle(2.5, 0, 6.9, layer="F.CrtYd", w=0.05)
+    f.write((2.5, -7.6), (2.5, 7.6))
 
-    Origin = centre of the pin pattern, USB at the top (-y), pin 1 (D0) top-left.
-    Each pin is ONE through-hole pad: the hole sits under the XIAO's own header hole (7.62 mm from the
-    centre, a pin header still fits), and the copper is stretched outwards to 1.9 mm past the module's
-    edge (8.9 mm), so the iron touches the board pad and the castellated half-hole at the same time.
-    Positions measured in Seeed's KiCad design of the XIAO ESP32C6 (v1.0, 2026-01-14):
-      * bare test pads on the XIAO's bottom (BAT+ / GND, 3V3, BOOT, EN, JTAG MTMS/MTDI/MTCK/MTDO) all lie
-        within x +-1.9, y -9.2 .. +6.6  -> F.Cu keep-out (no tracks / vias / pour may touch them)
-      * USB-C shell legs (soldered through the XIAO) at x +-4.3, y -9.48 / -5.28 -> clearance holes
-      * ceramic chip antenna at the far end (x 0.5 .. 5.7, y 8.3 .. 10.3) -> no copper on either layer
-        from y 8.75 up to 4 mm past the module end (keeps the 2.4 GHz antenna working for Wi-Fi / BLE)"""
-    f = FP("XIAO_ESP32C6_DirectSolder",
-           "Seeed Studio XIAO ESP32C6 soldered flat (no pin header): one THT pad per pin, copper stretched 1.9 mm past "
-           "the module edge for castellation soldering. Keep-outs under the bottom test pads and the chip antenna",
-           "Seeed XIAO ESP32C6 castellated direct solder no header")
-    PITCH, X, PAD_L, PAD_W, OFF = 2.54, 7.62, 4.0, 1.7, 1.2     # pad spans 6.82 .. 10.82 from the centre
+
+def fp_xiao_header():
+    """Seeed Studio XIAO ESP32C6 on two 1x7 pin headers (Lite rev.L3: the user wants pin headers, not flat
+    soldering).  Origin = centre of the pin pattern, USB at the top (-y), pin 1 (D0) top-left.
+    The module sits 2.5 mm above the board on the header plastic, so its bottom test pads and the USB legs
+    can not touch the board (no keep-outs needed for them).  The copper keep-out under the chip antenna
+    (+4 mm past the module end) stays, for Wi-Fi / BLE."""
+    f = FP("XIAO_ESP32C6_Header",
+           "Seeed Studio XIAO ESP32C6 on 2 x 1x7 pin headers (2.54 mm, rows 15.24 mm apart). Antenna copper keep-out",
+           "Seeed XIAO ESP32C6 pin header")
     for i in range(7):
-        y = round(-7.62 + PITCH * i, 3)
-        f.pad(str(i + 1), -X, y, "roundrect" if i == 0 else "oval", PAD_L, PAD_W, 1.0, offset=(-OFF, 0))
-        f.pad(str(14 - i), X, y, "oval", PAD_L, PAD_W, 1.0, offset=(OFF, 0))
-    for x in (-4.3, 4.3):                                       # USB-C shell legs
-        for y in (-9.48, -5.28):
-            f.pad("", x, y, None, 1.8, 1.8, 1.8, kind="np_thru_hole")
-    f.keepout("XIAO bottom test pads", ["F.Cu"], -2.9, -9.8, 2.9, 7.1, pads=True)
+        y = round(-7.62 + 2.54 * i, 3)
+        f.pad(str(i + 1), -7.62, y, "rect" if i == 0 else "circle", 1.7, 1.7, 1.0)
+        f.pad(str(14 - i), 7.62, y, "circle", 1.7, 1.7, 1.0)
     f.keepout("XIAO antenna", ["F.Cu", "B.Cu"], -8.9, 8.75, 8.9, 14.4)
-    # module 17.8 x 21.0 (pin pattern centre 0.06 mm towards the antenna end) + USB-C receptacle 1.5 mm out.
-    # The USB end lies on the board edge, so the silkscreen shows the antenna end and the pin-1 mark only.
+    # module outline 17.8 x 21.0 (the pin rows are inside it); USB-C receptacle 1.5 mm past the top end
+    f.rect(-8.9, -10.55, 8.9, 10.43)
     f.rect(-8.9, -10.55, 8.9, 10.43, layer="F.Fab", w=0.1)
     f.rect(-4.47, -12.05, 4.47, -4.75, layer="F.Fab", w=0.1)
     f.rect(0.5, 8.3, 5.7, 10.3, layer="F.Fab", w=0.1)
     f.text("ANT", 3.1, 9.3, layer="F.Fab", size=0.6, thick=0.1)
-    f.line(-8.9, 10.43, 8.9, 10.43)
-    f.line(-8.9, 8.75, -8.9, 10.43)
-    f.line(8.9, 8.75, 8.9, 10.43)
-    f.text("1", -12.0, -7.62, size=1.0, thick=0.15)
-    f.rect(-11.1, -12.3, 11.1, 10.7, layer="F.CrtYd", w=0.05)
+    f.text("1", -7.62, -9.4, size=1.0, thick=0.15)
+    f.rect(-9.15, -12.3, 9.15, 10.7, layer="F.CrtYd", w=0.05)
     f.write((0, 12.0), (0, 13.5))
 
 
 def write_footprints():
-    fp_xiao_direct()
+    fp_xiao_header()
+    fp_buzzer_pkm13()
     fp_buzzer()
     fp_module()
     fp_reflector()

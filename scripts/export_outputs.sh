@@ -1,7 +1,7 @@
 #!/bin/sh
 # Export everything needed for fabrication and documentation from the KiCad project.
 #   ./export_outputs.sh                      standard board (rev.A1)
-#   LT2_VARIANT=lite ./export_outputs.sh     Lite board (rev.L2)
+#   LT2_VARIANT=lite ./export_outputs.sh     Lite board (rev.L3)
 #
 #                    standard                                   Lite
 #   Gerber + drill   hardware/gerber/  (+ zip in hardware/)     lite/hardware/gerber/  (+ zip in lite/hardware/)
@@ -15,7 +15,7 @@ cd "$(dirname "$0")/.."
 ROOT=$(pwd)
 KC="$ROOT/scripts/kc"
 if [ "${LT2_VARIANT:-std}" = "lite" ]; then
-  NAME=Linetracer2-Lite; REV=rev.L2
+  NAME=Linetracer2-Lite; REV=rev.L3
   HW="$ROOT/lite/hardware"; DOCS="$ROOT/lite/docs"; IMG="$ROOT/lite/docs"
 else
   NAME=Linetracer2; REV=rev.A1
