@@ -5,6 +5,7 @@
 #   lite/hardware/Linetracer2-Lite_assembly.stl   one mesh (GitHub shows it in a 3D viewer; slicers / CAD import it)
 #   lite/hardware/Linetracer2-Lite_assembly.glb   the same with colours (Windows 3D Viewer, Blender, online glTF viewers)
 #   lite/docs/assembly_*.png                     pictures (OpenSCAD renders of the same pieces)
+#   lite/docs/steps/step_NN.png                  one picture per soldering step (for lite/docs/assembly.md)
 #
 # Coordinates: KiCad's 3D frame (x right, y to the FRONT, z up, PCB top at z = 0, origin = the board's (0, 0)).
 set -e
@@ -21,6 +22,9 @@ mkdir -p "$T"
 echo "== board (KiCad VRML, all parts)"
 ./kc pcb export vrml --units mm --user-origin 100x50mm -f -o "$T/board.wrl" \
     "$ROOT/lite/hardware/kicad/Linetracer2-Lite.kicad_pcb" | tail -1
+
+echo "== one picture per soldering step (lite/docs/steps/)"
+python3 "$ROOT/lite/scripts/step_images.py" "$T/board.wrl" | tail -1
 
 echo "== mechanical pieces (OpenSCAD, LITE_SUPPORT=$SUPPORT)"
 # piece:colour (sRGB hex)

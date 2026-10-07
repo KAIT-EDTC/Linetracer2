@@ -73,7 +73,7 @@ for s, name in (("top", "silk_top.png"), ("bot", "silk_bottom.png")):
 PYEOF
   echo "== schematic picture, routing picture (tracks only: the GND pours are left out so the tracks show)"
   pdftoppm -r 110 -png -singlefile "$DOCS/${NAME}_schematic.pdf" "$IMG/schematic"
-  ./kpy -c "
+  "$ROOT/scripts/kpy" -c "
 import pcbnew
 b = pcbnew.LoadBoard('$PCB')
 for z in list(b.Zones()):
