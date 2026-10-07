@@ -58,12 +58,15 @@ PLACE["C2"] = (76.35, U2_R - 10.16, 180, "F")  # + right (in line with D1's K), 
 PLACE["Q1"] = (20.5, 4.5, 0, "F")
 PLACE["R7"] = (25.58, R_REAR, 90, "F")   # pad 2 straight in front = Q1 base
 
-# user interface, left
-PLACE["SW1"] = (19.5, 23.5, 0, "F")
-PLACE["R9"] = (31.0, 24.5, 270, "F")     # pad 1 (LED1) front, pad 2 rear -> buzzer +
-PLACE["R8"] = (40.0, 24.5, 270, "F")     # pad 1 (LED1) front, pad 2 rear -> LED anode
+# user interface, left: one row of resistors (pad 1 at the front, on the bus), the parts right behind them.
+# D4 drives both the buzzer (through R9) and the button (through R10); the red LED has D6 to itself.
+UI_R = 24.5
+PLACE["R10"] = (25.58, UI_R, 270, "F")   # 1k: D4 -> button (right behind R7, same column)
+PLACE["SW1"] = (19.08, 37.4, 0, "F")     # pin 1 (front) on R10, pin 2 (rear) GND
+PLACE["R9"] = (32.5, UI_R, 270, "F")     # 100: D4 -> buzzer +
+PLACE["BZ1"] = (32.5, 47.5, 270, "F")    # + front, - rear (body centre 32.5 / 50.0; 1 mm from the frame pillar)
+PLACE["R8"] = (40.0, UI_R, 270, "F")     # 1k: D6 -> LED anode
 PLACE["D2"] = (40.0, 39.74, 90, "F")     # A front, K rear
-PLACE["BZ1"] = (31.0, 41.0, 270, "F")    # + front, - rear
 
 for _i, (_x, _y) in enumerate(FRAME_HOLES + [SKID_HOLE]):
     PLACE["H%d" % (_i + 1)] = (_x, _y, 0, "F")
@@ -131,12 +134,13 @@ for net, ps, r10k, upin, xt, lvl, xu in SENS:
 route("+3V3", "F", W_3V3, P("R1", "1"), P("R6", "1"))
 route("+3V3", "F", W_SIG + 0.05, P("R6", "1"), X(72.32), Y(37.35), P("U1", "12"))   # 0.3: between two XIAO pins
 
-# button / IR LED enable / LED+buzzer: a 3-line bus between the resistors and the XIAO, 1.0 mm pitch
+# IR LED enable / button+buzzer / LED: a 3-line bus between the resistors and the XIAO, 1.0 mm pitch
 route("SENS_LED_EN", "F", W_SIG, P("U1", "4"), Y(19.6), X(25.58), P("R7", "1"))
-route("SW1", "F", W_SIG, P("U1", "5"), Y(20.6), X(26.0), (26.0, 23.5))
-route("SW1", "F", W_SIG, P("SW1", "1"), X(26.0))      # the button's two pin-1 legs
-route("LED1", "F", W_SIG, P("U1", "7"), Y(21.6), X(31.0), P("R9", "1"))
-route("LED1", "F", W_SIG, (40.0, 21.6), P("R8", "1"))
+route("SW1", "F", W_SIG, P("U1", "5"), Y(20.6), X(25.58), P("R10", "1"))
+route("SW1", "F", W_SIG, (32.5, 20.6), P("R9", "1"))
+route("LED1", "F", W_SIG, P("U1", "7"), Y(21.6), X(40.0), P("R8", "1"))
+route("BTN", "F", W_SIG, P("R10", "2"), (25.58, 37.4))
+route("BTN", "F", W_SIG, P("SW1", "1"), X(25.58))      # the button's two pin-1 legs
 route("Q1-B", "F", W_SIG, P("R7", "2"), P("Q1", "3"))
 route("D2-A", "F", W_SIG, P("R8", "2"), P("D2", "2"))
 route("BZ1+", "F", W_SIG, P("R9", "2"), P("BZ1", "1"))

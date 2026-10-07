@@ -4,7 +4,7 @@
 Only SYMBOLS on the board (lower elementary school): build-order numbers, +/- and polarity pictures, the 3rd colour
 band of each resistor, short part names.  What they mean and the steps are in the assembly manual
 (lite/docs/assembly.md).  Build order (one kind of part per step, lowest parts first):
-   1 ちゃ resistors (100)   2 だいだい resistors (10k)   3 あか resistors (1k)   4 diode   5 0.1uF caps
+   1 ちゃ resistors (100) x4   2 だいだい resistors (10k) x3   3 あか resistors (1k) x3   4 diode   5 0.1uF caps
    6 transistor   7 LED   8 button   9 buzzer   10 battery connector   11 motor driver   12 XIAO
    13 470uF caps (the tallest: last, so they do not get in the way of the XIAO's joints)   14 sensors (bottom)
    15 motors (after the frames are on)
@@ -232,7 +232,7 @@ def silk(b):
         text(b, "S%d" % (i + 1), x, 6.7, 0.8)
 
     # ---- resistors: colour of the 3rd band on the body; the key in the front-right corner -----------------------
-    for ref in ("R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9"):
+    for ref in ("R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10"):
         fp = FPS[ref]
         (x1, y1), (x2, y2) = pad_xy(fp, "1"), pad_xy(fp, "2")
         w = BAND3[fp.GetValue()]
@@ -249,9 +249,11 @@ def silk(b):
     kx, ky = pad_xy(FPS["D2"], "1")                         # cathode = square pad = short leg
     text(b, "-", kx + 2.6, ky, 1.6, bold=True)
     num(b, 7, ax + 4.6, ay + 4.8)
-    cx, cy = (pad_xy(FPS["SW1"], "1")[0] + pad_xy(FPS["SW1"], "2")[0]) / 2 + 3.25, 25.75
+    sp = [p.GetPosition() for p in FPS["SW1"].Pads()]
+    cx = sum(pcbnew.ToMM(q.x) for q in sp) / len(sp) - G.OX     # centre of the 4 legs
+    cy = sum(pcbnew.ToMM(q.y) for q in sp) / len(sp) - G.OY
     num(b, 8, cx, cy)                                       # in the middle of the button
-    text(b, "スタート", cx + 0.8, 31.4, 2.0, jp=True)
+    text(b, "スタート", cx + 0.1, cy + 5.7, 1.7, jp=True)     # under the button
 
     # ---- buzzer ------------------------------------------------------------------------------------------------
     bx, by = pad_xy(FPS["BZ1"], "1")                        # + (front pad)

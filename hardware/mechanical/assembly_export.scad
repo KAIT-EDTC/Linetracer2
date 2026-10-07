@@ -24,8 +24,7 @@ else if (piece == "motor_cap") both_sides()
     translate([CAN_X1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 10, h = REAR_BOSS_X1 - CAN_X1);
 else if (piece == "motor_terminal") both_sides()
     for (s = [-1, 1]) translate([CAN_X1, MOTOR_Y + s * 9.2 - 0.6, AXIS_Z - 1.5]) cube([3.5, 1.2, 3]);
-else if (piece == "pinion") both_sides()
-    translate([SHAFT_TIP_X, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = MOD * (PINION_T + 2), h = 4);
+else if (piece == "pinion") both_sides() pinion8();
 else if (piece == "gear") both_sides() translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40();
 else if (piece == "axle") both_sides()
     translate([AXLE_END_X - AXLE_L, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 2, h = AXLE_L);

@@ -3319,6 +3319,18 @@
 		(uuid "1056bbee-6547-577e-8769-241134223894")
 	)
 	(rectangle
+		(start 17.78 195.58)
+		(end 299.72 281.94)
+		(stroke
+			(width 0.2)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "239e86d0-2bee-52ac-8903-3dffa48b806c")
+	)
+	(rectangle
 		(start 119.38 101.6)
 		(end 264.16 193.04)
 		(stroke
@@ -3329,18 +3341,6 @@
 			(type none)
 		)
 		(uuid "361206c3-d29c-50eb-85f1-fec1f9e6f50b")
-	)
-	(rectangle
-		(start 17.78 195.58)
-		(end 299.72 281.94)
-		(stroke
-			(width 0.2)
-			(type dash)
-		)
-		(fill
-			(type none)
-		)
-		(uuid "784caf73-03e8-52d6-8176-3c74a7ad17d0")
 	)
 	(rectangle
 		(start 269.24 101.6)
@@ -3354,16 +3354,27 @@
 		)
 		(uuid "db5c089a-26a0-5afc-ac9b-6e18d32e1462")
 	)
-	(text "The buzzer shares D6 (LED1) with the red LED (no free XIAO pin): LED on = DC -> the piezo is silent;"
+	(text "short press = start / stop, long press = speed level"
 		(exclude_from_sim no)
-		(at 279.4 182.88 0)
+		(at 271.78 128.27 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "05337a16-8e55-50aa-b774-03418dbc3866")
+		(uuid "05eba1ef-97fa-518d-9940-c1a8db1dedd1")
+	)
+	(text "internal pull-up, pressed = 0.  R10: if START is pressed while D4 beeps, only 3.3 mA flows"
+		(exclude_from_sim no)
+		(at 271.78 124.46 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "084336cb-33c4-5d4c-93a5-7b1348049023")
 	)
 	(text "Inside the XIAO: 5V pin -> Schottky -> buck regulator -> 3V3 (3V3 stays up while VBAT > about 4 V)."
 		(exclude_from_sim no)
@@ -3421,17 +3432,6 @@
 		)
 		(uuid "1f3184af-0305-59c5-8e50-b3d328b910a2")
 	)
-	(text "Q1: all IR LEDs on when SENS_LED_EN = 1 (about 60 mA)"
-		(exclude_from_sim no)
-		(at 200.66 270.51 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "278760e0-0dc5-5fe0-bd51-128236a3343a")
-	)
 	(text "2. MCU  Seeed Studio XIAO ESP32C6  (on two 1x7 pin headers)"
 		(exclude_from_sim no)
 		(at 121.92 106.68 0)
@@ -3454,17 +3454,6 @@
 			(justify left bottom)
 		)
 		(uuid "3b959564-41a2-5399-8cad-5e382adf06f6")
-	)
-	(text "PS1 = LEFT -> D2 (GPIO2/ADC),  PS2 = CENTRE -> D1 (GPIO1/ADC),  PS3 = RIGHT -> D0 (GPIO0/ADC)  (seen from above, robot moving up the page)"
-		(exclude_from_sim no)
-		(at 20.32 276.86 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "3c5f4c31-615e-50a5-991c-9d4f40393c1e")
 	)
 	(text "Insert the plug first and solder the header so that the RED wire is on '+'"
 		(exclude_from_sim no)
@@ -3523,9 +3512,9 @@
 		)
 		(uuid "7107dda4-7ae7-5a16-9168-3398594c9b0c")
 	)
-	(text "The body is 5.6 mm tall: the front of the robot is lifted by the 7.5 mm ball caster or skid (lens about 2.25 mm above the floor)"
+	(text "button (input + pull-up) works; to beep, D4 becomes a PWM output - it also sounds while START is held."
 		(exclude_from_sim no)
-		(at 20.32 209.55 0)
+		(at 271.78 186.69 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3545,28 +3534,27 @@
 		)
 		(uuid "7d334055-709d-56cd-b1a8-34faded62e6c")
 	)
-	(text "internal pull-up, pressed = 0"
+	(text "Q1: all IR LEDs on when SENS_LED_EN = 1 (about 60 mA)"
 		(exclude_from_sim no)
-		(at 279.4 124.46 0)
+		(at 200.66 270.51 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "874f1537-bbdd-520c-8843-9417c82fc10e")
+		(uuid "81818163-f319-5600-9a78-51de19697c37")
 	)
-	(text "5. LINE SENSORS  3 x LBR-127HLD (mount on the BOTTOM side, lens to the floor), 12 mm apart"
+	(text "PS1 = LEFT -> D2 (GPIO2/ADC),  PS2 = CENTRE -> D1 (GPIO1/ADC),  PS3 = RIGHT -> D0 (GPIO0/ADC)  (seen from above, robot moving up the page)"
 		(exclude_from_sim no)
-		(at 20.32 200.66 0)
+		(at 20.32 276.86 0)
 		(effects
 			(font
-				(size 2 2)
-				(bold yes)
+				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "8881f64e-daa3-58a8-9169-f76c21744b46")
+		(uuid "94223e08-0eb1-5928-ab87-319fb400c053")
 	)
 	(text "Reset state (ESP32-C6 datasheet): GPIO18-23 weak pull-up during reset, then floating;"
 		(exclude_from_sim no)
@@ -3579,9 +3567,9 @@
 		)
 		(uuid "ada16828-5a1a-5216-8a4b-ae8407a3a260")
 	)
-	(text "IR LED: (3.3V - 1.2V - 0.1V) / 100 ohm = about 20 mA each.  Q1 switches all LEDs (ambient light cancel).  Photo transistor: 10k pull-up -> white = low voltage, black = high voltage"
+	(text "The buzzer shares D4 with the START button (no free XIAO pin).  A piezo passes no DC, so reading the"
 		(exclude_from_sim no)
-		(at 20.32 205.74 0)
+		(at 271.78 182.88 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3600,17 +3588,6 @@
 			(justify left bottom)
 		)
 		(uuid "b55b5323-4e8b-5454-bfb4-d7c6f5bae914")
-	)
-	(text "beep = PWM (1-4 kHz) -> the LED glows while it beeps.  No power LED.  2nd LED: the XIAO's yellow LED (GPIO15)"
-		(exclude_from_sim no)
-		(at 279.4 186.69 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "b6a3c179-85ee-54f8-bad6-3acd4b5ec1e8")
 	)
 	(text "GPIO16 (TX) / GPIO17 (RX) pull-up after reset + boot log / UART REPL -> no button and no motor input there."
 		(exclude_from_sim no)
@@ -3645,16 +3622,17 @@
 		)
 		(uuid "d2cc0148-41ce-5909-86d2-f1f9de12c7e3")
 	)
-	(text "short press = start / stop, long press = speed level"
+	(text "5. LINE SENSORS  3 x LBR-127HLD (mount on the BOTTOM side, lens to the floor), 12 mm apart"
 		(exclude_from_sim no)
-		(at 279.4 128.27 0)
+		(at 20.32 200.66 0)
 		(effects
 			(font
-				(size 1.27 1.27)
+				(size 2 2)
+				(bold yes)
 			)
 			(justify left bottom)
 		)
-		(uuid "d33c66cf-927f-5d0a-861a-f3ce23bbb579")
+		(uuid "d8caeb89-4401-5af0-b0de-45cbfcf9f1cc")
 	)
 	(text "On pin headers the XIAO sits 2.5 mm above the board: its bare bottom test pads can not touch the tracks."
 		(exclude_from_sim no)
@@ -3666,6 +3644,17 @@
 			(justify left bottom)
 		)
 		(uuid "ed616c66-e56e-5a98-8720-1c7667028ce3")
+	)
+	(text "The body is 5.6 mm tall: the front of the robot is lifted by the 7.5 mm ball caster or skid (lens about 2.25 mm above the floor)"
+		(exclude_from_sim no)
+		(at 20.32 209.55 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "ef9d0a49-8477-50e9-8d8b-538fc61870a8")
 	)
 	(text "Linetracer2 Lite rev.L3  :  XIAO ESP32C6 on pin headers, 3 x LBR-127HLD, 1 button, 1 LED, 1 buzzer"
 		(exclude_from_sim no)
@@ -3679,37 +3668,38 @@
 		)
 		(uuid "f02e1e6f-89a6-5524-bf6e-ff0f3470a134")
 	)
-	(junction
-		(at 50.8 236.22)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "190f2e4e-3374-5d10-831f-d1caf509fc8e")
-	)
-	(junction
-		(at 172.72 236.22)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "2e56702d-e50a-5c8a-a026-6ebad2da8aea")
+	(text "IR LED: (3.3V - 1.2V - 0.1V) / 100 ohm = about 20 mA each.  Q1 switches all LEDs (ambient light cancel).  Photo transistor: 10k pull-up -> white = low voltage, black = high voltage"
+		(exclude_from_sim no)
+		(at 20.32 205.74 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f2030d08-f3bd-54a1-8a82-dfa337589f22")
 	)
 	(junction
 		(at 111.76 236.22)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "81cdba09-cebc-59e0-8ff6-92528164a870")
+		(uuid "30457fb0-eb8e-5306-93d8-f4b654d3ef1c")
+	)
+	(junction
+		(at 172.72 236.22)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "465de6b2-602d-5cb0-826f-b50b0cef5e3f")
+	)
+	(junction
+		(at 50.8 236.22)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "fff97185-6aab-5180-95fb-1a1114876d16")
 	)
 	(wire
 		(pts
-			(xy 147.32 222.25) (xy 147.32 219.71)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0d310444-48f4-5163-87f5-12c418bcbdf8")
-	)
-	(wire
-		(pts
-			(xy 109.22 241.3) (xy 109.22 243.84)
+			(xy 111.76 236.22) (xy 114.3 236.22)
 		)
 		(stroke
 			(width 0)
@@ -3719,33 +3709,13 @@
 	)
 	(wire
 		(pts
-			(xy 262.89 251.46) (xy 260.35 251.46)
+			(xy 167.64 241.3) (xy 170.18 241.3)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "0e05adbb-ff29-5cee-9a03-351503f05ba7")
-	)
-	(wire
-		(pts
-			(xy 281.94 246.38) (xy 281.94 243.84)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0e1d3f1b-3a76-52a6-9e65-48162aca2abd")
-	)
-	(wire
-		(pts
-			(xy 283.21 147.32) (xy 280.67 147.32)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "11de6031-8e95-5367-80ff-c0d1a8d57bfc")
 	)
 	(wire
 		(pts
@@ -3769,13 +3739,23 @@
 	)
 	(wire
 		(pts
-			(xy 147.32 229.87) (xy 147.32 236.22)
+			(xy 106.68 241.3) (xy 109.22 241.3)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "137d9f10-5afb-5c75-89d8-93b50723543b")
+	)
+	(wire
+		(pts
+			(xy 167.64 236.22) (xy 172.72 236.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "14be259b-a16d-52d7-9ef8-fa7fa824d432")
 	)
 	(wire
 		(pts
@@ -3809,7 +3789,7 @@
 	)
 	(wire
 		(pts
-			(xy 172.72 236.22) (xy 175.26 236.22)
+			(xy 152.4 241.3) (xy 149.86 241.3)
 		)
 		(stroke
 			(width 0)
@@ -3849,7 +3829,7 @@
 	)
 	(wire
 		(pts
-			(xy 30.48 241.3) (xy 27.94 241.3)
+			(xy 25.4 222.25) (xy 25.4 219.71)
 		)
 		(stroke
 			(width 0)
@@ -3859,7 +3839,7 @@
 	)
 	(wire
 		(pts
-			(xy 167.64 241.3) (xy 170.18 241.3)
+			(xy 172.72 229.87) (xy 172.72 236.22)
 		)
 		(stroke
 			(width 0)
@@ -3909,7 +3889,7 @@
 	)
 	(wire
 		(pts
-			(xy 50.8 236.22) (xy 53.34 236.22)
+			(xy 30.48 241.3) (xy 27.94 241.3)
 		)
 		(stroke
 			(width 0)
@@ -3939,7 +3919,7 @@
 	)
 	(wire
 		(pts
-			(xy 106.68 236.22) (xy 111.76 236.22)
+			(xy 86.36 229.87) (xy 86.36 236.22)
 		)
 		(stroke
 			(width 0)
@@ -3969,6 +3949,16 @@
 	)
 	(wire
 		(pts
+			(xy 106.68 236.22) (xy 111.76 236.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "46ccbda8-fe54-5b5b-87fd-d60dabe98d20")
+	)
+	(wire
+		(pts
 			(xy 383.54 69.85) (xy 386.08 69.85)
 		)
 		(stroke
@@ -3979,7 +3969,17 @@
 	)
 	(wire
 		(pts
-			(xy 111.76 236.22) (xy 114.3 236.22)
+			(xy 172.72 222.25) (xy 172.72 219.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4cf93cdd-fdcd-5d5d-bbf8-f20d98c31b15")
+	)
+	(wire
+		(pts
+			(xy 91.44 241.3) (xy 88.9 241.3)
 		)
 		(stroke
 			(width 0)
@@ -4009,7 +4009,7 @@
 	)
 	(wire
 		(pts
-			(xy 50.8 229.87) (xy 50.8 236.22)
+			(xy 25.4 236.22) (xy 30.48 236.22)
 		)
 		(stroke
 			(width 0)
@@ -4039,13 +4039,13 @@
 	)
 	(wire
 		(pts
-			(xy 50.8 222.25) (xy 50.8 219.71)
+			(xy 299.72 116.84) (xy 302.26 116.84)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "608e4260-2e2e-5e3f-a8d3-d4e79831e421")
+		(uuid "5e2489f3-b676-5735-abb6-e272f3bd8291")
 	)
 	(wire
 		(pts
@@ -4069,17 +4069,7 @@
 	)
 	(wire
 		(pts
-			(xy 290.83 147.32) (xy 298.45 147.32)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "632cf30a-a79f-59ed-8bf9-ea6caa76ee87")
-	)
-	(wire
-		(pts
-			(xy 86.36 229.87) (xy 86.36 236.22)
+			(xy 45.72 241.3) (xy 48.26 241.3)
 		)
 		(stroke
 			(width 0)
@@ -4096,16 +4086,6 @@
 			(type default)
 		)
 		(uuid "6d8a0504-dbf8-5339-9d81-7ea164dbd19b")
-	)
-	(wire
-		(pts
-			(xy 270.51 251.46) (xy 274.32 251.46)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6db932bc-9626-56cb-81b5-b3ffb5e88e5b")
 	)
 	(wire
 		(pts
@@ -4139,7 +4119,7 @@
 	)
 	(wire
 		(pts
-			(xy 170.18 241.3) (xy 170.18 243.84)
+			(xy 172.72 236.22) (xy 175.26 236.22)
 		)
 		(stroke
 			(width 0)
@@ -4156,6 +4136,16 @@
 			(type default)
 		)
 		(uuid "859c1398-50af-5a02-a8ac-b29bbbf4e0fb")
+	)
+	(wire
+		(pts
+			(xy 111.76 222.25) (xy 111.76 219.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "86082d33-1913-52c2-8623-0b30a4442e05")
 	)
 	(wire
 		(pts
@@ -4209,7 +4199,7 @@
 	)
 	(wire
 		(pts
-			(xy 111.76 229.87) (xy 111.76 236.22)
+			(xy 86.36 236.22) (xy 91.44 236.22)
 		)
 		(stroke
 			(width 0)
@@ -4219,7 +4209,7 @@
 	)
 	(wire
 		(pts
-			(xy 299.72 116.84) (xy 302.26 116.84)
+			(xy 283.21 116.84) (xy 285.75 116.84)
 		)
 		(stroke
 			(width 0)
@@ -4229,13 +4219,23 @@
 	)
 	(wire
 		(pts
-			(xy 45.72 241.3) (xy 48.26 241.3)
+			(xy 50.8 229.87) (xy 50.8 236.22)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "9a83cb67-a996-5bde-b900-66829a92cc72")
+	)
+	(wire
+		(pts
+			(xy 45.72 236.22) (xy 50.8 236.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9b4729c9-6184-570f-8a6e-21e40f6af907")
 	)
 	(wire
 		(pts
@@ -4249,7 +4249,7 @@
 	)
 	(wire
 		(pts
-			(xy 167.64 236.22) (xy 172.72 236.22)
+			(xy 147.32 229.87) (xy 147.32 236.22)
 		)
 		(stroke
 			(width 0)
@@ -4259,23 +4259,13 @@
 	)
 	(wire
 		(pts
-			(xy 306.07 147.32) (xy 308.61 147.32)
+			(xy 281.94 256.54) (xy 281.94 259.08)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "a2b61ea0-8e1d-5916-87d1-07bffcd5e9e7")
-	)
-	(wire
-		(pts
-			(xy 25.4 222.25) (xy 25.4 219.71)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a3a72c12-cfc0-57cd-afea-14d7fb1b9e72")
+		(uuid "a18db461-4681-50b0-838b-7b49bb831f0e")
 	)
 	(wire
 		(pts
@@ -4289,7 +4279,7 @@
 	)
 	(wire
 		(pts
-			(xy 91.44 241.3) (xy 88.9 241.3)
+			(xy 86.36 222.25) (xy 86.36 219.71)
 		)
 		(stroke
 			(width 0)
@@ -4309,7 +4299,7 @@
 	)
 	(wire
 		(pts
-			(xy 290.83 172.72) (xy 302.26 172.72)
+			(xy 290.83 147.32) (xy 298.45 147.32)
 		)
 		(stroke
 			(width 0)
@@ -4319,13 +4309,23 @@
 	)
 	(wire
 		(pts
-			(xy 45.72 236.22) (xy 50.8 236.22)
+			(xy 25.4 229.87) (xy 25.4 236.22)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "ac39c7c4-f3f0-53de-96f0-1dc015753ef8")
+	)
+	(wire
+		(pts
+			(xy 50.8 222.25) (xy 50.8 219.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "af1b3f71-0f06-5139-85f1-bec5b9a84e80")
 	)
 	(wire
 		(pts
@@ -4339,13 +4339,13 @@
 	)
 	(wire
 		(pts
-			(xy 172.72 222.25) (xy 172.72 219.71)
+			(xy 289.56 116.84) (xy 287.02 116.84)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "b1dabc56-3b81-5af7-8faf-efb25d890d05")
+		(uuid "b2abf113-9ebe-572c-96c6-abcd1de50498")
 	)
 	(wire
 		(pts
@@ -4359,16 +4359,6 @@
 	)
 	(wire
 		(pts
-			(xy 25.4 229.87) (xy 25.4 236.22)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b8dbf507-cacf-51ee-a8b3-1b66e1a23c31")
-	)
-	(wire
-		(pts
 			(xy 370.84 69.85) (xy 368.3 69.85)
 		)
 		(stroke
@@ -4376,6 +4366,16 @@
 			(type default)
 		)
 		(uuid "bb1241d8-484b-52c1-b375-a4586418e77c")
+	)
+	(wire
+		(pts
+			(xy 290.83 172.72) (xy 302.26 172.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c4ddadec-8ebc-50c0-a7d4-9c2d455e9f61")
 	)
 	(wire
 		(pts
@@ -4389,13 +4389,23 @@
 	)
 	(wire
 		(pts
-			(xy 48.26 241.3) (xy 48.26 243.84)
+			(xy 50.8 236.22) (xy 53.34 236.22)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "c7adcd90-db4a-51d1-afe5-bc95e65bd678")
+	)
+	(wire
+		(pts
+			(xy 170.18 241.3) (xy 170.18 243.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c83b1e51-cf84-5867-b106-6cc6a423a6e8")
 	)
 	(wire
 		(pts
@@ -4419,13 +4429,13 @@
 	)
 	(wire
 		(pts
-			(xy 111.76 222.25) (xy 111.76 219.71)
+			(xy 283.21 172.72) (xy 280.67 172.72)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d01ebf8e-40ad-59ad-9c84-b2a0a5bc38a3")
+		(uuid "d081fac9-8cd8-5df7-bc08-2840879252ec")
 	)
 	(wire
 		(pts
@@ -4439,7 +4449,7 @@
 	)
 	(wire
 		(pts
-			(xy 172.72 229.87) (xy 172.72 236.22)
+			(xy 147.32 236.22) (xy 152.4 236.22)
 		)
 		(stroke
 			(width 0)
@@ -4449,7 +4459,7 @@
 	)
 	(wire
 		(pts
-			(xy 302.26 177.8) (xy 299.72 177.8)
+			(xy 306.07 147.32) (xy 308.61 147.32)
 		)
 		(stroke
 			(width 0)
@@ -4479,7 +4489,7 @@
 	)
 	(wire
 		(pts
-			(xy 147.32 236.22) (xy 152.4 236.22)
+			(xy 109.22 241.3) (xy 109.22 243.84)
 		)
 		(stroke
 			(width 0)
@@ -4499,17 +4509,7 @@
 	)
 	(wire
 		(pts
-			(xy 86.36 222.25) (xy 86.36 219.71)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e2bf9bb6-84da-5ade-b9f5-7fd1e306744f")
-	)
-	(wire
-		(pts
-			(xy 281.94 256.54) (xy 281.94 259.08)
+			(xy 262.89 251.46) (xy 260.35 251.46)
 		)
 		(stroke
 			(width 0)
@@ -4529,7 +4529,7 @@
 	)
 	(wire
 		(pts
-			(xy 283.21 172.72) (xy 280.67 172.72)
+			(xy 283.21 147.32) (xy 280.67 147.32)
 		)
 		(stroke
 			(width 0)
@@ -4539,17 +4539,7 @@
 	)
 	(wire
 		(pts
-			(xy 25.4 236.22) (xy 30.48 236.22)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e7a5dc28-a046-5edc-b33a-684e7b9bf614")
-	)
-	(wire
-		(pts
-			(xy 86.36 236.22) (xy 91.44 236.22)
+			(xy 48.26 241.3) (xy 48.26 243.84)
 		)
 		(stroke
 			(width 0)
@@ -4559,13 +4549,33 @@
 	)
 	(wire
 		(pts
-			(xy 289.56 116.84) (xy 287.02 116.84)
+			(xy 281.94 246.38) (xy 281.94 243.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e904449b-94a6-5f43-809a-daa466aa8396")
+	)
+	(wire
+		(pts
+			(xy 275.59 116.84) (xy 273.05 116.84)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "e992d873-6181-5e3d-b525-c60abd8b187c")
+	)
+	(wire
+		(pts
+			(xy 302.26 177.8) (xy 299.72 177.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ea7a0f87-4830-50d7-b6ae-3bb49704ffac")
 	)
 	(wire
 		(pts
@@ -4576,6 +4586,16 @@
 			(type default)
 		)
 		(uuid "ef903db2-6a0d-5a54-86bd-3c08abb2f8ce")
+	)
+	(wire
+		(pts
+			(xy 270.51 251.46) (xy 274.32 251.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f13118e9-da7f-588c-b659-49d7e31b6499")
 	)
 	(wire
 		(pts
@@ -4599,7 +4619,7 @@
 	)
 	(wire
 		(pts
-			(xy 152.4 241.3) (xy 149.86 241.3)
+			(xy 147.32 222.25) (xy 147.32 219.71)
 		)
 		(stroke
 			(width 0)
@@ -4609,7 +4629,7 @@
 	)
 	(wire
 		(pts
-			(xy 106.68 241.3) (xy 109.22 241.3)
+			(xy 111.76 229.87) (xy 111.76 236.22)
 		)
 		(stroke
 			(width 0)
@@ -4627,15 +4647,25 @@
 		)
 		(uuid "08c4ad35-1718-540d-9f05-6fee6cf3af3a")
 	)
-	(label "SENS_LED_EN"
-		(at 260.35 251.46 180)
+	(label "SENS3"
+		(at 175.26 236.22 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "11152e3a-c68e-5d7a-bb42-79d25b3a6ef7")
+	)
+	(label "LED_K"
+		(at 88.9 241.3 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "103f6ca8-6bc6-59ad-8651-44e5e949bd08")
+		(uuid "14530463-6460-542c-9154-a6809a923105")
 	)
 	(label "MOT_OUT4"
 		(at 320.04 57.15 0)
@@ -4646,6 +4676,16 @@
 			(justify left bottom)
 		)
 		(uuid "1fad15fa-7654-5f9d-ab28-69825f6f7eb5")
+	)
+	(label "SENS1"
+		(at 53.34 236.22 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "20430d0a-6414-54d0-9c9e-c894b12d58e6")
 	)
 	(label "MOT_OUT2"
 		(at 382.27 54.61 0)
@@ -4676,16 +4716,6 @@
 			(justify right bottom)
 		)
 		(uuid "2e0a4897-5c9b-5533-a5b1-b223aeb27012")
-	)
-	(label "SENS1"
-		(at 53.34 236.22 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "37f8da5e-1929-56f4-85c9-b4696588fddd")
 	)
 	(label "SW1"
 		(at 165.1 147.32 180)
@@ -4718,7 +4748,7 @@
 		(uuid "47eb0c8b-9c5a-5544-aeed-4fa629cf7d63")
 	)
 	(label "LED1"
-		(at 280.67 172.72 180)
+		(at 280.67 147.32 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4767,18 +4797,18 @@
 		)
 		(uuid "50205623-795b-5af4-b59d-7a6d310fc958")
 	)
-	(label "LED_K"
-		(at 281.94 243.84 90)
+	(label "SENS_LED_EN"
+		(at 260.35 251.46 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left bottom)
+			(justify right bottom)
 		)
-		(uuid "54adaf2f-a733-55fa-ac3d-93615b97edc6")
+		(uuid "5cb1a8e5-2fb8-5dd3-a77a-4764f1c858af")
 	)
 	(label "SW1"
-		(at 287.02 116.84 180)
+		(at 273.05 116.84 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4807,15 +4837,15 @@
 		)
 		(uuid "69697d84-e698-516f-bc7b-aebda0654627")
 	)
-	(label "LED_K"
-		(at 149.86 241.3 180)
+	(label "SW1"
+		(at 280.67 172.72 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify right bottom)
 		)
-		(uuid "6e743dd5-50f8-5fc6-9bdd-f9dd10145ac6")
+		(uuid "6ab67d69-4e62-5807-8b85-8c0e9b1b7c1c")
 	)
 	(label "MOT_OUT1"
 		(at 368.3 44.45 180)
@@ -4827,16 +4857,6 @@
 		)
 		(uuid "6f0391d5-820f-5089-89c5-e655eacbe093")
 	)
-	(label "SENS3"
-		(at 175.26 236.22 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "728e0b13-5991-5389-bd60-44d02e8b1436")
-	)
 	(label "VBAT"
 		(at 63.5 49.53 90)
 		(effects
@@ -4846,6 +4866,16 @@
 			(justify left bottom)
 		)
 		(uuid "7dd5c4de-6ea2-5445-868e-4648dee8b6ee")
+	)
+	(label "BTN"
+		(at 285.75 116.84 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8281395d-c685-58ea-9a52-0fddc265e702")
 	)
 	(label "VSYS"
 		(at 92.71 45.72 0)
@@ -4907,16 +4937,6 @@
 		)
 		(uuid "abbc0375-abdd-5b89-a323-a8b6946ff1c8")
 	)
-	(label "LED1"
-		(at 280.67 147.32 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "ae9710bf-df8c-5f4b-8fda-bb44f4303181")
-	)
 	(label "VBAT"
 		(at 320.04 54.61 0)
 		(effects
@@ -4935,7 +4955,27 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "b48158f2-176b-5213-add6-80294287e3fa")
+		(uuid "b44b397e-0b46-5b3d-857e-4924cba1e130")
+	)
+	(label "LED_K"
+		(at 27.94 241.3 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "bf0b82a2-968f-5bc2-bf9c-2c81dd939841")
+	)
+	(label "LED_K"
+		(at 281.94 243.84 90)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c44c12bb-cdd6-5a9a-a4ac-86511525a436")
 	)
 	(label "MOT_OUT2"
 		(at 320.04 64.77 0)
@@ -4977,6 +5017,16 @@
 		)
 		(uuid "cc54ae1c-06bb-5f8a-8f65-a89736f2ebeb")
 	)
+	(label "LED_K"
+		(at 149.86 241.3 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "d9aa8e28-c169-54cd-9ccd-10db41657952")
+	)
 	(label "VSYS"
 		(at 106.68 49.53 90)
 		(effects
@@ -4986,16 +5036,6 @@
 			(justify left bottom)
 		)
 		(uuid "d9c0f3c4-d917-510e-925b-dc0241dbef0d")
-	)
-	(label "LED_K"
-		(at 27.94 241.3 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "da7ba197-a80a-5104-9037-52683e117b58")
 	)
 	(label "MOT_IN3"
 		(at 215.9 147.32 0)
@@ -5067,16 +5107,6 @@
 		)
 		(uuid "ee787dc6-7921-5a9d-9bea-6578dc570956")
 	)
-	(label "LED_K"
-		(at 88.9 241.3 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "efd29eb2-0df8-549e-87a6-7e7c6cba9279")
-	)
 	(label "MOT_OUT1"
 		(at 320.04 62.23 0)
 		(effects
@@ -5086,6 +5116,16 @@
 			(justify left bottom)
 		)
 		(uuid "f2a0d9a3-1c5a-5642-9dd7-d275c7445613")
+	)
+	(label "BTN"
+		(at 287.02 116.84 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "f6c03952-2442-51ac-8ef7-655645846105")
 	)
 	(label "MOT_IN1"
 		(at 215.9 149.86 0)
@@ -8292,6 +8332,102 @@
 			(project "Linetracer2-Lite"
 				(path "/19cc55c1-5979-571f-b65c-7638f0532cc3"
 					(reference "R3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 279.4 116.84 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "c142f090-8f48-544e-b219-2f1f9bf246f8")
+		(property "Reference" "R10"
+			(at 276.86 114.3 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "1k"
+			(at 278.13 119.38 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+			(at 279.4 116.84 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Datasheet" ""
+			(at 279.4 116.84 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 279.4 116.84 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Akizuki" "125102 (100pcs)"
+			(at 279.4 116.84 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "1"
+			(uuid "0aa74ebd-7289-51f4-aae6-c2eee1c5aab1")
+		)
+		(pin "2"
+			(uuid "026b47dd-0041-55a0-858f-60825f69bc55")
+		)
+		(instances
+			(project "Linetracer2-Lite"
+				(path "/19cc55c1-5979-571f-b65c-7638f0532cc3"
+					(reference "R10")
 					(unit 1)
 				)
 			)

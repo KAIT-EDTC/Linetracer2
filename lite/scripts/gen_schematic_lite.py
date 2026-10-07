@@ -8,7 +8,7 @@ Differences from the standard board (gen_schematic.py):
     powered through its 5V pin (= USB VBUS) behind D1
   * 3 x LBR-127HLD sensors straight into the XIAO's three ADC pins (no 4051 multiplexer)
   * no battery measurement (the XIAO has only 3 ADC pins; all of them are used by the sensors)
-  * 1 button, 1 LED + a passive piezo buzzer sharing the LED's pin, no power LED, no expansion header
+  * 1 button, 1 LED, a passive piezo buzzer sharing the button's pin (D4), no power LED, no expansion header
 """
 import os
 import sys
@@ -120,6 +120,7 @@ u1 = s.place("Linetracer2:XIAO_ESP32C6", "U1", "XIAO ESP32C6", 190.5, 144.78, 0,
 # TX / RX carry the boot log and the UART REPL: only outputs there (red LED, STBY), never the button.
 # The XIAO's rear row (D7..D10) feeds only the motor driver behind it; everything else leaves from the front row.
 # rev.L3: D3/D4 and D8/D10 swapped against rev.L2 so that no two tracks cross on the top side (see layout_lite.py).
+# D4 (SW1) also drives the buzzer (through R9; the button hangs on R10).  D6 (LED1) = the red LED only.
 pins = {"1": "SENS3", "2": "SENS2", "3": "SENS1", "4": "SENS_LED_EN", "5": "SW1", "6": "MOT_IN2",
         "7": "LED1", "8": "MOT_STBY", "9": "MOT_IN1", "10": "MOT_IN3", "11": "MOT_IN4"}
 for num, net in pins.items():
@@ -184,10 +185,15 @@ s.rect(269.24, 101.6, 408.94, 190.5)
 s.text("4. BUTTON / LED / BUZZER", 271.78, 106.68, 2, True)
 sw1 = s.place("Switch:SW_Push", "SW1", "START", 294.64, 116.84, 0, footprint="Button_Switch_THT:SW_PUSH_6mm",
               fields={"Akizuki": "108075"}, ref_off=(-2.54, -3.81), val_off=(-2.54, 3.81))
-s.lab(sw1, "1", "SW1")
+r10 = s.place("Device:R", "R10", "1k", 279.4, 116.84, 90, footprint=R_FP,
+              ref_off=(-2.54, -2.54), val_off=(-1.27, 2.54))
+s.lab(r10, "1", "SW1")
+s.lab(r10, "2", "BTN")
+s.lab(sw1, "1", "BTN")
 s.pwr(sw1, "2", "GND")
-s.text("internal pull-up, pressed = 0", 279.4, 124.46, 1.27)
-s.text("short press = start / stop, long press = speed level", 279.4, 128.27, 1.27)
+s.text("internal pull-up, pressed = 0.  R10: if START is pressed while D4 beeps, only 3.3 mA flows",
+       271.78, 124.46, 1.27)
+s.text("short press = start / stop, long press = speed level", 271.78, 128.27, 1.27)
 
 r8 = s.place("Device:R", "R8", "1k", 287.02, 147.32, 90, footprint=R_FP,
              ref_off=(-2.54, -2.54), val_off=(-1.27, 2.54))
@@ -202,13 +208,13 @@ bz = s.place("Device:Buzzer", "BZ1", "piezo 13mm", 304.8, 175.26, 0,
              footprint="Linetracer2:Buzzer_PKM13_P5.0",
              fields={"Akizuki": "104118 (Murata PKM13EPYH4000-A0)", "Note": "passive piezo, + on the square pad"},
              ref_off=(3.81, -2.54), val_off=(3.81, 2.54))
-s.lab(r9, "1", "LED1")
+s.lab(r9, "1", "SW1")
 s.connect(r9, "2", bz, "1")
 s.pwr(bz, "2", "GND", length=2.54)
-s.text("The buzzer shares D6 (LED1) with the red LED (no free XIAO pin): LED on = DC -> the piezo is silent;",
-       279.4, 182.88, 1.27)
-s.text("beep = PWM (1-4 kHz) -> the LED glows while it beeps.  No power LED.  2nd LED: the XIAO's yellow LED (GPIO15)",
-       279.4, 186.69, 1.27)
+s.text("The buzzer shares D4 with the START button (no free XIAO pin).  A piezo passes no DC, so reading the",
+       271.78, 182.88, 1.27)
+s.text("button (input + pull-up) works; to beep, D4 becomes a PWM output - it also sounds while START is held.",
+       271.78, 186.69, 1.27)
 
 # ================================================================= SENSOR block
 s.rect(17.78, 195.58, 299.72, 281.94)

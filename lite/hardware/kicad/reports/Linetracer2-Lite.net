@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/home/aonuma/Desktop/EDTC/Linetracer2/.claude/worktrees/esp32c6-photoreflector-spec-95e549/lite/hardware/kicad/Linetracer2-Lite.kicad_sch")
-		(date "2026-10-07T15:49:01")
+		(date "2026-10-07T19:15:59")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")
@@ -1712,6 +1712,66 @@
 			)
 		)
 		(comp
+			(ref "R10")
+			(value "1k")
+			(footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Akizuki") "125102 (100pcs)")
+				(field
+					(name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Akizuki")
+				(value "125102 (100pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "c142f090-8f48-544e-b219-2f1f9bf246f8")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
 			(ref "SW1")
 			(value "START")
 			(footprint "Button_Switch_THT:SW_PUSH_6mm")
@@ -2653,15 +2713,26 @@
 		)
 		(net
 			(code "2")
+			(name "/BTN")
+			(class "Default")
+			(node
+				(ref "R10")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "SW1")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "3")
 			(name "/LED1")
 			(class "Default")
 			(node
 				(ref "R8")
-				(pin "1")
-				(pintype "passive")
-			)
-			(node
-				(ref "R9")
 				(pin "1")
 				(pintype "passive")
 			)
@@ -2673,7 +2744,7 @@
 			)
 		)
 		(net
-			(code "3")
+			(code "4")
 			(name "/LED_K")
 			(class "Power")
 			(node
@@ -2702,7 +2773,7 @@
 			)
 		)
 		(net
-			(code "4")
+			(code "5")
 			(name "/MOT_IN1")
 			(class "Default")
 			(node
@@ -2719,7 +2790,7 @@
 			)
 		)
 		(net
-			(code "5")
+			(code "6")
 			(name "/MOT_IN2")
 			(class "Default")
 			(node
@@ -2736,7 +2807,7 @@
 			)
 		)
 		(net
-			(code "6")
+			(code "7")
 			(name "/MOT_IN3")
 			(class "Default")
 			(node
@@ -2753,7 +2824,7 @@
 			)
 		)
 		(net
-			(code "7")
+			(code "8")
 			(name "/MOT_IN4")
 			(class "Default")
 			(node
@@ -2770,7 +2841,7 @@
 			)
 		)
 		(net
-			(code "8")
+			(code "9")
 			(name "/MOT_OUT1")
 			(class "Motor")
 			(node
@@ -2792,7 +2863,7 @@
 			)
 		)
 		(net
-			(code "9")
+			(code "10")
 			(name "/MOT_OUT2")
 			(class "Motor")
 			(node
@@ -2814,7 +2885,7 @@
 			)
 		)
 		(net
-			(code "10")
+			(code "11")
 			(name "/MOT_OUT3")
 			(class "Motor")
 			(node
@@ -2836,7 +2907,7 @@
 			)
 		)
 		(net
-			(code "11")
+			(code "12")
 			(name "/MOT_OUT4")
 			(class "Motor")
 			(node
@@ -2858,7 +2929,7 @@
 			)
 		)
 		(net
-			(code "12")
+			(code "13")
 			(name "/MOT_STBY")
 			(class "Default")
 			(node
@@ -2875,7 +2946,7 @@
 			)
 		)
 		(net
-			(code "13")
+			(code "14")
 			(name "/SENS1")
 			(class "Default")
 			(node
@@ -2897,7 +2968,7 @@
 			)
 		)
 		(net
-			(code "14")
+			(code "15")
 			(name "/SENS2")
 			(class "Default")
 			(node
@@ -2919,7 +2990,7 @@
 			)
 		)
 		(net
-			(code "15")
+			(code "16")
 			(name "/SENS3")
 			(class "Default")
 			(node
@@ -2941,7 +3012,7 @@
 			)
 		)
 		(net
-			(code "16")
+			(code "17")
 			(name "/SENS_LED_EN")
 			(class "Default")
 			(node
@@ -2957,13 +3028,17 @@
 			)
 		)
 		(net
-			(code "17")
+			(code "18")
 			(name "/SW1")
 			(class "Default")
 			(node
-				(ref "SW1")
+				(ref "R10")
 				(pin "1")
-				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "R9")
+				(pin "1")
 				(pintype "passive")
 			)
 			(node
@@ -2974,7 +3049,7 @@
 			)
 		)
 		(net
-			(code "18")
+			(code "19")
 			(name "/VBAT")
 			(class "Motor")
 			(node
@@ -3008,7 +3083,7 @@
 			)
 		)
 		(net
-			(code "19")
+			(code "20")
 			(name "/VSYS")
 			(class "Power")
 			(node
@@ -3030,7 +3105,7 @@
 			)
 		)
 		(net
-			(code "20")
+			(code "21")
 			(name "GND")
 			(class "Ground")
 			(node
@@ -3129,7 +3204,7 @@
 			)
 		)
 		(net
-			(code "21")
+			(code "22")
 			(name "Net-(BZ1-+)")
 			(class "Default")
 			(node
@@ -3145,7 +3220,7 @@
 			)
 		)
 		(net
-			(code "22")
+			(code "23")
 			(name "Net-(D2-A)")
 			(class "Default")
 			(node
@@ -3161,7 +3236,7 @@
 			)
 		)
 		(net
-			(code "23")
+			(code "24")
 			(name "Net-(PS1-A)")
 			(class "Default")
 			(node
@@ -3177,7 +3252,7 @@
 			)
 		)
 		(net
-			(code "24")
+			(code "25")
 			(name "Net-(PS2-A)")
 			(class "Default")
 			(node
@@ -3193,7 +3268,7 @@
 			)
 		)
 		(net
-			(code "25")
+			(code "26")
 			(name "Net-(PS3-A)")
 			(class "Default")
 			(node
@@ -3209,7 +3284,7 @@
 			)
 		)
 		(net
-			(code "26")
+			(code "27")
 			(name "Net-(Q1-B)")
 			(class "Default")
 			(node

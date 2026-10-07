@@ -11,7 +11,7 @@
 "Q1","2SC1815-GR","Package_TO_SOT_THT:TO-92_Inline_Wide","117089","","1"
 "R1-R3,R9","100","Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal","125101 (100pcs)","","4"
 "R4-R6","10k","Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal","125103 (100pcs)","","3"
-"R7,R8","1k","Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal","125102 (100pcs)","","2"
+"R7,R8,R10","1k","Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal","125102 (100pcs)","","3"
 "SW1","START","Button_Switch_THT:SW_PUSH_6mm","108075","","1"
 "U1","XIAO ESP32C6","Linetracer2:XIAO_ESP32C6_Header","129481 (Seeed Studio XIAO ESP32C6) + pin header 1x40 100167 (2 x 7 pins)","solder the XIAO on two 1x7 pin headers (cut from a 1x40 strip), then into the board","1"
 "U2","AE-TC78H653FTG","Linetracer2:AE-TC78H653FTG","114746","uses the two 1x8 pin headers that come with the module","1"

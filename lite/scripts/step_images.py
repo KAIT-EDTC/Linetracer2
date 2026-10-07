@@ -23,7 +23,7 @@ import asm3d  # noqa: E402
 import layout_lite as LL  # noqa: E402
 
 # build order (= the circled numbers on the board, lite/docs/assembly.md)
-STEPS = {1: ["R1", "R2", "R3", "R9"], 2: ["R4", "R5", "R6"], 3: ["R7", "R8"], 4: ["D1"], 5: ["C3", "C4"],
+STEPS = {1: ["R1", "R2", "R3", "R9"], 2: ["R4", "R5", "R6"], 3: ["R7", "R8", "R10"], 4: ["D1"], 5: ["C3", "C4"],
          6: ["Q1"], 7: ["D2"], 8: ["SW1"], 9: ["BZ1"], 10: ["J1"], 11: ["U2"], 12: ["U1"], 13: ["C1", "C2"],
          14: ["PS1", "PS2", "PS3"]}
 S = 11.0                       # px per mm

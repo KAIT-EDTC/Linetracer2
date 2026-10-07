@@ -6,6 +6,7 @@
 #                       the buzzer beeps / the red LED blinks the new level)
 #   red LED on        : ready (the Lite board has no power LED)
 #   buzzer            : a short tune at power-on, "pi-pi-pi-PI" before it starts, a low tone when something failed
+#                       (the buzzer is on the START button's pin: it can not see a press while it sounds)
 #                       (hold START while switching on = quiet mode: no sound, the LED blinks instead)
 #   On USB alone the motors have NO power (they run from the batteries only): switch the battery box ON.
 #

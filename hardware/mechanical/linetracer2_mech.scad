@@ -65,6 +65,9 @@ WALL     = 1.8;
 FRONT_X0 = CAN_X0 - BOSS_L;            // 18.8 : the boss pocket starts here
 PLATE_X0 = 16.8;                       // motor plate is 3.7 mm thick (pinion ends at 15.5)
 OUTER_X0 = 8.5; OUTER_X1 = 10.5;       // outer axle wall (hangs in the notch)
+OUTER_Y0 = 70.0;                       // its front end (was 73.0: room around the relief hole for the shaft tip)
+WALL_RELIEF = true;                    // hole in the outer wall for a long motor shaft (false = positive control)
+SHAFT_LONG = 0.9;                      // worst case: shaft 0.5 mm longer than nominal + 0.4 mm end play
 HANG_Z   = 0.0;                        // lowest point (flat bottom -> prints without supports)
 AXLE_D   = 2.0;
 AXLE_L   = 20.0;                       // brass rod, 2 mm
@@ -207,7 +210,7 @@ module frame_left(lbl = true) {
             rbox([PLATE_X0, 64.0, 0], [CAN_X0 - PLATE_X0, 100.5 - 64.0, AXIS_Z + 9], 1.0);
             translate([NOTCH_X - 0.5, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 6, h = FRONT_X0 - NOTCH_X + 0.5);
             // outer axle wall (in the wheel notch) with spacer bosses on both faces
-            rbox([OUTER_X0, 73.0, HANG_Z], [OUTER_X1 - OUTER_X0, 100.5 - 73.0, AXIS_Z + 4 - HANG_Z], 0.9);
+            rbox([OUTER_X0, OUTER_Y0, HANG_Z], [OUTER_X1 - OUTER_X0, 100.5 - OUTER_Y0, AXIS_Z + 4 - HANG_Z], 0.9);
             translate([WHEEL_X1 + 0.3, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 6, h = OUTER_X0 - WHEEL_X1 - 0.3 + 0.01);
             translate([OUTER_X1 - 0.01, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 6, h = GEAR_X0 - 0.2 - OUTER_X1 + 0.01);
             // lower front bar under the pinion, rear bar behind the spur gear
@@ -230,6 +233,11 @@ module frame_left(lbl = true) {
         // room for pinion and spur gear between the walls
         translate([OUTER_X1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0])
             cylinder(d = MOD * (PINION_T + 2) + 2 * CLR + 1, h = PLATE_X0 - 0.5 - OUTER_X1);
+        // ... and through the outer wall: FA-130 shaft = 9.5 +-0.5 mm from the can face + 0.05..0.4 mm end play, so
+        // the tip (and the pinion pressed flush with it) can reach 0.9 mm past the nominal 11.0 - the wall face is at
+        // 10.5.  The wheel covers this hole from the outside.
+        if (WALL_RELIEF) translate([OUTER_X0 - 1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0])
+            cylinder(d = MOD * (PINION_T + 2) + 2 * CLR + 1, h = OUTER_X1 - OUTER_X0 + 2);
         translate([GEAR_X0 - 0.2, AXLE_Y, AXIS_Z]) rotate([0, 90, 0])
             cylinder(d = MOD * (SPUR_T + 2) + 2 * CLR + 1, h = PLATE_X0 - (GEAR_X0 - 0.2));
         // motor pads M1 (+ relief holes) and C5 must stay free
@@ -250,6 +258,20 @@ module frame_right() difference() {
 // and keeps them in their cradles.  Print UPSIDE DOWN (the battery side on the bed).
 function all_holes() = [for (h = HOLES) h, for (h = HOLES) [100 - h[0], h[1]]];
 
+// motor stop: a rib under the deck that drops into the 2 mm gap between the two motors' rear bosses (x 49 / 51).
+// The motors are slid OUTWARD into mesh (pinion first, see check_motor_slide) and only the snap's friction held
+// them there; with the deck on, neither motor can creep back toward the centre (0.5 mm air each side).
+MOTOR_STOP_W = 1.0;                    // rib thickness (x): 0.5 mm air to each rear boss (FA-130 overall 38.0 +-0.1)
+MOTOR_STOP_Z = 8.5;                    // rib bottom (the rear bosses are d10 around z 10.4)
+MOTOR_STOP_CH = 0.3;                   // 45 deg lead-in on both sides of the bottom edge: a motor that sits up to
+                                       // 0.8 mm too far in is pushed back into its seat as the deck goes down
+module motor_stop() hull() {
+    translate([50 - MOTOR_STOP_W / 2, MOTOR_Y - 4.5, MOTOR_STOP_Z + MOTOR_STOP_CH])
+        cube([MOTOR_STOP_W, 9, DECK_UNDER - MOTOR_STOP_Z - MOTOR_STOP_CH + 0.01]);
+    translate([50 - MOTOR_STOP_W / 2 + MOTOR_STOP_CH, MOTOR_Y - 4.5, MOTOR_STOP_Z])
+        cube([MOTOR_STOP_W - 2 * MOTOR_STOP_CH, 9, 0.01]);
+}
+
 module deck_body() {
     intersection() {                   // child safety: the 4 outer corners are rounded (r 2, vertical edges)
         union() {
@@ -259,6 +281,7 @@ module deck_body() {
         }
         rbox([DECK_X0, DECK_FRONT[0], TOWER_TOP - 1], [DECK_X1 - DECK_X0, DECK_REAR[1] - DECK_FRONT[0], DECK_TOP - TOWER_TOP + 2], 2.0);
     }
+    motor_stop();
 }
 
 module deck_common_cuts() {
@@ -721,7 +744,7 @@ module pcb() {                     // standard: 100 x 100 with the rear notches;
 }
 
 module drive_side() {              // left side: gears, axle, wheel, tyre
-    gear_disc(PINION_T, SHAFT_TIP_X, SHAFT_TIP_X + 4, MOTOR_Y, "gold");
+    color("gold") pinion8();                                    // Tamiya 8T, outer face flush with the shaft tip
     color("white") translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40();
     color("goldenrod") translate([AXLE_END_X - AXLE_L, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 2, h = AXLE_L);
     color("orange") translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel();
@@ -828,6 +851,9 @@ module motor_drop_sweep() {
 }
 module snap_lips() translate([CAN_X0 + 0.5 - 0.01, MOTOR_Y - CAN_R - WALL - 0.01, AXIS_Z]) cube([CAN_X1 - CAN_X0 - 1.0 + 0.02, CAN_W + 2 * WALL + 0.02, 2.2 + 0.01]);
 module pinion_round(dx) translate([SHAFT_TIP_X + dx, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = MOD * (PINION_T + 2) + PIN_MARGIN, h = 4);
+// the 8T pinion as it sits on the motor shaft (assembly views): tooth shape, turned so that it meshes with the 40T
+module pinion8() translate([SHAFT_TIP_X, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) rotate(PINION_PHASE)
+    difference() { linear_extrude(4) gear2d(MOD, PINION_T, 20, 0); translate([0, 0, -1]) cylinder(d = 1.9, h = 6); }
 // 8T pinion (tooth shape, right phase) swept from its final place over the whole slide, against the printed 40T gear
 module pinion_slide_teeth() translate([SHAFT_TIP_X, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) rotate(PINION_PHASE)
     linear_extrude(4 + MOTOR_SLIDE) gear2d(MOD, PINION_T, 20, 0);
@@ -896,6 +922,13 @@ else if (part == "check_gear_frame") intersection() { translate([GEAR_X0, AXLE_Y
 else if (part == "check_pinion_plate") intersection() { frame_left(); hull() for (d = [SLIDE_END, MOTOR_SLIDE]) pinion_round(d); }
 else if (part == "check_motor_slide") intersection() { frame_left(); motor_slide_sweep(SLIDE_END, MOTOR_SLIDE); }
 else if (part == "check_motor_drop") intersection() { difference() { frame_left(); snap_lips(); } motor_drop_sweep(); }
+else if (part == "check_shaft_wall") intersection() {    // the longest allowed shaft (+ pinion flush with its tip)
+    frame_left();
+    translate([-SHAFT_LONG, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) {
+        translate([0, 0, SHAFT_TIP_X]) cylinder(d = 2, h = FRONT_X0 - SHAFT_TIP_X);
+        translate([0, 0, SHAFT_TIP_X]) cylinder(d = MOD * (PINION_T + 2) + 0.1, h = 4);
+    }
+}
 else if (part == "check_pinion_spur") intersection() { translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40(); pinion_slide_teeth(); }
 else if (part == "check_wheel_frame") intersection() { translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel(); frame_left(); }
 else if (part == "exploded") exploded();

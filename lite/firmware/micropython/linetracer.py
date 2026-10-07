@@ -1,6 +1,6 @@
 # linetracer.py  -  Linetracer2 Lite library for MicroPython (Seeed Studio XIAO ESP32C6)
 #
-# For the Lite board rev.L3: XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button, 1 LED + a buzzer on the same pin.
+# For the Lite board rev.L3: XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button + a buzzer on the same pin, 1 LED.
 # MicroPython: the official "ESP32_GENERIC_C6" firmware (micropython.org).
 # (The standard rev.A1 board has its own library in firmware/micropython/ at the top of the repo.)
 #
@@ -22,8 +22,11 @@ PIN_SENS_LED = 21          # D3   1 = IR LEDs on (through Q1)
 PIN_STBY = 17              # D7 (RX)  TC78H653 STBY
 PIN_IN1, PIN_IN2 = 19, 23  # D8, D5   LEFT  motor
 PIN_IN3, PIN_IN4 = 20, 18  # D9, D10  RIGHT motor
-PIN_SW = 22                # D4   START (pressed = 0)
-PIN_LED = 16               # D6 (TX)  red LED + buzzer (both flicker / click with the boot log)
+PIN_SW = 22                # D4   START (pressed = 0) + buzzer: the button hangs on R10 1k, the piezo on R9 100R.
+                           #      The piezo passes no DC, so the button reads normally; to beep, D4 becomes a PWM
+                           #      output for a moment (it sounds even while START is held)
+PIN_BUZZER = PIN_SW
+PIN_LED = 16               # D6 (TX)  red LED (flickers with the boot log)
 PIN_LED_XIAO = 15          # yellow user LED on the XIAO itself (0 = on)
 ADC_SENS = (2, 1, 0)       # S1 (left), S2 (centre), S3 (right)  -> D2, D1, D0 (the XIAO's only ADC pins)
 
@@ -281,24 +284,25 @@ class Robot:
             time.sleep_ms(ms)
         self.led.value(was)
 
-    # buzzer (on the LED's pin: a steady 1 only lights the LED, a tone sounds the buzzer) ---------------------
+    # buzzer (on the button's pin D4: for the length of the tone the pin is a PWM output) --------------------
     def beep(self, freq=BEEP_FREQ, ms=100, volume=None):
         """Sound the buzzer.  freq in Hz (0 = a rest), ms = length, volume 0..1 (default robot.volume).
-        The red LED glows while it sounds.  With volume 0 (quiet mode) the LED flashes instead."""
-        was = self.led.value()
+        The button can not be read while it sounds.  With volume 0 (quiet mode) the red LED flashes instead."""
         v = self.volume if volume is None else volume
         if freq > 0 and v > 0:
-            pwm = PWM(self.led, freq=int(freq), duty_u16=int(32768 * min(1.0, v)))
+            pwm = PWM(self.sw, freq=int(freq), duty_u16=int(32768 * min(1.0, v)))
             time.sleep_ms(ms)
             pwm.deinit()
-            self.led.init(Pin.OUT)
+            self.sw.init(Pin.OUT, value=1)        # charge the piezo at once (the pull-up alone takes ~1 ms) ...
+            time.sleep_us(100)
+            self.sw.init(Pin.IN, Pin.PULL_UP)     # ... and back to a button input
         elif freq > 0:                            # quiet mode: a flash of the LED instead of the sound
+            was = self.led.value()
             self.led.value(1)
             time.sleep_ms(ms)
+            self.led.value(was)
         else:                                     # a rest
-            self.led.value(0)
             time.sleep_ms(ms)
-        self.led.value(was)
 
     def melody(self, notes, gap_ms=20):
         """Play [(freq, ms), ...]  e.g.  robot.melody([(1047, 150), (1319, 150), (1568, 300)])"""
