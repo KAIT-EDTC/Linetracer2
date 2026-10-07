@@ -3444,7 +3444,7 @@
 		)
 		(uuid "2c5ff520-f1e3-51f0-82c1-dd5d8a211001")
 	)
-	(text "MECHANICAL: H1-H4 = gearbox frame M3 (x30/x70, y62/y96), H5 = front skid M3 (x50, y11: behind the centre sensor)"
+	(text "MECHANICAL: H1-H4 = gearbox frame M3 (x30/x70, y62/y96), H5 = front ball caster / skid, snap-in (x50, y11: behind the centre sensor)"
 		(exclude_from_sim no)
 		(at 20.32 83.82 0)
 		(effects
@@ -3523,7 +3523,7 @@
 		)
 		(uuid "7107dda4-7ae7-5a16-9168-3398594c9b0c")
 	)
-	(text "The body is 5.6 mm tall: the front of the robot is lifted by a 7.5 mm skid (lens about 2.3 mm above the floor)"
+	(text "The body is 5.6 mm tall: the front of the robot is lifted by the 7.5 mm ball caster or skid (lens about 2.25 mm above the floor)"
 		(exclude_from_sim no)
 		(at 20.32 209.55 0)
 		(effects

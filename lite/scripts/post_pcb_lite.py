@@ -5,8 +5,9 @@ Only SYMBOLS on the board (lower elementary school): build-order numbers, +/- an
 band of each resistor, short part names.  What they mean and the steps are in the assembly manual
 (lite/docs/assembly.md).  Build order (one kind of part per step, lowest parts first):
    1 ちゃ resistors (100)   2 だいだい resistors (10k)   3 あか resistors (1k)   4 diode   5 0.1uF caps
-   6 transistor   7 LED   8 button   9 buzzer   10 battery connector   11 470uF caps   12 motor driver
-   13 XIAO   14 sensors (bottom)   15 motors
+   6 transistor   7 LED   8 button   9 buzzer   10 battery connector   11 motor driver   12 XIAO
+   13 470uF caps (the tallest: last, so they do not get in the way of the XIAO's joints)   14 sensors (bottom)
+   15 motors (after the frames are on)
 Japanese text is 1.3 mm or bigger (smaller kana fail the stroke-width check); symbols use the stroke font.
 NOTE: run only once on a freshly routed board (build_pcb.py does this).
 """
@@ -59,11 +60,13 @@ def poly(b, pts, layer=F):
     b.Add(s)
 
 
-def num(b, n, x, y, layer=F, r=1.15):
+def num(b, n, x, y, layer=F, r=None):
     """Build-order number: a silk circle with the digit inside (stroke font; the CJK font's circled digits are
-    too thin for the silkscreen rules)."""
+    too thin for the silkscreen rules).  Two-digit numbers get a bigger circle so that they stay readable."""
+    if r is None:
+        r = 1.15 if n < 10 else 1.35
     circle(b, x, y, r, layer)
-    text(b, str(n), x, y, 1.2 if n < 10 else 0.85, layer=layer)
+    text(b, str(n), x, y, 1.2 if n < 10 else 1.0, layer=layer)
 
 
 def hide_fp_texts(fp, words):
@@ -90,7 +93,7 @@ def fp_xy(frame, lx, ly):
     return ox + lx * math.cos(a) + ly * math.sin(a), oy - lx * math.sin(a) + ly * math.cos(a)
 
 
-def electrolytic(b, fp):
+def electrolytic(b, fp, plus_outside=True):
     """CP_Radial_D8.0mm: the hatched (black) half is the minus side, like the stripe on the can.  Redraw the hatch
     with two white "-" bars left open in it (the real stripe has minus signs too) and put two big "+" in the white
     half."""
@@ -109,6 +112,8 @@ def electrolytic(b, fp):
             lxe = dxe * math.cos(a) - dye * math.sin(a)
             if lx > 1.7 and abs(lx - lxe) < 0.01:
                 hatch.append(item)                                # a hatch line (vertical, minus half)
+            elif lx < -1.5 and lxe < -1.5:
+                hatch.append(item)                                # KiCad's small "+" outside the circle
     for item in hatch:
         fp.Remove(item)
         GRAVEYARD.append(item)
@@ -165,6 +170,11 @@ def electrolytic(b, fp):
     for sg in (-1, 1):                                # two big "+" in the white half, beside pad 1
         px, py = fp_xy(frame, 0, 0)
         text(b, "+", px + sg * side[0] - ux * 0.1, py + sg * side[1] - uy * 0.1, 1.6, bold=True)
+    # the can (8 mm) covers the circle once it is soldered: a "-" (and a "+") OUTSIDE the outline keep the
+    # direction checkable afterwards
+    text(b, "-", cx + ux * (R + 1.0), cy + uy * (R + 1.0), 1.6, bold=True)
+    if plus_outside:
+        text(b, "+", cx - ux * (R + 1.0), cy - uy * (R + 1.0), 1.6, bold=True)
 
 
 def led_picture(b, px, py):
@@ -211,11 +221,13 @@ def silk(b):
         fp.Value().SetVisible(False)
     for i, x in enumerate(LL.SENSOR_X):
         text(b, "S%d" % (i + 1), x - 6.0, LL.SENSOR_Y, 0.9, layer=BL)    # in the gap beside the sensor body
-    hide_fp_texts(FPS["U2"], ("TC78H653", "VM", "GND"))
+    hide_fp_texts(FPS["U2"], ("TC78H653", "VM", "GND"))   # (the footprint's VM / GND sit on C4: drawn below instead)
     hide_fp_texts(FPS["D1"], ("K",))
 
     # ---- front edge ----------------------------------------------------------------------------------------
     text(b, "▲まえ", 30.8, 2.2, 1.4, jp=True)
+    num(b, 14, 28.6, 5.7)                                   # the sensors go on the BACK
+    text(b, "うら", 31.7, 5.7, 1.3, jp=True)
     for i, x in enumerate(LL.SENSOR_X):
         text(b, "S%d" % (i + 1), x, 6.7, 0.8)
 
@@ -233,9 +245,10 @@ def silk(b):
     num(b, 5, 50.0, 58.6)                                   # 0.1uF x2 (on the motor tracks)
     num(b, 6, 21.2, 9.6)                                    # transistor
     ax, ay = pad_xy(FPS["D2"], "2")                         # LED: anode = front pad
-    text(b, "+", ax + 2.7, ay - 0.3, 1.4)
-    led_picture(b, ax + 5.6, ay - 2.6)
-    num(b, 7, ax + 3.4, ay + 4.3)
+    led_picture(b, ax + 5.6, ay - 5.1)                      # its "+" (long leg) ends level with the anode pad
+    kx, ky = pad_xy(FPS["D2"], "1")                         # cathode = square pad = short leg
+    text(b, "-", kx + 2.6, ky, 1.6, bold=True)
+    num(b, 7, ax + 4.6, ay + 4.8)
     cx, cy = (pad_xy(FPS["SW1"], "1")[0] + pad_xy(FPS["SW1"], "2")[0]) / 2 + 3.25, 25.75
     num(b, 8, cx, cy)                                       # in the middle of the button
     text(b, "スタート", cx + 0.8, 31.4, 2.0, jp=True)
@@ -252,17 +265,19 @@ def silk(b):
     text(b, "+", jx, jy - 3.25, 1.0, bold=True)
     text(b, "-", jx + 2.5, jy - 3.25, 1.0, bold=True)
     text(b, "でんち", jx + 1.25, jy + 2.3, 1.3, jp=True)
-    num(b, 10, jx + 5.5, jy + 4.7, r=1.0)
-    for ref, (nx, ny) in (("C1", (64.8, 46.9)), ("C2", (69.7, 48.4))):
-        electrolytic(b, FPS[ref])
-        num(b, 11, nx, ny)
+    num(b, 10, jx + 5.5, jy + 4.7)
+    # the 470 uF cans are the tallest parts: soldered LAST (13), after the driver (11) and the XIAO (12)
+    for ref, (nx, ny), po in (("C1", (62.0, 47.0), True), ("C2", (69.7, 48.4), False)):
+        electrolytic(b, FPS[ref], plus_outside=po)
+        num(b, 13, nx, ny)
 
     # ---- modules --------------------------------------------------------------------------------------------
-    num(b, 12, 41.6, LL.U2_Y)
+    num(b, 11, 41.6, LL.U2_Y)
     text(b, "モーター", 50.6, LL.U2_Y - 1.05, 1.3, jp=True)
     text(b, "ドライバー", 50.6, LL.U2_Y + 1.15, 1.3, jp=True)
+    text(b, "VM", 57.7, LL.U2_R - 1.9, 1.1, bold=True)    # same word as on the module, next to its VM pins
     ux, uy = LL.XIAO_C
-    num(b, 13, ux - 7.4, uy - 3.0)
+    num(b, 12, ux - 7.4, uy - 3.0)
     text(b, "マイコン", ux - 0.6, uy - 3.0, 2.0, jp=True)
     text(b, "XIAO ESP32C6", ux - 0.6, uy + 0.4, 1.0)
     text(b, "USB", ux + 7.6, uy + 4.0, 1.0)
@@ -270,7 +285,7 @@ def silk(b):
     text(b, "Lite rev.L3", 49.8, 28.4, 1.0)
 
     # ---- motors: pads in the frames' cut-outs ---------------------------------------------------------------
-    num(b, 15, 50.0, 62.4)
+    num(b, 15, 50.0, 64.0)
     text(b, "ひだり", 43.04, 66.7, 1.3, jp=True)
     text(b, "みぎ", 56.96, 66.7, 1.3, jp=True)
 

@@ -368,8 +368,9 @@ def fp_battery_xh():
     f = FP("BatteryXH_2P",
            "Battery input, JST XH 2P (B2B-XH-A) header OR direct wire soldering. Symmetric silk: orient by wire colour (red=+)",
            "battery JST XH B2B-XH-A")
-    f.pad("1", 0, 0, "rect", 1.8, 2.2, 1.0)
-    f.pad("2", 2.5, 0, "oval", 1.8, 2.2, 1.0)
+    # 1.5 mm wide pads: 1.0 mm between + and - (1.8 mm pads left only 0.7 mm: a solder bridge here shorts the cells)
+    f.pad("1", 0, 0, "rect", 1.5, 2.4, 1.0)
+    f.pad("2", 2.5, 0, "oval", 1.5, 2.4, 1.0)
     f.rect(-2.45, -2.45, 4.95, 3.3)
     f.text("+", -3.4, 0, size=1.5, thick=0.3)
     f.text("-", 5.9, 0, size=1.5, thick=0.3)

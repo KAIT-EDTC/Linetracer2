@@ -37,8 +37,11 @@ PWM_FREQ = 20000          # 20 kHz (not audible)
 RAMP_PER_CALL = 0.04      # max change of duty per run() call (soft start, avoids ISD trip)
 LEFT_INVERT = False       # set True if the left wheel turns backwards on run(30, 30)
 RIGHT_INVERT = False      # the motors face opposite directions, but M2's + pad is on OUT4 (wired reversed)
-LONG_PRESS_MS = 800       # button held this long = "long press"
+LONG_PRESS_MS = 1500      # button held this long = "long press" (children often hold a normal press ~0.8 s)
 BEEP_FREQ = 4000          # the piezo (PKM13EPYH4000) is loudest around 4 kHz
+BEEP_VOLUME = 0.4         # 0 (silent) .. 1 (loudest, 50 % duty). 4 kHz is where ears are most sensitive
+CAL_MIN_SPAN = 4000       # calibration is good if white and black differ by this much (of 65535) on every
+                          # sensor.  Check the real numbers with examples/03_sensor_monitor.py
 
 
 def _clamp(x, lo, hi):
@@ -137,6 +140,11 @@ class Motors:
         self.left.coast()
         self.right.coast()
 
+    def off(self):
+        """Motors off and the driver in standby (use in `finally:` so Ctrl-C in Thonny never leaves them running)."""
+        self.stop()
+        self.stby.value(0)
+
 
 class LineSensors:
     """3 x LBR-127HLD, each on its own ADC pin (no multiplexer on the Lite board).
@@ -188,7 +196,7 @@ class LineSensors:
                     self.hi[i] = r[i]
 
     def calibrated(self):
-        return all(self.hi[i] - self.lo[i] > 500 for i in range(self.N))
+        return all(self.hi[i] - self.lo[i] > CAL_MIN_SPAN for i in range(self.N))
 
     def read(self):
         r = self.read_raw()
@@ -225,6 +233,7 @@ class Robot:
         self.sw = Pin(PIN_SW, Pin.IN, Pin.PULL_UP)
         self.led = Pin(PIN_LED, Pin.OUT, value=0)
         self._led_xiao = Pin(PIN_LED_XIAO, Pin.OUT, value=1)   # yellow LED on the XIAO (free 2nd LED, 0 = on)
+        self.volume = BEEP_VOLUME                                  # 0 = quiet mode (no sound at all)
 
     def led_xiao(self, on):
         """The small yellow LED on the XIAO itself (it lights when the pin is 0)."""
@@ -253,6 +262,8 @@ class Robot:
                 kind = "long"
                 self.led.value(0)
                 self.led_xiao(True)
+                self.beep(2000, 30)                # "click": you can let go now
+                self.led.value(0)
             time.sleep_ms(10)
         self.led_xiao(False)
         self.led.value(was)
@@ -271,15 +282,20 @@ class Robot:
         self.led.value(was)
 
     # buzzer (on the LED's pin: a steady 1 only lights the LED, a tone sounds the buzzer) ---------------------
-    def beep(self, freq=BEEP_FREQ, ms=100):
-        """Sound the buzzer.  freq in Hz (0 = a rest), ms = length.  The red LED glows while it sounds."""
+    def beep(self, freq=BEEP_FREQ, ms=100, volume=None):
+        """Sound the buzzer.  freq in Hz (0 = a rest), ms = length, volume 0..1 (default robot.volume).
+        The red LED glows while it sounds.  With volume 0 (quiet mode) the LED flashes instead."""
         was = self.led.value()
-        if freq > 0:
-            pwm = PWM(self.led, freq=int(freq), duty_u16=32768)
+        v = self.volume if volume is None else volume
+        if freq > 0 and v > 0:
+            pwm = PWM(self.led, freq=int(freq), duty_u16=int(32768 * min(1.0, v)))
             time.sleep_ms(ms)
             pwm.deinit()
             self.led.init(Pin.OUT)
-        else:
+        elif freq > 0:                            # quiet mode: a flash of the LED instead of the sound
+            self.led.value(1)
+            time.sleep_ms(ms)
+        else:                                     # a rest
             self.led.value(0)
             time.sleep_ms(ms)
         self.led.value(was)

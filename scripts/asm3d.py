@@ -135,49 +135,51 @@ def _transform_matrix(f):
     return m
 
 
+def _walk(n, m, out):
+    if n["type"] == "Transform" or n["type"] == "Group":
+        mm = _mat_mul(m, _transform_matrix(n["f"])) if n["type"] == "Transform" else m
+        for c in n["f"].get("children", []):
+            _walk(c, mm, out)
+    elif n["type"] == "Shape":
+        g = n["f"].get("geometry")
+        if not g or g["type"] != "IndexedFaceSet":
+            return
+        col = (0.6, 0.6, 0.6)
+        app = n["f"].get("appearance")
+        if app and app["f"].get("material"):
+            d = app["f"]["material"]["f"].get("diffuseColor")
+            if d:
+                col = tuple(round(v, 3) for v in d)
+        pts = g["f"]["coord"]["f"]["point"]
+        P = [(pts[k], pts[k + 1], pts[k + 2]) for k in range(0, len(pts) - 2, 3)]
+        W = [(m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3],
+              m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3],
+              m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3]) for x, y, z in P]
+        tris = out.setdefault(col, [])
+        face = []
+        for v in list(g["f"].get("coordIndex", [])) + [-1]:
+            v = int(v)
+            if v < 0:
+                for k in range(1, len(face) - 1):
+                    tris.append((W[face[0]], W[face[k]], W[face[k + 1]]))
+                face = []
+            else:
+                face.append(v)
+
+
+def read_vrml_node(node, matrix):
+    """One parsed VRML node (with the parent transform `matrix`) -> {rgb: [triangles]}"""
+    out = {}
+    _walk(node, matrix, out)
+    return out
+
+
 def read_vrml(path):
     """-> {rgb: [triangles]} with triangles ((x,y,z),(x,y,z),(x,y,z))"""
     p = _Parser(_tokens(open(path).read()))
-    roots = []
-    while p.peek() is not None:
-        roots.append(p.node())
     out = {}
-
-    def walk(n, m):
-        if n["type"] == "Transform" or n["type"] == "Group":
-            mm = _mat_mul(m, _transform_matrix(n["f"])) if n["type"] == "Transform" else m
-            for c in n["f"].get("children", []):
-                walk(c, mm)
-        elif n["type"] == "Shape":
-            g = n["f"].get("geometry")
-            if not g or g["type"] != "IndexedFaceSet":
-                return
-            col = (0.6, 0.6, 0.6)
-            app = n["f"].get("appearance")
-            if app and app["f"].get("material"):
-                d = app["f"]["material"]["f"].get("diffuseColor")
-                if d:
-                    col = tuple(round(v, 3) for v in d)
-            pts = g["f"]["coord"]["f"]["point"]
-            P = [(pts[k], pts[k + 1], pts[k + 2]) for k in range(0, len(pts) - 2, 3)]
-            W = [(m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3],
-                  m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3],
-                  m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3]) for x, y, z in P]
-            tris = out.setdefault(col, [])
-            face = []
-            for v in g["f"].get("coordIndex", []):
-                v = int(v)
-                if v < 0:
-                    for k in range(1, len(face) - 1):
-                        tris.append((W[face[0]], W[face[k]], W[face[k + 1]]))
-                    face = []
-                else:
-                    face.append(v)
-            for k in range(1, len(face) - 1):
-                tris.append((W[face[0]], W[face[k]], W[face[k + 1]]))
-
-    for r in roots:
-        walk(r, _ident())
+    while p.peek() is not None:
+        _walk(p.node(), _ident(), out)
     return out
 
 
