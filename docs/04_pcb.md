@@ -145,7 +145,7 @@ python3 build_pcb.py 6      # 配置・配線（約 15 分）
 
 （コマンドの細かい順番は各スクリプト冒頭のコメント参照。KiCad は flatpak 版、`./kc` = kicad-cli、`./kpy` = KiCad 付属 Python）
 
-> 同じスクリプトで**Lite**（rev.L2: XIAO ESP32C6 版、`lite/hardware/`）も作れる: 環境変数 `LT2_VARIANT=lite` を付け、Lite 専用のスクリプトは `lite/scripts/` にある（手順は `lite/README.md` §9）。何も付けなければ標準版。
+> 同じスクリプトで**Lite**（rev.L3: XIAO ESP32C6 版、`lite/hardware/`。配線は自動配線ではなく `lite/scripts/layout_lite.py` の手で引いた配線）も作れる: 環境変数 `LT2_VARIANT=lite` を付け、Lite 専用のスクリプトは `lite/scripts/` にある（手順は `lite/README.md` §9）。何も付けなければ標準版。
 
 ### 6.2 KiCad の画面で直す（小さな修正）
 
