@@ -2,7 +2,7 @@
 	(version "E")
 	(design
 		(source "/home/aonuma/Desktop/EDTC/Linetracer2/.claude/worktrees/esp32c6-photoreflector-spec-95e549/lite/hardware/kicad/Linetracer2-Lite.kicad_sch")
-		(date "2026-10-08T19:33:59")
+		(date "2026-10-09T02:42:08")
 		(tool "Eeschema 10.0.6")
 		(sheet
 			(number "1")
@@ -373,66 +373,6 @@
 			)
 		)
 		(comp
-			(ref "C5")
-			(value "0.1uF")
-			(footprint "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm")
-			(description "Unpolarized capacitor")
-			(fields
-				(field
-					(name "Akizuki") "113582 (10pcs)")
-				(field
-					(name "Footprint") "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "Unpolarized capacitor")
-			)
-			(libsource
-				(lib "Device")
-				(part "C")
-				(description "Unpolarized capacitor")
-			)
-			(property
-				(name "Akizuki")
-				(value "113582 (10pcs)")
-			)
-			(property
-				(name "Sheetname")
-				(value "Linetracer2-Lite")
-			)
-			(property
-				(name "Sheetfile")
-				(value "Linetracer2-Lite.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "cap capacitor")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "C_*")
-			)
-			(sheetpath
-				(names "/")
-				(tstamps "/")
-			)
-			(tstamps "32d71ec5-cbb7-531c-b69b-84a64430bf2c")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-					)
-				)
-			)
-		)
-		(comp
 			(ref "D1")
 			(value "1N5819")
 			(footprint "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal")
@@ -768,6 +708,64 @@
 				(tstamps "/")
 			)
 			(tstamps "c7b6fdb5-78ce-5678-a536-0c158d21efff")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "3")
+						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "D7")
+			(value "PL9823")
+			(footprint "Linetracer2:LED_PL9823_5mm")
+			(datasheet "https://akizukidenshi.com/goodsaffix/pl9823.pdf")
+			(description "5 mm full-colour LED with controller (NeoPixel type, 800 kHz), supply 4.5-6 V")
+			(fields
+				(field
+					(name "Akizuki") "108411 (PL9823-F5)")
+				(field
+					(name "Footprint") "Linetracer2:LED_PL9823_5mm")
+				(field
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/pl9823.pdf")
+				(field
+					(name "Description") "5 mm full-colour LED with controller (NeoPixel type, 800 kHz), supply 4.5-6 V")
+			)
+			(libsource
+				(lib "Linetracer2")
+				(part "PL9823")
+				(description "5 mm full-colour LED with controller (NeoPixel type, 800 kHz), supply 4.5-6 V")
+			)
+			(property
+				(name "Akizuki")
+				(value "108411 (PL9823-F5)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "bcb86713-4ab6-5241-b627-a5dee80dd25b")
 			(units
 				(unit
 					(name "A")
@@ -2058,6 +2056,384 @@
 			)
 		)
 		(comp
+			(ref "TP1")
+			(value "GND")
+			(footprint "TestPoint:TestPoint_Pad_D1.5mm")
+			(description "test point")
+			(fields
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.5mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "test point")
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "02fe4746-8be6-5b8e-b76f-cd2c4ef6453b")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TP2")
+			(value "3V3")
+			(footprint "TestPoint:TestPoint_Pad_D1.5mm")
+			(description "test point")
+			(fields
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.5mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "test point")
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "39fa9896-73b9-542c-8da1-f040c251de63")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TP3")
+			(value "VSYS")
+			(footprint "TestPoint:TestPoint_Pad_D1.5mm")
+			(description "test point")
+			(fields
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.5mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "test point")
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "5f3aa77f-0178-5557-8bc8-e78ba4421e26")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TP4")
+			(value "SENS1")
+			(footprint "TestPoint:TestPoint_Pad_D1.5mm")
+			(description "test point")
+			(fields
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.5mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "test point")
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "125d7cfd-68ba-5412-a78c-7c2bbf467c50")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TP5")
+			(value "SENS2")
+			(footprint "TestPoint:TestPoint_Pad_D1.5mm")
+			(description "test point")
+			(fields
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.5mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "test point")
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "d6c38530-5f4b-5195-9960-2224973d5188")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TP6")
+			(value "SENS3")
+			(footprint "TestPoint:TestPoint_Pad_D1.5mm")
+			(description "test point")
+			(fields
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.5mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "test point")
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "2fd2d441-7dad-5d80-a96a-383e4eb4b43e")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "TP7")
+			(value "LED_K")
+			(footprint "TestPoint:TestPoint_Pad_D1.5mm")
+			(description "test point")
+			(fields
+				(field
+					(name "Footprint") "TestPoint:TestPoint_Pad_D1.5mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "test point")
+			)
+			(libsource
+				(lib "Connector")
+				(part "TestPoint")
+				(description "test point")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "exclude_from_bom")
+			)
+			(property
+				(name "ki_keywords")
+				(value "test point tp")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "Pin* Test*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "9a1903fb-bda6-5516-a58f-60e6fc466d77")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+					)
+				)
+			)
+		)
+		(comp
 			(ref "U1")
 			(value "XIAO ESP32C6")
 			(footprint "Linetracer2:XIAO_ESP32C6_Header")
@@ -2263,6 +2639,36 @@
 	(groups)
 	(variants)
 	(libparts
+		(libpart
+			(lib "Connector")
+			(part "TestPoint")
+			(description "test point")
+			(footprints
+				(fp "Pin*")
+				(fp "Test*")
+			)
+			(fields
+				(field
+					(name "Reference") "TP")
+				(field
+					(name "Value") "TestPoint")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "test point")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "1")
+					(type "passive")
+				)
+			)
+		)
 		(libpart
 			(lib "Connector_Generic")
 			(part "Conn_01x02")
@@ -2873,6 +3279,10 @@
 	)
 	(libraries
 		(library
+			(logical "Connector")
+			(uri "${KICAD10_SYMBOL_DIR}/Connector.kicad_sym")
+		)
+		(library
 			(logical "Connector_Generic")
 			(uri "${KICAD10_SYMBOL_DIR}/Connector_Generic.kicad_sym")
 		)
@@ -2937,6 +3347,12 @@
 				(pintype "passive")
 			)
 			(node
+				(ref "TP2")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
 				(ref "U1")
 				(pin "12")
 				(pinfunction "3V3_12")
@@ -2985,6 +3401,12 @@
 				(ref "Q1")
 				(pin "2")
 				(pinfunction "C_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "TP7")
+				(pin "1")
+				(pinfunction "1_1")
 				(pintype "passive")
 			)
 		)
@@ -3194,6 +3616,12 @@
 				(pintype "passive")
 			)
 			(node
+				(ref "TP4")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
 				(ref "U1")
 				(pin "3")
 				(pinfunction "GPIO2/A2/D2_3")
@@ -3216,6 +3644,12 @@
 				(pintype "passive")
 			)
 			(node
+				(ref "TP5")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
 				(ref "U1")
 				(pin "2")
 				(pinfunction "GPIO1/A1/D1_2")
@@ -3235,6 +3669,12 @@
 			(node
 				(ref "R6")
 				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "TP6")
+				(pin "1")
+				(pinfunction "1_1")
 				(pintype "passive")
 			)
 			(node
@@ -3325,11 +3765,6 @@
 				(pintype "passive")
 			)
 			(node
-				(ref "C5")
-				(pin "1")
-				(pintype "passive")
-			)
-			(node
 				(ref "D1")
 				(pin "1")
 				(pinfunction "K_1")
@@ -3366,6 +3801,18 @@
 				(pintype "power_in")
 			)
 			(node
+				(ref "D7")
+				(pin "3")
+				(pinfunction "VDD_3")
+				(pintype "power_in")
+			)
+			(node
+				(ref "TP3")
+				(pin "1")
+				(pinfunction "1_1")
+				(pintype "passive")
+			)
+			(node
 				(ref "U1")
 				(pin "14")
 				(pinfunction "5V_14")
@@ -3389,11 +3836,6 @@
 			)
 			(node
 				(ref "C2")
-				(pin "2")
-				(pintype "passive")
-			)
-			(node
-				(ref "C5")
 				(pin "2")
 				(pintype "passive")
 			)
@@ -3423,6 +3865,12 @@
 			)
 			(node
 				(ref "D6")
+				(pin "1")
+				(pinfunction "GND_1")
+				(pintype "power_in")
+			)
+			(node
+				(ref "D7")
 				(pin "1")
 				(pinfunction "GND_1")
 				(pintype "power_in")
@@ -3461,6 +3909,12 @@
 				(ref "SW1")
 				(pin "2")
 				(pinfunction "2_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "TP1")
+				(pin "1")
+				(pinfunction "1_1")
 				(pintype "passive")
 			)
 			(node
@@ -3586,6 +4040,23 @@
 		)
 		(net
 			(code "27")
+			(name "Net-(D6-DO)")
+			(class "Default")
+			(node
+				(ref "D6")
+				(pin "2")
+				(pinfunction "DO_2")
+				(pintype "output")
+			)
+			(node
+				(ref "D7")
+				(pin "4")
+				(pinfunction "DIN_4")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "28")
 			(name "Net-(PS1-A)")
 			(class "Default")
 			(node
@@ -3601,7 +4072,7 @@
 			)
 		)
 		(net
-			(code "28")
+			(code "29")
 			(name "Net-(PS2-A)")
 			(class "Default")
 			(node
@@ -3617,7 +4088,7 @@
 			)
 		)
 		(net
-			(code "29")
+			(code "30")
 			(name "Net-(PS3-A)")
 			(class "Default")
 			(node
@@ -3633,7 +4104,7 @@
 			)
 		)
 		(net
-			(code "30")
+			(code "31")
 			(name "Net-(Q1-B)")
 			(class "Default")
 			(node
@@ -3649,11 +4120,11 @@
 			)
 		)
 		(net
-			(code "31")
-			(name "unconnected-(D6-DO-Pad2)")
+			(code "32")
+			(name "unconnected-(D7-DO-Pad2)")
 			(class "Default")
 			(node
-				(ref "D6")
+				(ref "D7")
 				(pin "2")
 				(pinfunction "DO_2")
 				(pintype "output+no_connect")

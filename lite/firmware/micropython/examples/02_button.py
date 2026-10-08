@@ -4,7 +4,7 @@ from neopixel import NeoPixel
 import time
 
 sw = Pin(22, Pin.IN, Pin.PULL_UP)   # 押すと 0 になる（基板の D4）
-led = NeoPixel(Pin(16), 5, timing=(350, 1360, 1360, 350))   # フルカラー LED 5 こ
+led = NeoPixel(Pin(16), 6, timing=(350, 1360, 1360, 350))   # フルカラー LED 6 こ
 
 count = 0
 before = 1

@@ -4,9 +4,9 @@
 Only SYMBOLS on the board (lower elementary school): build-order numbers, +/- and polarity pictures, the 3rd colour
 band of each resistor, short part names.  What they mean and the steps are in the assembly manual
 (lite/docs/assembly.md).  Build order (one kind of part per step, lowest parts first):
-   1 ちゃ resistors (100) x4   2 だいだい resistors (10k) x3   3 あか resistors (1k) x2   4 diode   5 0.1uF caps x3
+   1 ちゃ resistors (100) x4   2 だいだい resistors (10k) x3   3 あか resistors (1k) x2   4 diode   5 0.1uF caps x2
    6 transistor   7 button   8 buzzer   9 battery connector   10 motor driver   11 XIAO
-   12 full-colour LEDs x5 (8.7 mm tall)   13 470uF caps (the tallest: last, so they do not get in the way of the
+   12 full-colour LEDs x6 (8.7 mm tall, down both sides)   13 470uF caps (the tallest: last, so they do not get in the way of the
    XIAO's joints)   14 sensors (bottom)   15 motors (after the frames are on)
 Japanese text is 1.3 mm or bigger (smaller kana fail the stroke-width check); symbols use the stroke font.
 NOTE: run only once on a freshly routed board (build_pcb.py does this).
@@ -225,9 +225,9 @@ def silk(b):
     hide_fp_texts(FPS["D1"], ("K",))
 
     # ---- front edge ----------------------------------------------------------------------------------------
-    text(b, "▲まえ", 30.8, 2.2, 1.4, jp=True)
-    num(b, 14, 28.6, 5.7)                                   # the sensors go on the BACK
-    text(b, "うら", 31.7, 5.7, 1.3, jp=True)
+    text(b, "▲まえ", 44.0, 3.4, 1.4, jp=True)
+    num(b, 14, 56.0, 2.0)                                   # the sensors go on the BACK
+    text(b, "うら", 56.0, 4.6, 1.3, jp=True)
     for i, x in enumerate(LL.SENSOR_X):
         text(b, "S%d" % (i + 1), x, 6.7, 0.8)
 
@@ -238,13 +238,12 @@ def silk(b):
         w = BAND3[fp.GetValue()]
         text(b, w, (x1 + x2) / 2, (y1 + y2) / 2, 1.1 if len(w) > 2 else 1.5,
              angle=90 if abs(x1 - x2) < 0.1 else 0, jp=True)
-    resistor_key(b, 70.4, 2.1)
+    resistor_key(b, 35.4, 25.0)                             # in the middle (the right front has an LED column)
 
     # ---- small parts ---------------------------------------------------------------------------------------
-    num(b, 4, 80.9, 42.2)                                   # diode
-    num(b, 5, 50.0, 58.6)                                   # 0.1uF (C3 / C4 on the motor tracks ...
-    num(b, 5, 36.0, 36.4)                                   # ... and C5 beside the full-colour LEDs)
-    num(b, 6, 21.2, 9.6)                                    # transistor
+    num(b, 4, 80.6, 51.3)                                   # diode (inside its outline)
+    num(b, 5, 50.0, 58.6)                                   # 0.1uF x2 (on the motor tracks)
+    num(b, 6, 33.0, 2.6)                                    # transistor
     sp = [p.GetPosition() for p in FPS["SW1"].Pads()]
     cx = sum(pcbnew.ToMM(q.x) for q in sp) / len(sp) - G.OX     # centre of the 4 legs
     cy = sum(pcbnew.ToMM(q.y) for q in sp) / len(sp) - G.OY
@@ -263,7 +262,8 @@ def silk(b):
     text(b, "+", jx, jy - 3.25, 1.0, bold=True)
     text(b, "-", jx + 2.5, jy - 3.25, 1.0, bold=True)
     text(b, "でんち", jx + 1.25, jy + 2.3, 1.3, jp=True)
-    num(b, 9, jx + 5.5, jy + 4.7)
+    num(b, 9, jx - 3.8, jy + 4.6)
+    text(b, "VBAT", 80.6, 57.4, 0.9)                        # D1's anode pad = the battery (test point)
     # the 470 uF cans are the tallest parts: soldered LAST (13), after the driver (10), the XIAO (11) and the LEDs (12)
     for ref, (nx, ny), po in (("C1", (62.0, 47.0), True), ("C2", (69.7, 48.4), False)):
         electrolytic(b, FPS[ref], plus_outside=po)
@@ -279,9 +279,18 @@ def silk(b):
     text(b, "マイコン", ux - 0.6, uy - 3.0, 2.0, jp=True)
     text(b, "XIAO ESP32C6", ux - 0.6, uy + 0.4, 1.0)
     text(b, "USB", ux + 7.6, uy + 4.0, 1.0)
-    # full-colour LEDs: the footprint brings the outline and the dot at the GND hole (= the longest leg)
-    num(b, 12, 49.5, 22.3)
-    text(b, "Linetracer2 Lite rev.L3", 46.0, 39.3, 1.0)
+    # full-colour LEDs (both sides): the footprint brings the outline and the dot beside the GND hole (longest leg)
+    num(b, 12, LL.LED_L - 0.1, 23.7)
+    num(b, 12, 74.4, 4.2)
+    text(b, "Linetracer2", 51.0, 30.2, 1.3, bold=True)
+    text(b, "Lite rev.L3", 51.0, 32.6, 1.0)
+
+    # ---- test pads (for the teacher's multimeter; meaning and voltages in the manual) ---------------------
+    for ref, label, dx, dy in (("TP1", "GND", 3.3, 0), ("TP2", "3V3", -3.0, 0), ("TP3", "VSYS", -0.6, 1.9),
+                               ("TP4", "S1", 0, -1.7), ("TP5", "S2", 0, -1.7), ("TP6", "S3", 0, -1.7),
+                               ("TP7", "IR", 0, 2.0)):
+        tx, ty = LL.TEST_PADS[ref]
+        text(b, label, tx + dx, ty + dy, 0.9)
 
     # ---- motors: pads in the frames' cut-outs ---------------------------------------------------------------
     num(b, 15, 50.0, 64.0)

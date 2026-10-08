@@ -1,6 +1,6 @@
 # Linetracer2 Lite rev.L3 部品表（秋月のリンクつき）
 
-> 最終更新: 2026-10-08（赤 LED → **フルカラー LED PL9823 ×5**、0.1 µF を 1 こ追加）。秋月の通販コード・品名・価格は、この日に**全部のリンクを開いて確かめた**（19 品目）。価格は税込・変わることがある。
+> 最終更新: 2026-10-09（赤 LED → **フルカラー LED PL9823 ×6**（左右の端に 3 こずつ）、テストパッドは基板の銅だけで部品なし）。秋月の通販コード・品名・価格は、この日に**全部のリンクを開いて確かめた**（19 品目）。価格は税込・変わることがある。
 > 機械可読の部品表（KiCad から自動で出る）: [`../hardware/kicad/bom/Linetracer2-Lite_bom.csv`](../hardware/kicad/bom/Linetracer2-Lite_bom.csv)。くわしい理由は [`../README.md`](../README.md) §5。
 > 買い方のルール（実店舗か T 番号のある通販だけ）は [`../../docs/05_bom.md`](../../docs/05_bom.md) §0。
 
@@ -19,11 +19,11 @@
 | R4〜R6 | 抵抗 10 kΩ（ちゃ くろ **だいだい** きん） | 3 | [125103](https://akizukidenshi.com/catalog/g/g125103/) | 100 本 ¥100 | ¥3 |
 | R7, R10 | 抵抗 1 kΩ（ちゃ くろ **あか** きん） | 2 | [125102](https://akizukidenshi.com/catalog/g/g125102/) | 100 本 ¥100 | ¥2 |
 | C1, C2 | 電解コンデンサー 470 µF 16 V（ルビコン WXA） | 2 | [108426](https://akizukidenshi.com/catalog/g/g108426/) | 1 個 ¥10 | ¥20 |
-| C3, C4, C5 | 積層セラミックコンデンサー 0.1 µF 50 V（C5 はフルカラー LED のそば） | 3 | [113582](https://akizukidenshi.com/catalog/g/g113582/) | 10 個 ¥100 | ¥30 |
-| D2〜D6 | **5 mm シリアル制御フルカラー LED PL9823-F5**（NeoPixel 型） | 5 | [108411](https://akizukidenshi.com/catalog/g/g108411/) | 1 個 ¥40 | ¥200 |
+| C3, C4 | 積層セラミックコンデンサー 0.1 µF 50 V | 2 | [113582](https://akizukidenshi.com/catalog/g/g113582/) | 10 個 ¥100 | ¥20 |
+| D2〜D7 | **5 mm シリアル制御フルカラー LED PL9823-F5**（NeoPixel 型） | 6 | [108411](https://akizukidenshi.com/catalog/g/g108411/) | 1 個 ¥40 | ¥240 |
 | SW1 | タクトスイッチ（黒） | 1 | [108075](https://akizukidenshi.com/catalog/g/g108075/) | 1 個 ¥10 | ¥10 |
 | J1 | XH コネクター ベース付ポスト 2P B2B-XH-A | 1 | [112247](https://akizukidenshi.com/catalog/g/g112247/) | 1 個 ¥10 | ¥10 |
-| | | | | **小計** | **≒¥1,882** |
+| | | | | **小計** | **≒¥1,912** |
 
 - （やり方 B）XIAO を抜き差しして使い回すなら、7 ピンのピンソケット 2 本も要る。
 - 基板そのものは特注（JLCPCB など、30 枚で 1 枚 ≒¥80）。Gerber: [`../hardware/Linetracer2-Lite_rev.L3_gerber.zip`](../hardware/Linetracer2-Lite_rev.L3_gerber.zip)。
@@ -50,10 +50,10 @@
 
 | | 金額 |
 |---|---|
-| 基板に載る部品 | ≒¥1,882 |
+| 基板に載る部品 | ≒¥1,912 |
 | 基板 | ≒¥80 |
 | 機械部品 | ≒¥770〜860 |
-| **合計** | **約 ¥2,730〜2,820** |
+| **合計** | **約 ¥2,760〜2,850** |
 
 ## 4. 授業 10 台分の注文（秋月でまとめて買う数）
 
@@ -70,18 +70,18 @@
 | 抵抗 10 kΩ | [125103](https://akizukidenshi.com/catalog/g/g125103/) | 30 | 1 袋（100 本） | ¥100 |
 | 抵抗 1 kΩ | [125102](https://akizukidenshi.com/catalog/g/g125102/) | 20 | 1 袋（100 本） | ¥100 |
 | 470 µF 16 V | [108426](https://akizukidenshi.com/catalog/g/g108426/) | 20 | 20 | ¥200 |
-| 0.1 µF | [113582](https://akizukidenshi.com/catalog/g/g113582/) | 30 | 3 袋（10 個入り） | ¥300 |
-| フルカラー LED PL9823-F5 | [108411](https://akizukidenshi.com/catalog/g/g108411/) | 50 | 50 | ¥2,000 |
+| 0.1 µF | [113582](https://akizukidenshi.com/catalog/g/g113582/) | 20 | 2 袋（10 個入り） | ¥200 |
+| フルカラー LED PL9823-F5 | [108411](https://akizukidenshi.com/catalog/g/g108411/) | 60 | 60 | ¥2,400 |
 | タクトスイッチ | [108075](https://akizukidenshi.com/catalog/g/g108075/) | 10 | 10 | ¥100 |
 | XH ポスト 2P | [112247](https://akizukidenshi.com/catalog/g/g112247/) | 10 | 10 | ¥100 |
 | 電池ボックス | [112243](https://akizukidenshi.com/catalog/g/g112243/) | 10 | 10 | ¥1,300 |
 | FA-130RA-2270 | [106437](https://akizukidenshi.com/catalog/g/g106437/) | 20 | 20 | ¥3,000 |
 | なべ小ねじ M3×20 | [107437](https://akizukidenshi.com/catalog/g/g107437/) | 40 | 4 袋（10 本入り） | ¥1,280 |
 | 六角ナット M3 | [114372](https://akizukidenshi.com/catalog/g/g114372/) | 60 | 6 袋（10 個入り） | ¥720 |
-| | | | **秋月の合計** | **¥25,440** |
+| | | | **秋月の合計** | **¥25,740** |
 
 秋月以外: タミヤ 15289 ×3 袋（≒¥924）、真鍮丸棒 φ2 1 m、皿小ねじ M3×8 ×20、電線、PLA（約 300 g）・TPU 95A（約 25 g）、単3 アルカリ電池 ×30、基板（JLCPCB など）。ねじ・ナットはホームセンターのほうが安いことが多い。
 
 - 抵抗・トランジスター・ダイオード・0.1 µF は袋の余りが多いので、次の授業や予備にまわせる。
-- 秋月の在庫はリンク先で確かめてから注文する（とくに XIAO、LBR-127HLD、**PL9823-F5 は 50 こ要る**）。
-- 前の版（赤 LED 1 こ）からの差: 赤 LED ¥10 と 1 kΩ 1 本をやめ、PL9823 ×5（¥200）と 0.1 µF ×1（¥10）を足して **1 台 +¥199**。
+- 秋月の在庫はリンク先で確かめてから注文する（とくに XIAO、LBR-127HLD、**PL9823-F5 は 60 こ要る**）。
+- 前の版（赤 LED 1 こ）からの差: 赤 LED ¥10 と 1 kΩ 1 本をやめ、PL9823 ×6（¥240）を足して **1 台 +¥229**。テストパッド（7 こ）は基板の銅なので部品代は 0。

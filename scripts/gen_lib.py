@@ -493,20 +493,21 @@ def fp_xiao_header():
 def fp_pl9823():
     """PL9823-F5 (5 mm full-colour LED with controller).  Its legs come out in one row, 1.27 mm apart:
     DIN, VDD, GND (the longest leg), DO.  The holes are staggered (+-0.9 mm) so that children can solder them
-    without bridges (the legs only need a small bend).  Origin = LED centre.  The dot marks the GND hole =
-    the LONGEST leg (a PL9823 put in the wrong way round gets VDD and GND swapped)."""
+    without bridges (the legs only need a small bend).  Origin = LED centre.  All pads round (1.4 mm) so that the
+    outline (r 3.05) fits the 5.8 mm flange and the LEDs can sit close to the board edge.
+    The dot INSIDE the outline, right beside the GND hole, marks the LONGEST leg (a PL9823 put in the wrong way
+    round gets VDD and GND swapped)."""
     f = FP("LED_PL9823_5mm",
            "PL9823-F5 5 mm addressable RGB LED (DIN VDD GND DO, 1.27 mm), staggered holes, dot = GND (longest leg)",
            "LED RGB PL9823 NeoPixel WS2812 5mm")
     for num, x, y in (("4", -1.905, -0.9), ("3", -0.635, 0.9), ("1", 0.635, -0.9), ("2", 1.905, 0.9)):
-        f.pad(num, x, y, "rect" if num == "4" else "circle", 1.5, 1.5, 0.9)
-    f.circle(0, 0, 3.35)                             # flange (5.8 mm), clear of the pads
-    f.circle(0.635, -4.0, 0.35, w=0.1, fill=True)    # the GND hole = longest leg
+        f.pad(num, x, y, "circle", 1.4, 1.4, 0.9)
+    f.circle(0, 0, 3.05)                             # flange (5.8 mm)
+    f.circle(0.635, -2.3, 0.3, w=0.1, fill=True)     # beside the GND hole = longest leg
     f.circle(0, 0, 2.9, layer="F.Fab", w=0.1)
     f.text("DIN", -1.905, -2.1, layer="F.Fab", size=0.5, thick=0.08)
-    f.circle(0, 0, 3.45, layer="F.CrtYd", w=0.05)    # 7 mm apart on the Lite board
-    f.write((0, -4.9), (0, 4.6))
-
+    f.circle(0, 0, 3.2, layer="F.CrtYd", w=0.05)
+    f.write((0, -4.3), (0, 4.3))
 
 def write_footprints():
     fp_pl9823()

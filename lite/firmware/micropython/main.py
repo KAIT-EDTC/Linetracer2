@@ -4,8 +4,9 @@
 #                       after that = run.  Press START again to stop.
 #   START long press  : change speed level 1..3 (hold until the LEDs go out, then let go;
 #                       the buzzer beeps and 1..3 LEDs light yellow)
-#   LEDs (5, full colour): green = ready, blue = calibrating, red = calibration failed,
-#                       while running the LED above the line lights (left .. right)
+#   LEDs (6, full colour, 3 down each side): green = ready, blue = calibrating, red = calibration failed,
+#                       while running: lights run front -> rear on each side as fast as that wheel turns
+#                       (red when the line is lost)
 #   buzzer            : a short tune at power-on, "pi-pi-pi-PI" before it starts, a low tone when something failed
 #                       (the buzzer is on the START button's pin: it can not see a press while it sounds)
 #                       (hold START while switching on = quiet mode: no sound, the LED blinks instead)
@@ -42,11 +43,12 @@ def run_course(base, kp, kd):
     robot.led.value(0)
     robot.wait_release()
     n = 0
+    left = right = base
     while not robot.start_pressed():
         pos = s.position()
         n += 1
-        if n % 20 == 0:
-            robot.led.bar(pos)              # the LED above the line (about 0.3 ms, so not every time)
+        if n % 10 == 0:                     # running lights (about 0.3 ms, so not every time)
+            robot.led.flow(left, right, "cyan" if pos is not None else "red")
         now = time.ticks_us()
         dt = max(1, time.ticks_diff(now, t_prev)) / 1000.0   # ms
         t_prev = now
@@ -57,7 +59,8 @@ def run_course(base, kp, kd):
             if time.ticks_diff(time.ticks_ms(), lost_since) > 800:
                 break                       # gave up (off the course)
             turn = 60 if s.last_pos > 0 else -60
-            m.run(base * 0.3 + turn, base * 0.3 - turn)
+            left, right = base * 0.3 + turn, base * 0.3 - turn
+            m.run(left, right)
             continue
         lost_since = None
         err = pos                           # -1000 .. +1000  (+ = line is right)
@@ -65,7 +68,8 @@ def run_course(base, kp, kd):
         d_f += (d - d_f) * 0.3              # smooth it: with 3 sensors the position moves in steps
         last_err = err
         steer = kp * err + kd * d_f
-        m.run(base + steer, base - steer)
+        left, right = base + steer, base - steer
+        m.run(left, right)
     m.brake()
     time.sleep_ms(300)
     m.stop()
@@ -89,7 +93,7 @@ try:
             time.sleep_ms(300)
             robot.led.value(0)
             time.sleep_ms(300)
-            robot.led.count(level)          # 1..3 yellow LEDs
+            robot.led.count(level)          # 1..3 yellow LEDs on each side
             for _ in range(level):
                 robot.beep(2000, 120)
                 time.sleep_ms(150)

@@ -54,9 +54,9 @@ PLACE["J1"] = (72.8, 53.0, 0, "F")       # + (red) left, - right
 PLACE["D1"] = (80.6, U2_R - 10.16, 270, "F")   # K front (VSYS), A rear = end of the VBAT line
 PLACE["C2"] = (76.35, U2_R - 10.16, 180, "F")  # + right (in line with D1's K), - left
 
-# IR LED switch, front left
-PLACE["Q1"] = (20.5, 4.5, 0, "F")
-PLACE["R7"] = (25.58, R_REAR, 90, "F")   # pad 2 straight in front = Q1 base
+# IR LED switch, front left (turned 180 deg: base on the left, straight in front of R7)
+PLACE["Q1"] = (30.66, 3.2, 180, "F")
+PLACE["R7"] = (25.58, R_REAR, 90, "F")   # pad 2 straight behind Q1's base
 
 # user interface, left: one row of resistors (pad 1 at the front, on the bus), the parts right behind them.
 # D4 drives both the buzzer (through R9) and the button (through R10).
@@ -66,15 +66,22 @@ PLACE["SW1"] = (19.08, 37.4, 0, "F")     # pin 1 (front) on R10, pin 2 (rear) GN
 PLACE["R9"] = (32.5, UI_R, 270, "F")     # 100: D4 -> buzzer +
 PLACE["BZ1"] = (32.5, 47.5, 270, "F")    # + front, - rear (body centre 32.5 / 50.0; 1 mm from the frame pillar)
 
-# 5 full-colour LEDs (PL9823) in the free middle, 3 in front + 2 behind, one data chain D2 -> D6 in a zigzag:
-# front row left -> right (DIN on the left), rear row right -> left (turned 180 deg).  Kept 0.9 mm off the
-# XIAO's antenna keep-out (x >= 56.65).  C5 (0.1 uF) at the left end of the VSYS bar between the rows.
-RGB_A, RGB_B = 27.0, 34.0
-for _ref, _x, _y, _r in (("D2", 39.0, RGB_A, 0), ("D3", 46.0, RGB_A, 0), ("D4", 53.0, RGB_A, 0),
-                         ("D5", 49.5, RGB_B, 180), ("D6", 42.5, RGB_B, 180)):
-    PLACE[_ref] = (_x, _y, _r, "F")
-RGB_BAR = 30.5                               # VSYS on the bottom, between the two rows
-PLACE["C5"] = (36.0, RGB_BAR + 0.8, 270, "F")   # pad 1 just behind the end of the bar, pad 2 (GND) behind it
+# 6 full-colour LEDs (PL9823), 3 down each side edge of the front half (the board is free there in front of the
+# XIAO).  One data chain: left rear -> left front (turned 90: DIN rear, DO front), along the front edge,
+# right front -> right rear (turned 270: DIN front, DO rear).  VDD on the inner side of each column (bottom bars),
+# GND on the outer side (pours).
+LED_L, LED_R, LED_Y = 20.75, 79.25, (18.6, 11.6, 4.6)        # rear, middle, front
+for _ref, _y in zip(("D2", "D3", "D4"), LED_Y):
+    PLACE[_ref] = (LED_L, _y, 90, "F")
+for _ref, _y in zip(("D5", "D6", "D7"), LED_Y[::-1]):
+    PLACE[_ref] = (LED_R, _y, 270, "F")
+
+# test pads (SMD, top) for a multimeter: GND/3V3 in the middle, the sensors on their bus lines, VSYS beside D1,
+# IR (= IR LED cathodes) at Q1.  (VBAT: D1's anode pad, labelled - there is no room for one more pad there.)
+TEST_PADS = {"TP1": (50.0, 22.6), "TP2": (50.0, R_REAR), "TP3": (81.0, 41.5),
+             "TP4": (47.2, 16.6), "TP5": (59.0, 15.3), "TP6": (71.0, 14.0), "TP7": (28.79, 7.8)}
+for _ref, (_x, _y) in TEST_PADS.items():
+    PLACE[_ref] = (_x, _y, 0, "F")
 
 for _i, (_x, _y) in enumerate(FRAME_HOLES + [SKID_HOLE]):
     PLACE["H%d" % (_i + 1)] = (_x, _y, 0, "F")
@@ -87,7 +94,7 @@ BOTTOM_ZONES = [("rect", 45.0, 6.5, 55.0, 16.0)] + [("rect", x - 4.35, 1.75, x +
 
 # ---------------------------------------------------------------- routes
 W_SIG, W_LED, W_3V3, W_VSYS, W_PWR = 0.25, 0.3, 0.4, 0.8, 1.0
-W_LEDV = 0.5                 # VSYS to the RGB LEDs (bottom)
+W_LEDV = 0.4                 # VSYS to the RGB LEDs (bottom)
 CHAMFER = 0.8
 ROUTES = []      # dict(net, layer, w, pts, c)
 VIAS = []        # (x, y, net)
@@ -132,37 +139,53 @@ for i, (r100, r10k) in enumerate((("R1", "R4"), ("R2", "R5"), ("R3", "R6"))):
 SENS = (("SENS1", "PS1", "R4", "3", 40.05, 16.6, 73.59),
         ("SENS2", "PS2", "R5", "2", 53.5, 15.3, 76.13),
         ("SENS3", "PS3", "R6", "1", 64.05, 14.0, 78.67))
+SENS_TP = {"SENS1": "TP4", "SENS2": "TP5", "SENS3": "TP6"}
 for net, ps, r10k, upin, xt, lvl, xu in SENS:
+    tp = SENS_TP[net]
     if ps == "PS2":
-        route(net, "F", W_SIG, P(ps, "4"), DX(xt), Y(lvl), X(xu), P("U1", upin))
+        route(net, "F", W_SIG, P(ps, "4"), DX(xt), Y(lvl), P(tp, "1"))
     else:
-        route(net, "F", W_SIG, P(ps, "4"), Y(lvl), X(xu), P("U1", upin))
+        route(net, "F", W_SIG, P(ps, "4"), Y(lvl), P(tp, "1"))
+    if net == "SENS3":       # down at x 77.0, then 45 deg onto D0 (the right LED column is at x 78.35 ..)
+        route(net, "F", W_SIG, P(tp, "1"), X(77.0), Y(23.38 - 1.67), DX(xu), P("U1", upin))
+    else:
+        route(net, "F", W_SIG, P(tp, "1"), X(xu), P("U1", upin))
     route(net, "F", W_SIG, (xt, R_FRONT), P(r10k, "2"))
 
 # 3V3: along the resistors' rear pads, then between D3 and D2 under the XIAO to its 3V3 pin
-route("+3V3", "F", W_3V3, P("R1", "1"), P("R6", "1"))
+route("+3V3", "F", W_3V3, P("R1", "1"), P("TP2", "1"))
+route("+3V3", "F", W_3V3, P("TP2", "1"), P("R6", "1"))
 route("+3V3", "F", W_SIG + 0.05, P("R6", "1"), X(72.32), Y(37.35), P("U1", "12"))   # 0.3: between two XIAO pins
 
 # IR LED enable / button+buzzer / RGB data: a 3-line bus between the resistors and the XIAO, 1.0 mm pitch
 route("SENS_LED_EN", "F", W_SIG, P("U1", "4"), Y(19.6), X(25.58), P("R7", "1"))
 route("SW1", "F", W_SIG, P("U1", "5"), Y(20.6), X(25.58), P("R10", "1"))
 route("SW1", "F", W_SIG, (32.5, 20.6), P("R9", "1"))
-route("RGB_DIN", "F", W_SIG, P("U1", "7"), Y(21.6), X(37.095), P("D2", "4"))
 route("BTN", "F", W_SIG, P("R10", "2"), (25.58, 37.4))
 route("BTN", "F", W_SIG, P("SW1", "1"), X(25.58))      # the button's two pin-1 legs
 route("Q1-B", "F", W_SIG, P("R7", "2"), P("Q1", "3"))
 route("BZ1+", "F", W_SIG, P("R9", "2"), P("BZ1", "1"))
 
-# RGB LED chain on the top: DO -> next DIN (front row: a step and a 45 deg jog, row change: down and 45 deg back)
-route("D2-DO", "F", W_SIG, P("D2", "2"), X(42.295), DX(44.095, -1), P("D3", "4"))
-route("D3-DO", "F", W_SIG, P("D3", "2"), X(49.295), DX(51.095, -1), P("D4", "4"))
-route("D4-DO", "F", W_SIG, P("D4", "2"), Y(31.4), DX(51.405), P("D5", "4"))
-route("D5-DO", "F", W_SIG, P("D5", "2"), X(46.205), DX(44.405), P("D6", "4"))
-# their supply (VSYS, up to 0.3 A) on the bottom: from the XIAO's 5V pin past its right end, along the front of the
-# antenna keep-out, then a bar between the two rows with a short stub to each VDD pin; C5 at the end of the bar
-route("VSYS", "B", W_LEDV, P("U1", "14"), X(80.4), Y(21.0), X(56.3), Y(RGB_BAR), X(36.0), P("C5", "1"))
-for _ref in ("D2", "D3", "D4", "D5", "D6"):
-    route("VSYS", "B", W_SIG + 0.15, ("padx", _ref, "3", RGB_BAR), P(_ref, "3"))
+# RGB LEDs.  Data: D6 on the bottom just in front of the XIAO's pins to the left rear LED, then on the top along
+# each column (a step and a 45 deg jog between neighbours) and along the front edge from the left to the right
+route("RGB_DIN", "B", W_SIG, P("U1", "7"), Y(21.8), X(LED_L - 0.9), P("D2", "4"))
+route("D2-DO", "F", W_SIG, P("D2", "2"), Y(15.305), DX(LED_L - 0.9, -1), P("D3", "4"))
+route("D3-DO", "F", W_SIG, P("D3", "2"), Y(8.305), DX(LED_L - 0.9, -1), P("D4", "4"))
+route("D4-DO", "F", W_SIG, P("D4", "2"), Y(1.0), X(LED_R + 0.9), P("D5", "4"))
+route("D5-DO", "F", W_SIG, P("D5", "2"), Y(7.895), DX(LED_R + 0.9), P("D6", "4"))
+route("D6-DO", "F", W_SIG, P("D6", "2"), Y(14.895), DX(LED_R + 0.9), P("D7", "4"))
+# supply (VSYS, up to 0.36 A) on the bottom: from the XIAO's 5V pin past its right end to a bar inside the right
+# column, across the front half at y 14.5 (behind the caster pin) to a bar inside the left column; short stubs
+LB, RB = LED_L + 2.1, LED_R - 2.1                     # the two bars (0.3 mm off the VDD / DO pads)
+route("VSYS", "B", W_LEDV, P("U1", "14"), X(81.6), Y(22.0), X(RB), Y(LED_Y[2] - 0.635), P("D5", "3"), c=0.5)
+route("VSYS", "B", W_LEDV, (RB, 14.5), X(LB), Y(LED_Y[0] + 0.635), P("D2", "3"), c=0)      # (LB, 14.5) is a T
+route("VSYS", "B", W_LEDV, (LB, 14.5), Y(LED_Y[2] + 0.635), P("D4", "3"))
+route("VSYS", "B", W_LEDV, (LB, LED_Y[1] + 0.635), P("D3", "3"))
+route("VSYS", "B", W_LEDV, (RB, LED_Y[1] - 0.635), P("D6", "3"))
+route("VSYS", "B", W_LEDV, (RB, LED_Y[0] - 0.635), P("D7", "3"))
+# test pads on short stubs
+route("VSYS", "F", W_SIG + 0.15, P("TP3", "1"), X(78.67))
+route("LED_K", "F", W_SIG + 0.15, P("Q1", "2"), Y(7.13), DX(28.79), P("TP7", "1"))
 
 # motor inputs: a 4-line bus from the XIAO's rear row to the driver, 1.27 mm between the levels.
 # IN2 comes from the front row under the XIAO (it sits 2.5 mm up on its headers) and leaves between D7 and D8.
@@ -272,7 +295,8 @@ def routed_nets():
     """Board net names that are fully hand-routed (the preview hides their ratsnest)."""
     names = {"A1": "Net-(PS1-A)", "A2": "Net-(PS2-A)", "A3": "Net-(PS3-A)", "Q1-B": "Net-(Q1-B)",
              "BZ1+": "Net-(BZ1-+)", "+3V3": "+3V3",
-             "D2-DO": "Net-(D2-DO)", "D3-DO": "Net-(D3-DO)", "D4-DO": "Net-(D4-DO)", "D5-DO": "Net-(D5-DO)"}
+             "D2-DO": "Net-(D2-DO)", "D3-DO": "Net-(D3-DO)", "D4-DO": "Net-(D4-DO)", "D5-DO": "Net-(D5-DO)",
+             "D6-DO": "Net-(D6-DO)"}
     return {names.get(r["net"], "/" + r["net"]) for r in ROUTES}
 
 

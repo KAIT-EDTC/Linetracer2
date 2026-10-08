@@ -6,7 +6,7 @@
 	(descr "PL9823-F5 5 mm addressable RGB LED (DIN VDD GND DO, 1.27 mm), staggered holes, dot = GND (longest leg)")
 	(tags "LED RGB PL9823 NeoPixel WS2812 5mm")
 	(property "Reference" "REF**"
-		(at 0 -4.9 0)
+		(at 0 -4.3 0)
 		(layer "F.SilkS")
 		(uuid "ddd9bf18-b26d-50f2-8726-5a5bdc7e1809")
 		(effects
@@ -17,7 +17,7 @@
 		)
 	)
 	(property "Value" "LED_PL9823_5mm"
-		(at 0 4.6 0)
+		(at 0 4.3 0)
 		(layer "F.Fab")
 		(uuid "607f2775-3bd4-5020-adff-83a217a39ee8")
 		(effects
@@ -55,7 +55,7 @@
 	(duplicate_pad_numbers_are_jumpers no)
 	(fp_circle
 		(center 0 0)
-		(end 3.35 0)
+		(end 3.05 0)
 		(stroke
 			(width 0.12)
 			(type solid)
@@ -65,8 +65,8 @@
 		(uuid "b2ee2d48-0c34-5b79-9c63-e5534639aca9")
 	)
 	(fp_circle
-		(center 0.635 -4)
-		(end 0.985 -4)
+		(center 0.635 -2.3)
+		(end 0.935 -2.3)
 		(stroke
 			(width 0.1)
 			(type solid)
@@ -77,7 +77,7 @@
 	)
 	(fp_circle
 		(center 0 0)
-		(end 3.45 0)
+		(end 3.2 0)
 		(stroke
 			(width 0.05)
 			(type solid)
@@ -110,7 +110,7 @@
 	)
 	(pad "1" thru_hole circle
 		(at 0.635 -0.9)
-		(size 1.5 1.5)
+		(size 1.4 1.4)
 		(drill 0.9)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
@@ -118,7 +118,7 @@
 	)
 	(pad "2" thru_hole circle
 		(at 1.905 0.9)
-		(size 1.5 1.5)
+		(size 1.4 1.4)
 		(drill 0.9)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
@@ -126,15 +126,15 @@
 	)
 	(pad "3" thru_hole circle
 		(at -0.635 0.9)
-		(size 1.5 1.5)
+		(size 1.4 1.4)
 		(drill 0.9)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
 		(uuid "6a8b9b3a-337f-5243-a3aa-f1acca746462")
 	)
-	(pad "4" thru_hole rect
+	(pad "4" thru_hole circle
 		(at -1.905 -0.9)
-		(size 1.5 1.5)
+		(size 1.4 1.4)
 		(drill 0.9)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)

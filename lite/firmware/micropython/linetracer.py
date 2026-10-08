@@ -1,7 +1,7 @@
 # linetracer.py  -  Linetracer2 Lite library for MicroPython (Seeed Studio XIAO ESP32C6)
 #
 # For the Lite board rev.L3: XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button + a buzzer on the same pin,
-# 5 full-colour LEDs (PL9823, NeoPixel type) on one data pin.
+# 6 full-colour LEDs (PL9823, NeoPixel type, 3 down each side of the board) on one data pin.
 # MicroPython: the official "ESP32_GENERIC_C6" firmware (micropython.org).
 # (The standard rev.A1 board has its own library in firmware/micropython/ at the top of the repo.)
 #
@@ -28,7 +28,7 @@ PIN_SW = 22                # D4   START (pressed = 0) + buzzer: the button hangs
                            #      The piezo passes no DC, so the button reads normally; to beep, D4 becomes a PWM
                            #      output for a moment (it sounds even while START is held)
 PIN_BUZZER = PIN_SW
-PIN_RGB = 16               # D6 (TX)  data of the 5 full-colour LEDs (the boot log may light them for a moment)
+PIN_RGB = 16               # D6 (TX)  data of the 6 full-colour LEDs (the boot log may light them for a moment)
 PIN_LED_XIAO = 15          # yellow user LED on the XIAO itself (0 = on)
 ADC_SENS = (2, 1, 0)       # S1 (left), S2 (centre), S3 (right)  -> D2, D1, D0 (the XIAO's only ADC pins)
 
@@ -47,12 +47,15 @@ BEEP_FREQ = 4000          # the piezo (PKM13EPYH4000) is loudest around 4 kHz
 BEEP_VOLUME = 0.4         # 0 (silent) .. 1 (loudest, 50 % duty). 4 kHz is where ears are most sensitive
 CAL_MIN_SPAN = 4000       # calibration is good if white and black differ by this much (of 65535) on every
                           # sensor.  Check the real numbers with examples/03_sensor_monitor.py
-# full-colour LEDs (PL9823): chain order D2 (front left) -> D3 -> D4 (front right) -> D5 (rear right) -> D6 (rear left)
-N_RGB = 5
+# full-colour LEDs (PL9823), 3 down each side.  Chain order: D2 (left rear) -> D3 -> D4 (left front) -> D5 (right
+# front) -> D6 -> D7 (right rear), so led[0..2] = left side rear -> front, led[3..5] = right side front -> rear
+N_RGB = 6
 RGB_TIMING = (350, 1360, 1360, 350)   # PL9823 bit timing in ns: 0 = 0.35 us high + 1.36 low, 1 = 1.36 + 0.35
 RGB_ORDER = (0, 1, 2)     # PL9823 takes red, green, blue.  If red and green come out swapped, use (1, 0, 2)
-RGB_MAX = 60              # brightness limit 0..255: 5 x white at 255 = 0.3 A and they get warm
-LEFT_TO_RIGHT = (0, 4, 1, 3, 2)   # the LEDs from left to right on the board (front, rear, front, rear, front)
+RGB_MAX = 60              # brightness limit 0..255: 6 x white at 255 = 0.36 A and they get warm
+LEFT_SIDE = (2, 1, 0)     # the left LEDs, front -> rear
+RIGHT_SIDE = (3, 4, 5)    # the right LEDs, front -> rear
+FLOW_SPEED = 6.0          # running lights: steps per second at 100 % motor speed
 COLORS = {"off": (0, 0, 0), "red": (255, 0, 0), "orange": (255, 80, 0), "yellow": (255, 200, 0),
           "green": (0, 255, 0), "cyan": (0, 220, 255), "blue": (0, 0, 255), "purple": (180, 0, 255),
           "pink": (255, 60, 150), "white": (255, 255, 255)}
@@ -241,12 +244,15 @@ class LineSensors:
 
 
 class Lights:
-    """The 5 full-colour LEDs.  Colours are (red, green, blue) 0..255 or a name from COLORS ("red", "blue", ...).
+    """The 6 full-colour LEDs, 3 down each side.  Colours are (red, green, blue) 0..255 or a name from COLORS.
 
-        robot.led[0] = "red"          # one LED (0 = front left ... 4 = rear left, see LEFT_TO_RIGHT)
+        robot.led[0] = "red"          # one LED: 0..2 = left side rear -> front, 3..5 = right side front -> rear
         robot.led.show()              # nothing changes until show()
         robot.led.fill("blue")        # all of them (shown at once)
+        robot.led.side("red", "off")  # left side / right side
         robot.led.value(1)            # like a plain LED: all on in robot.led.color, value(0) = all off
+        robot.led.flow(30, 30)        # running lights (call it again and again): each side flows front -> rear
+                                      # at the speed of its wheel (negative = rear -> front)
         robot.led.brightness = 30     # 0..255 (limit, default RGB_MAX)
     """
 
@@ -257,11 +263,13 @@ class Lights:
         self.brightness = RGB_MAX
         self.color = "green"          # colour for value(1)
         self._on = 0
+        self._phase = [0.0, 0.0]      # flow(): position of the light on each side (0 .. 3)
+        self._t = time.ticks_ms()
         self.fill("off")
 
-    def _rgb(self, c):
+    def _rgb(self, c, k=1.0):
         c = COLORS[c] if isinstance(c, str) else c
-        k = _clamp(self.brightness, 0, 255) / 255
+        k = k * _clamp(self.brightness, 0, 255) / 255
         return (int(c[0] * k), int(c[1] * k), int(c[2] * k))
 
     def __setitem__(self, i, c):
@@ -274,26 +282,47 @@ class Lights:
         self.np.fill(self._rgb(c))
         self.np.write()
 
+    def side(self, left, right):
+        for i in LEFT_SIDE:
+            self.np[i] = self._rgb(left)
+        for i in RIGHT_SIDE:
+            self.np[i] = self._rgb(right)
+        self.np.write()
+
     def value(self, v=None):
         if v is None:
             return self._on
         self._on = 1 if v else 0
         self.fill(self.color if v else "off")
 
-    def bar(self, pos, c="cyan"):
-        """Show a line position -1000 (left) .. +1000 (right) on the LED that sits there (None = all off)."""
-        self.np.fill((0, 0, 0))
-        if pos is not None:
-            k = _clamp((pos + 1000) * self.n // 2001, 0, self.n - 1)
-            self.np[LEFT_TO_RIGHT[k]] = self._rgb(c)
+    def flow(self, left, right, c="cyan"):
+        """Running lights: on each side a light runs front -> rear (with a dim tail), as fast as that wheel turns
+        (left / right = motor % -100 .. 100, like motors.run).  Call it often; it uses the time since the last call."""
+        now = time.ticks_ms()
+        dt = min(time.ticks_diff(now, self._t), 200) / 1000      # seconds
+        self._t = now
+        for k, (leds, sp) in enumerate(((LEFT_SIDE, left), (RIGHT_SIDE, right))):
+            self._phase[k] = (self._phase[k] + FLOW_SPEED * sp / 100 * dt) % 3
+            head = int(self._phase[k]) % 3      # (a float % 3 can come out as 3.0)
+            tail = (head - 1) % 3 if sp >= 0 else (head + 1) % 3
+            for j, i in enumerate(leds):
+                self.np[i] = self._rgb(c) if j == head else self._rgb(c, 0.2) if j == tail else (0, 0, 0)
         self.np.write()
 
     def count(self, n, c="yellow"):
-        """Light n LEDs from the left (e.g. the speed level)."""
-        self.np.fill((0, 0, 0))
-        for k in range(min(n, self.n)):
-            self.np[LEFT_TO_RIGHT[k]] = self._rgb(c)
+        """Light n LEDs from the front on both sides (e.g. the speed level 1 .. 3)."""
+        for j in range(3):
+            v = self._rgb(c) if j < n else (0, 0, 0)
+            self.np[LEFT_SIDE[j]] = v
+            self.np[RIGHT_SIDE[j]] = v
         self.np.write()
+
+    def bar(self, pos, c="cyan"):
+        """Show where the line is: left side (pos < -300), both (centre), right side (pos > 300); None = off."""
+        if pos is None:
+            self.side("off", "off")
+        else:
+            self.side(c if pos < 300 else "off", c if pos > -300 else "off")
 
 
 class Robot:

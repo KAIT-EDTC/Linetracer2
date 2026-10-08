@@ -8,8 +8,8 @@ Differences from the standard board (gen_schematic.py):
     powered through its 5V pin (= USB VBUS) behind D1
   * 3 x LBR-127HLD sensors straight into the XIAO's three ADC pins (no 4051 multiplexer)
   * no battery measurement (the XIAO has only 3 ADC pins; all of them are used by the sensors)
-  * 1 button, a passive piezo buzzer sharing the button's pin (D4), 5 full-colour LEDs (PL9823, one data line
-    on D6), no power LED, no expansion header
+  * 1 button, a passive piezo buzzer sharing the button's pin (D4), 6 full-colour LEDs (PL9823, one data line
+    on D6), test pads for a multimeter, no power LED, no expansion header
 """
 import os
 import sys
@@ -34,6 +34,7 @@ AKIZUKI = {
     "0.1uF (at motor)": "113582 (10pcs)",
     "0.1uF": "113582 (10pcs)",
     "PL9823": "108411 (PL9823-F5)",
+    "TP": "",
 }
 _place = s.place
 
@@ -48,7 +49,7 @@ def _place_with_code(lib_id, ref, value, *args, **kw):
 s.place = _place_with_code
 
 # ----------------------------------------------------------------- headings
-s.text("Linetracer2 Lite rev.L3  :  XIAO ESP32C6 on pin headers, 3 x LBR-127HLD, 1 button, 1 buzzer, 5 RGB LEDs", 20.32, 17.78, 3, True)
+s.text("Linetracer2 Lite rev.L3  :  XIAO ESP32C6 on pin headers, 3 x LBR-127HLD, 1 button, 1 buzzer, 6 RGB LEDs", 20.32, 17.78, 3, True)
 s.text("Power: AA x3 (alkaline 4.5V recommended / NiMH 3.6V) -> VBAT (motors) ; VBAT -> D1 Schottky -> VSYS -> XIAO 5V pin. "
        "USB 5V can not back-feed the batteries. Never use 4 cells (the XIAO's 5V input clamps above about 6 V).", 20.32, 24.13, 1.5)
 
@@ -197,12 +198,13 @@ s.text("internal pull-up, pressed = 0.  R10: if START is pressed while D4 beeps,
        271.78, 124.46, 1.27)
 s.text("short press = start / stop, long press = speed level", 271.78, 128.27, 1.27)
 
-# 5 full-colour LEDs in one chain: D6 -> D2 DIN, DO -> next DIN ... D6 DO open.  Powered from VSYS (battery - 0.3 V,
-# or USB 5 V): the PL9823 asks for 4.5-6 V, on fresh AA cells VSYS is about 4.2 V (works, a little out of spec;
-# blue / green get dimmer as the cells run down).  C5 = 0.1 uF next to the LEDs.
+# 6 full-colour LEDs in one chain, 3 down each side of the board: D6 -> D2 DIN (left rear), D2 -> D3 -> D4 (left front)
+# -> D5 (right front) -> D6 -> D7 (right rear), D7 DO open.  Powered from VSYS (battery - 0.3 V, or USB 5 V): the
+# PL9823 asks for 4.5-6 V, on fresh AA cells VSYS is about 4.2 V (works, a little out of spec; blue / green get
+# dimmer as the cells run down).  C2 (470 uF on VSYS) is the only bulk capacitor.
 leds = []
-for i in range(5):
-    d = s.place("Linetracer2:PL9823", "D%d" % (i + 2), "PL9823", 284.48 + 22.86 * i, 149.86, 0, footprint=RGB_FP,
+for i in range(6):
+    d = s.place("Linetracer2:PL9823", "D%d" % (i + 2), "PL9823", 284.48 + 20.32 * i, 149.86, 0, footprint=RGB_FP,
                 ref_off=(-5.08, -7.62), val_off=(2.54, 7.62))
     s.lab(d, "3", "VSYS")
     s.pwr(d, "1", "GND")
@@ -211,12 +213,10 @@ s.lab(leds[0], "4", "RGB_DIN")
 for a, b in zip(leds, leds[1:]):
     s.connect(a, "2", b, "4")
 s.nc(leds[-1], "2")
-c5 = s.place("Device:C", "C5", "0.1uF", 396.24, 149.86, 0, footprint=C_FP, ref_off=(2.54, -1.27), val_off=(2.54, 1.27))
-s.lab(c5, "1", "VSYS")
-s.pwr(c5, "2", "GND")
-s.text("D2..D6 = PL9823 (NeoPixel type, 800 kHz, 24 bit per LED).  Data from D6 (TX: the boot log may flash them once).",
+s.text("D2..D7 = PL9823 (NeoPixel type, 800 kHz, 24 bit per LED): D2-D4 left side (rear -> front), D5-D7 right side",
        271.78, 163.83, 1.27)
-s.text("All 5 white at full power = about 0.3 A: the library limits the brightness.", 271.78, 167.64, 1.27)
+s.text("(front -> rear).  Data from D6 (TX: the boot log may flash them once).  6 x white = 0.36 A: the library limits it.",
+       271.78, 167.64, 1.27)
 r9 = s.place("Device:R", "R9", "100", 287.02, 172.72, 90, footprint=R_FP,
              ref_off=(-2.54, -2.54), val_off=(-1.27, 2.54))
 bz = s.place("Device:Buzzer", "BZ1", "piezo 13mm", 304.8, 175.26, 0,
@@ -285,6 +285,24 @@ s.lab(r7, "1", "SENS_LED_EN")
 s.lab(q1, qc, "LED_K")
 s.pwr(q1, qe, "GND")
 s.text("Q1: all IR LEDs on when SENS_LED_EN = 1 (about 60 mA)", 200.66, 270.51, 1.27)
+
+# ================================================================= TEST PADS
+s.rect(300.99, 195.58, 408.94, 281.94)
+s.text("6. TEST PADS  (multimeter, black probe on GND)", 303.53, 200.66, 2, True)
+TPS = (("TP1", "GND"), ("TP2", "+3V3"), ("TP3", "VSYS"), ("TP4", "SENS1"), ("TP5", "SENS2"), ("TP6", "SENS3"),
+       ("TP7", "LED_K"))
+for i, (ref, net) in enumerate(TPS):
+    x, y = 317.5 + 22.86 * (i % 4), 223.52 + 25.4 * (i // 4)
+    t = s.place("Connector:TestPoint", ref, net if net[0] != "+" else net[1:], x, y, 0,
+                footprint="TestPoint:TestPoint_Pad_D1.5mm", in_bom=False, ref_off=(2.54, -2.54), val_off=(2.54, 0))
+    if net in ("GND", "+3V3"):
+        s.pwr(t, "1", net)
+    else:
+        s.lab(t, "1", net)
+s.text("VBAT (D1 anode / J1 +) 3.6-4.8 V, VSYS = VBAT - 0.3 V (USB: 5 V), 3V3 = 3.3 V.  S1-S3: white low, black ~3 V.",
+       303.53, 271.78, 1.27)
+s.text("IR (LED_K): about 0.1 V while the IR LEDs are on (robot.sensors.leds(True)), about 2 V when off.",
+       303.53, 275.59, 1.27)
 
 out = os.path.join(KDIR, PROJ + ".kicad_sch")
 s.save(out, date="2026-10-07", rev="L3",
