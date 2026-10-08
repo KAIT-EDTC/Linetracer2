@@ -1,6 +1,7 @@
 # linetracer.py  -  Linetracer2 Lite library for MicroPython (Seeed Studio XIAO ESP32C6)
 #
-# For the Lite board rev.L3: XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button + a buzzer on the same pin, 1 LED.
+# For the Lite board rev.L3: XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button + a buzzer on the same pin,
+# 5 full-colour LEDs (PL9823, NeoPixel type) on one data pin.
 # MicroPython: the official "ESP32_GENERIC_C6" firmware (micropython.org).
 # (The standard rev.A1 board has its own library in firmware/micropython/ at the top of the repo.)
 #
@@ -13,6 +14,7 @@
 # Hardware: see lite/README.md  (pin numbers below must match the PCB)
 
 from machine import Pin, PWM, ADC
+from neopixel import NeoPixel
 import time
 
 # ----------------------------------------------------------------- pins (PCB rev.L3)
@@ -26,7 +28,7 @@ PIN_SW = 22                # D4   START (pressed = 0) + buzzer: the button hangs
                            #      The piezo passes no DC, so the button reads normally; to beep, D4 becomes a PWM
                            #      output for a moment (it sounds even while START is held)
 PIN_BUZZER = PIN_SW
-PIN_LED = 16               # D6 (TX)  red LED (flickers with the boot log)
+PIN_RGB = 16               # D6 (TX)  data of the 5 full-colour LEDs (the boot log may light them for a moment)
 PIN_LED_XIAO = 15          # yellow user LED on the XIAO itself (0 = on)
 ADC_SENS = (2, 1, 0)       # S1 (left), S2 (centre), S3 (right)  -> D2, D1, D0 (the XIAO's only ADC pins)
 
@@ -45,6 +47,15 @@ BEEP_FREQ = 4000          # the piezo (PKM13EPYH4000) is loudest around 4 kHz
 BEEP_VOLUME = 0.4         # 0 (silent) .. 1 (loudest, 50 % duty). 4 kHz is where ears are most sensitive
 CAL_MIN_SPAN = 4000       # calibration is good if white and black differ by this much (of 65535) on every
                           # sensor.  Check the real numbers with examples/03_sensor_monitor.py
+# full-colour LEDs (PL9823): chain order D2 (front left) -> D3 -> D4 (front right) -> D5 (rear right) -> D6 (rear left)
+N_RGB = 5
+RGB_TIMING = (350, 1360, 1360, 350)   # PL9823 bit timing in ns: 0 = 0.35 us high + 1.36 low, 1 = 1.36 + 0.35
+RGB_ORDER = (0, 1, 2)     # PL9823 takes red, green, blue.  If red and green come out swapped, use (1, 0, 2)
+RGB_MAX = 60              # brightness limit 0..255: 5 x white at 255 = 0.3 A and they get warm
+LEFT_TO_RIGHT = (0, 4, 1, 3, 2)   # the LEDs from left to right on the board (front, rear, front, rear, front)
+COLORS = {"off": (0, 0, 0), "red": (255, 0, 0), "orange": (255, 80, 0), "yellow": (255, 200, 0),
+          "green": (0, 255, 0), "cyan": (0, 220, 255), "blue": (0, 0, 255), "purple": (180, 0, 255),
+          "pink": (255, 60, 150), "white": (255, 255, 255)}
 
 
 def _clamp(x, lo, hi):
@@ -229,12 +240,68 @@ class LineSensors:
         return self.last_pos
 
 
+class Lights:
+    """The 5 full-colour LEDs.  Colours are (red, green, blue) 0..255 or a name from COLORS ("red", "blue", ...).
+
+        robot.led[0] = "red"          # one LED (0 = front left ... 4 = rear left, see LEFT_TO_RIGHT)
+        robot.led.show()              # nothing changes until show()
+        robot.led.fill("blue")        # all of them (shown at once)
+        robot.led.value(1)            # like a plain LED: all on in robot.led.color, value(0) = all off
+        robot.led.brightness = 30     # 0..255 (limit, default RGB_MAX)
+    """
+
+    def __init__(self, pin=PIN_RGB, n=N_RGB):
+        self.n = n
+        self.np = NeoPixel(Pin(pin, Pin.OUT), n, timing=RGB_TIMING)
+        self.np.ORDER = RGB_ORDER + (3,)
+        self.brightness = RGB_MAX
+        self.color = "green"          # colour for value(1)
+        self._on = 0
+        self.fill("off")
+
+    def _rgb(self, c):
+        c = COLORS[c] if isinstance(c, str) else c
+        k = _clamp(self.brightness, 0, 255) / 255
+        return (int(c[0] * k), int(c[1] * k), int(c[2] * k))
+
+    def __setitem__(self, i, c):
+        self.np[i] = self._rgb(c)
+
+    def show(self):
+        self.np.write()
+
+    def fill(self, c):
+        self.np.fill(self._rgb(c))
+        self.np.write()
+
+    def value(self, v=None):
+        if v is None:
+            return self._on
+        self._on = 1 if v else 0
+        self.fill(self.color if v else "off")
+
+    def bar(self, pos, c="cyan"):
+        """Show a line position -1000 (left) .. +1000 (right) on the LED that sits there (None = all off)."""
+        self.np.fill((0, 0, 0))
+        if pos is not None:
+            k = _clamp((pos + 1000) * self.n // 2001, 0, self.n - 1)
+            self.np[LEFT_TO_RIGHT[k]] = self._rgb(c)
+        self.np.write()
+
+    def count(self, n, c="yellow"):
+        """Light n LEDs from the left (e.g. the speed level)."""
+        self.np.fill((0, 0, 0))
+        for k in range(min(n, self.n)):
+            self.np[LEFT_TO_RIGHT[k]] = self._rgb(c)
+        self.np.write()
+
+
 class Robot:
     def __init__(self):
         self.motors = Motors()
         self.sensors = LineSensors()
         self.sw = Pin(PIN_SW, Pin.IN, Pin.PULL_UP)
-        self.led = Pin(PIN_LED, Pin.OUT, value=0)
+        self.led = Lights()
         self._led_xiao = Pin(PIN_LED_XIAO, Pin.OUT, value=1)   # yellow LED on the XIAO (free 2nd LED, 0 = on)
         self.volume = BEEP_VOLUME                                  # 0 = quiet mode (no sound at all)
 
@@ -253,7 +320,7 @@ class Robot:
 
     def wait_press(self):
         """Wait for one press.  Returns 'short' or 'long' (held LONG_PRESS_MS or more).
-        When the press becomes 'long' the red LED goes out (and the XIAO's yellow LED lights),
+        When the press becomes 'long' the LEDs go out (and the XIAO's yellow LED lights),
         so you know when to let go."""
         while not self.start_pressed():
             time.sleep_ms(10)
@@ -275,7 +342,7 @@ class Robot:
 
     # LED --------------------------------------------------------------------
     def blink(self, n=1, ms=120):
-        """Blink the red LED n times, then leave it as it was."""
+        """Blink the LEDs n times (robot.led.color), then leave them as they were."""
         was = self.led.value()
         for _ in range(n):
             self.led.value(1)
@@ -287,7 +354,7 @@ class Robot:
     # buzzer (on the button's pin D4: for the length of the tone the pin is a PWM output) --------------------
     def beep(self, freq=BEEP_FREQ, ms=100, volume=None):
         """Sound the buzzer.  freq in Hz (0 = a rest), ms = length, volume 0..1 (default robot.volume).
-        The button can not be read while it sounds.  With volume 0 (quiet mode) the red LED flashes instead."""
+        The button can not be read while it sounds.  With volume 0 (quiet mode) the LEDs flash instead."""
         v = self.volume if volume is None else volume
         if freq > 0 and v > 0:
             pwm = PWM(self.sw, freq=int(freq), duty_u16=int(32768 * min(1.0, v)))

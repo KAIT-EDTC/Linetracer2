@@ -2,16 +2,17 @@
 #
 #   START short press : 1st time = auto calibration (robot spins on the line)
 #                       after that = run.  Press START again to stop.
-#   START long press  : change speed level 1..3 (hold until the red LED goes out, then let go;
-#                       the buzzer beeps / the red LED blinks the new level)
-#   red LED on        : ready (the Lite board has no power LED)
+#   START long press  : change speed level 1..3 (hold until the LEDs go out, then let go;
+#                       the buzzer beeps and 1..3 LEDs light yellow)
+#   LEDs (5, full colour): green = ready, blue = calibrating, red = calibration failed,
+#                       while running the LED above the line lights (left .. right)
 #   buzzer            : a short tune at power-on, "pi-pi-pi-PI" before it starts, a low tone when something failed
 #                       (the buzzer is on the START button's pin: it can not see a press while it sounds)
 #                       (hold START while switching on = quiet mode: no sound, the LED blinks instead)
 #   On USB alone the motors have NO power (they run from the batteries only): switch the battery box ON.
 #
 # The board can not measure the battery: when the cells run down the robot gets slower, and when they are
-# nearly empty the XIAO restarts as the motors start (red LED goes out) -> put in new cells.
+# nearly empty the XIAO restarts as the motors start (the LEDs go out) -> put in new cells.
 #
 # Put the robot on the line before pressing START.
 
@@ -40,8 +41,12 @@ def run_course(base, kp, kd):
     t_prev = time.ticks_us()
     robot.led.value(0)
     robot.wait_release()
+    n = 0
     while not robot.start_pressed():
         pos = s.position()
+        n += 1
+        if n % 20 == 0:
+            robot.led.bar(pos)              # the LED above the line (about 0.3 ms, so not every time)
         now = time.ticks_us()
         dt = max(1, time.ticks_diff(now, t_prev)) / 1000.0   # ms
         t_prev = now
@@ -84,20 +89,23 @@ try:
             time.sleep_ms(300)
             robot.led.value(0)
             time.sleep_ms(300)
+            robot.led.count(level)          # 1..3 yellow LEDs
             for _ in range(level):
                 robot.beep(2000, 120)
                 time.sleep_ms(150)
+            time.sleep_ms(600)
             robot.led.value(1)
             continue
         if not s.calibrated():
-            robot.led.value(0)
+            robot.led.fill("blue")              # calibrating
             robot.beep(2000, 60)                # take your hand off the robot ...
             time.sleep_ms(1000)                 # ... it starts to turn in 1 second
             ok = robot.auto_calibrate()
             print("calibrated" if ok else "calibration failed", s.lo, s.hi)
             if not ok:
+                robot.led.fill("red")
                 robot.beep(400, 600)            # low tone = failed
-                robot.blink(4, 300)
+                time.sleep_ms(1000)
             else:
                 robot.melody([(1568, 100), (2093, 200)])
             robot.led.value(1)

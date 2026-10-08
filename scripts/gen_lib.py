@@ -182,11 +182,45 @@ def sym_pico():
     return sexpr.dump(src, 1)
 
 
+def sym_pl9823():
+    """PL9823 (5 mm NeoPixel-type full-colour LED, Akizuki 108411).  1 = GND, 2 = DO, 3 = VDD, 4 = DIN.
+    Drawn like KiCad's WS2812: data in left, data out right, VDD on top, GND at the bottom."""
+    pins = [pin("power_in", 0, -7.62, 90, "GND", "1"), pin("output", 7.62, 0, 180, "DO", "2"),
+            pin("power_in", 0, 7.62, 270, "VDD", "3"), pin("input", -7.62, 0, 0, "DIN", "4")]
+    g = """
+    (rectangle (start -5.08 5.08) (end 5.08 -5.08) (stroke (width 0.254) (type default)) (fill (type background)))
+    (circle (center 1.27 0) (radius 2.286) (stroke (width 0.254) (type default)) (fill (type none)))
+    (polyline (pts (xy 0.508 0.762) (xy 2.032 0.762) (xy 1.27 -0.762) (xy 0.508 0.762)) (stroke (width 0.2) (type default)) (fill (type outline)))
+    (polyline (pts (xy 0.508 -0.762) (xy 2.032 -0.762)) (stroke (width 0.2) (type default)) (fill (type none)))
+    (text "RGB" (at -2.286 0 0) (effects (font (size 1 1))))
+"""
+    return """(symbol "PL9823"
+  (pin_names (offset 0.254))
+  (exclude_from_sim no) (in_bom yes) (on_board yes)
+  %s
+  %s
+  %s
+  %s
+  %s
+  (symbol "PL9823_0_1"%s  )
+  (symbol "PL9823_1_1"
+    %s
+  )
+  (embedded_fonts no)
+)""" % (
+        prop("Reference", "D", -5.08, 6.35, justify="left"),
+        prop("Value", "PL9823", 1.27, -6.35, justify="left"),
+        prop("Footprint", "Linetracer2:LED_PL9823_5mm", 0, -10.16, hide=True),
+        prop("Datasheet", "https://akizukidenshi.com/goodsaffix/pl9823.pdf", 0, -12.7, hide=True),
+        prop("Description", "5 mm full-colour LED with controller (NeoPixel type, 800 kHz), supply 4.5-6 V", 0, -15.24, hide=True),
+        g, "\n    ".join(pins))
+
+
 def write_symbols():
     txt = "(kicad_symbol_lib\n\t(version 20241209)\n\t(generator \"linetracer2_gen\")\n\t(generator_version \"9.0\")\n"
     lbr127 = sym_reflector("LBR-127HLD", "https://akizukidenshi.com/goodsaffix/lbr127hld.pdf",
                            "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
-    for s in (sym_module(), sym_reflector(), lbr127, sym_xiao()):
+    for s in (sym_module(), sym_reflector(), lbr127, sym_xiao(), sym_pl9823()):
         node = sexpr.parse(s)
         txt += sexpr.dump(node, 1) + "\n"
     txt += sym_pico() + "\n)\n"
@@ -456,7 +490,26 @@ def fp_xiao_header():
     f.write((0, 12.0), (0, 13.5))
 
 
+def fp_pl9823():
+    """PL9823-F5 (5 mm full-colour LED with controller).  Its legs come out in one row, 1.27 mm apart:
+    DIN, VDD, GND (the longest leg), DO.  The holes are staggered (+-0.9 mm) so that children can solder them
+    without bridges (the legs only need a small bend).  Origin = LED centre.  The dot marks the GND hole =
+    the LONGEST leg (a PL9823 put in the wrong way round gets VDD and GND swapped)."""
+    f = FP("LED_PL9823_5mm",
+           "PL9823-F5 5 mm addressable RGB LED (DIN VDD GND DO, 1.27 mm), staggered holes, dot = GND (longest leg)",
+           "LED RGB PL9823 NeoPixel WS2812 5mm")
+    for num, x, y in (("4", -1.905, -0.9), ("3", -0.635, 0.9), ("1", 0.635, -0.9), ("2", 1.905, 0.9)):
+        f.pad(num, x, y, "rect" if num == "4" else "circle", 1.5, 1.5, 0.9)
+    f.circle(0, 0, 3.35)                             # flange (5.8 mm), clear of the pads
+    f.circle(0.635, -4.0, 0.35, w=0.1, fill=True)    # the GND hole = longest leg
+    f.circle(0, 0, 2.9, layer="F.Fab", w=0.1)
+    f.text("DIN", -1.905, -2.1, layer="F.Fab", size=0.5, thick=0.08)
+    f.circle(0, 0, 3.45, layer="F.CrtYd", w=0.05)    # 7 mm apart on the Lite board
+    f.write((0, -4.9), (0, 4.6))
+
+
 def write_footprints():
+    fp_pl9823()
     fp_xiao_header()
     fp_buzzer_pkm13()
     fp_buzzer()

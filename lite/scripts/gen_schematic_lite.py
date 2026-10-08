@@ -8,7 +8,8 @@ Differences from the standard board (gen_schematic.py):
     powered through its 5V pin (= USB VBUS) behind D1
   * 3 x LBR-127HLD sensors straight into the XIAO's three ADC pins (no 4051 multiplexer)
   * no battery measurement (the XIAO has only 3 ADC pins; all of them are used by the sensors)
-  * 1 button, 1 LED, a passive piezo buzzer sharing the button's pin (D4), no power LED, no expansion header
+  * 1 button, a passive piezo buzzer sharing the button's pin (D4), 5 full-colour LEDs (PL9823, one data line
+    on D6), no power LED, no expansion header
 """
 import os
 import sys
@@ -22,7 +23,7 @@ assert VARIANT == "lite", "run with LT2_VARIANT=lite"
 R_FP = "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 C_FP = "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm"
 CP_FP = "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm"
-LED_FP = "LED_THT:LED_D3.0mm"
+RGB_FP = "Linetracer2:LED_PL9823_5mm"
 
 s = Sch("Linetracer2 Lite rev.L3 - XIAO ESP32C6 kids line tracer")
 
@@ -31,7 +32,8 @@ AKIZUKI = {
     "100": "125101 (100pcs)", "1k": "125102 (100pcs)", "10k": "125103 (100pcs)",
     "470uF 16V": "108426 (Rubycon 16WXA470MEFC 8x9)",
     "0.1uF (at motor)": "113582 (10pcs)",
-    "LED red": "111577",
+    "0.1uF": "113582 (10pcs)",
+    "PL9823": "108411 (PL9823-F5)",
 }
 _place = s.place
 
@@ -46,7 +48,7 @@ def _place_with_code(lib_id, ref, value, *args, **kw):
 s.place = _place_with_code
 
 # ----------------------------------------------------------------- headings
-s.text("Linetracer2 Lite rev.L3  :  XIAO ESP32C6 on pin headers, 3 x LBR-127HLD, 1 button, 1 LED, 1 buzzer", 20.32, 17.78, 3, True)
+s.text("Linetracer2 Lite rev.L3  :  XIAO ESP32C6 on pin headers, 3 x LBR-127HLD, 1 button, 1 buzzer, 5 RGB LEDs", 20.32, 17.78, 3, True)
 s.text("Power: AA x3 (alkaline 4.5V recommended / NiMH 3.6V) -> VBAT (motors) ; VBAT -> D1 Schottky -> VSYS -> XIAO 5V pin. "
        "USB 5V can not back-feed the batteries. Never use 4 cells (the XIAO's 5V input clamps above about 6 V).", 20.32, 24.13, 1.5)
 
@@ -117,12 +119,12 @@ u1 = s.place("Linetracer2:XIAO_ESP32C6", "U1", "XIAO ESP32C6", 190.5, 144.78, 0,
 # IN1..IN4 + button on GPIO18..23: weak pull-up only while the chip is held in reset, then floating.
 # STBY on RX (GPIO17): floating during reset (-> the driver's 150k pull-down = standby), pulled up after reset
 # when IN1..IN4 already float low (= coast).  Either way the motors can not start before the program runs.
-# TX / RX carry the boot log and the UART REPL: only outputs there (red LED, STBY), never the button.
+# TX / RX carry the boot log and the UART REPL: only outputs there (RGB LED data, STBY), never the button.
 # The XIAO's rear row (D7..D10) feeds only the motor driver behind it; everything else leaves from the front row.
 # rev.L3: D3/D4 and D8/D10 swapped against rev.L2 so that no two tracks cross on the top side (see layout_lite.py).
-# D4 (SW1) also drives the buzzer (through R9; the button hangs on R10).  D6 (LED1) = the red LED only.
+# D4 (SW1) also drives the buzzer (through R9; the button hangs on R10).  D6 = data of the 5 RGB LEDs.
 pins = {"1": "SENS3", "2": "SENS2", "3": "SENS1", "4": "SENS_LED_EN", "5": "SW1", "6": "MOT_IN2",
-        "7": "LED1", "8": "MOT_STBY", "9": "MOT_IN1", "10": "MOT_IN3", "11": "MOT_IN4"}
+        "7": "RGB_DIN", "8": "MOT_STBY", "9": "MOT_IN1", "10": "MOT_IN3", "11": "MOT_IN4"}
 for num, net in pins.items():
     s.lab(u1, num, net)
 s.pwr(u1, "12", "+3V3")
@@ -182,7 +184,7 @@ s.text("toggle STBY L->H to recover (done by the library).", 271.78, 96.52, 1.27
 
 # ================================================================= UI block
 s.rect(269.24, 101.6, 408.94, 190.5)
-s.text("4. BUTTON / LED / BUZZER", 271.78, 106.68, 2, True)
+s.text("4. BUTTON / BUZZER / RGB LEDs", 271.78, 106.68, 2, True)
 sw1 = s.place("Switch:SW_Push", "SW1", "START", 294.64, 116.84, 0, footprint="Button_Switch_THT:SW_PUSH_6mm",
               fields={"Akizuki": "108075"}, ref_off=(-2.54, -3.81), val_off=(-2.54, 3.81))
 r10 = s.place("Device:R", "R10", "1k", 279.4, 116.84, 90, footprint=R_FP,
@@ -195,13 +197,26 @@ s.text("internal pull-up, pressed = 0.  R10: if START is pressed while D4 beeps,
        271.78, 124.46, 1.27)
 s.text("short press = start / stop, long press = speed level", 271.78, 128.27, 1.27)
 
-r8 = s.place("Device:R", "R8", "1k", 287.02, 147.32, 90, footprint=R_FP,
-             ref_off=(-2.54, -2.54), val_off=(-1.27, 2.54))
-d2 = s.place("Device:LED", "D2", "LED red", 302.26, 147.32, 180,
-             footprint=LED_FP, ref_off=(-2.54, -3.81), val_off=(-3.81, 3.81))
-s.lab(r8, "1", "LED1")
-s.connect(r8, "2", d2, "2")
-s.pwr(d2, "1", "GND")
+# 5 full-colour LEDs in one chain: D6 -> D2 DIN, DO -> next DIN ... D6 DO open.  Powered from VSYS (battery - 0.3 V,
+# or USB 5 V): the PL9823 asks for 4.5-6 V, on fresh AA cells VSYS is about 4.2 V (works, a little out of spec;
+# blue / green get dimmer as the cells run down).  C5 = 0.1 uF next to the LEDs.
+leds = []
+for i in range(5):
+    d = s.place("Linetracer2:PL9823", "D%d" % (i + 2), "PL9823", 284.48 + 22.86 * i, 149.86, 0, footprint=RGB_FP,
+                ref_off=(-5.08, -7.62), val_off=(2.54, 7.62))
+    s.lab(d, "3", "VSYS")
+    s.pwr(d, "1", "GND")
+    leds.append(d)
+s.lab(leds[0], "4", "RGB_DIN")
+for a, b in zip(leds, leds[1:]):
+    s.connect(a, "2", b, "4")
+s.nc(leds[-1], "2")
+c5 = s.place("Device:C", "C5", "0.1uF", 396.24, 149.86, 0, footprint=C_FP, ref_off=(2.54, -1.27), val_off=(2.54, 1.27))
+s.lab(c5, "1", "VSYS")
+s.pwr(c5, "2", "GND")
+s.text("D2..D6 = PL9823 (NeoPixel type, 800 kHz, 24 bit per LED).  Data from D6 (TX: the boot log may flash them once).",
+       271.78, 163.83, 1.27)
+s.text("All 5 white at full power = about 0.3 A: the library limits the brightness.", 271.78, 167.64, 1.27)
 r9 = s.place("Device:R", "R9", "100", 287.02, 172.72, 90, footprint=R_FP,
              ref_off=(-2.54, -2.54), val_off=(-1.27, 2.54))
 bz = s.place("Device:Buzzer", "BZ1", "piezo 13mm", 304.8, 175.26, 0,

@@ -21,16 +21,16 @@ Raspberry Pi Pico ＋ TC78H653FTG ＋ 130 モーター ×2 の、**全部足付�
 | 性能（計算値） | 最高速度 理論 5 m/s（ソフトで 1.5〜2.5 m/s に制限）、加速 4 m/s² でモーター電流 約 1.4 A |
 | コスト（1 台） | 全部新品 約 ¥2,370、**Pico を再利用すれば 約 ¥1,500**（`docs/05_bom.md`） |
 
-## 「Linetracer2 Lite」（rev.L3：XIAO ESP32C6（ピンヘッダ）＋ LBR-127HLD ＋ ブザー）
+## 「Linetracer2 Lite」（rev.L3：XIAO ESP32C6（ピンヘッダ）＋ LBR-127HLD ＋ ブザー ＋ フルカラー LED）
 
 標準版から部品を減らした版も用意した（詳しくは [lite/README.md](lite/README.md)）。**Lite のファイルはすべて `lite/` フォルダにまとめてあり、標準版のファイルとは混ざらない**。**枠・デッキ・平歯車・車輪の 3D プリント部品、ねじ、モーター、電池ボックスは標準版と共通**で、基板・ソフト・前の支え（Lite 用ボールキャスター）が違う。
-rev.L2（2026-10-05）でマイコンを **Seeed Studio XIAO ESP32C6**、センサーを **LBR-127HLD** に変え、rev.L3（2026-10-07）で **XIAO をピンヘッダ付けに、ブザーを追加、配線を全部手で引き直し（交差なし・ビア 0）、Lite 用ボールキャスター**を作った。ロボット全体の 3D モデル（STL / GLB）もある。
+rev.L2（2026-10-05）でマイコンを **Seeed Studio XIAO ESP32C6**、センサーを **LBR-127HLD** に変え、rev.L3（2026-10-07）で **XIAO をピンヘッダ付けに、ブザーとフルカラー LED 5 こを追加、配線を全部手で引き直し（交差なし・ビア 0）、Lite 用ボールキャスター**を作った。ロボット全体の 3D モデル（STL / GLB）もある。
 
 | | 標準版 rev.A1 | Lite rev.L3 |
 |---|---|---|
 | マイコン | Pico をピンヘッダで付ける | **XIAO ESP32C6 をピンヘッダで付ける**（Wi-Fi / Bluetooth 付き） |
 | センサー | LBR-123F 6 個 ＋ マルチプレクサ TC4051BP | **LBR-127HLD 3 個を ADC に直結**（マルチプレクサなし） |
-| ボタン / LED / ブザー | 2 / 3 / オプション | **1 / 1 / あり（START ボタンと同じピン）**（XIAO の黄 LED も使える） |
+| ボタン / LED / ブザー | 2 / 3 / オプション | **1 / フルカラー 5（PL9823、信号線 1 本）/ あり（START ボタンと同じピン）**（XIAO の黄 LED も使える） |
 | タイヤ / 前の支え | O リング P-24 / スキッド 4.0 mm | **TPU の印刷タイヤ / ボールキャスター 7.5 mm**（センサーが背高なので前を上げる） |
 | 電池電圧の測定 | あり | **なし**（XIAO の ADC 3 本をセンサーで使い切る） |
 | はんだ付け | 約 230 か所 | **約 120 か所** |
@@ -85,7 +85,7 @@ Linetracer2/
     ├── README.md             Lite の設計書（変更点・コスト比較・組み立て・ソフト）
     ├── docs/                 回路図/組立図 PDF、3D 画像
     ├── hardware/             KiCad プロジェクト、Gerber（Linetracer2-Lite_rev.L3_gerber.zip）、ロボット全体の 3D（STL / GLB）
-    ├── firmware/micropython/ Lite 用ソフト（XIAO ESP32C6 用 MicroPython。センサー 3 個・ボタン 1 個・LED 1 個・ブザー）
+    ├── firmware/micropython/ Lite 用ソフト（XIAO ESP32C6 用 MicroPython。センサー 3 個・ボタン 1 個・フルカラー LED 5 個・ブザー）
     └── scripts/              Lite 専用の生成スクリプト（回路図・配置と手で引いた配線・シルク・配置の確認用の絵）
 ```
 

@@ -84,3 +84,11 @@ write("Buzzer_PKM13_P5.0", [cylinder(2.5, 0, 0, 6.5, 6.9, BLACK), cylinder(2.5, 
 x = [box(1.25, -0.425, 0, 7.4, 5.75, 7.0, WHITE)]
 x += [box(px, 0, -3.0, 0.64, 0.64, 9.5, GOLD) for px in (0, 2.5)]
 write("BatteryXH_2P", x)
+
+# PL9823-F5: 5 mm full-colour LED, flange 5.8 mm, 8.7 mm tall (dome approximated by steps), milky white body.
+# Legs at the staggered holes (KiCad 3D y = footprint -y).
+MILK = (0.93, 0.93, 0.9)
+x = [cylinder(0, 0, 0, 2.9, 1.0, MILK), cylinder(0, 0, 1.0, 2.5, 5.2, MILK), cylinder(0, 0, 6.2, 2.25, 1.0, MILK),
+     cylinder(0, 0, 7.2, 1.8, 0.8, MILK), cylinder(0, 0, 8.0, 1.1, 0.7, MILK)]
+x += [box(px, -py, -3.0, 0.5, 0.5, 3.0, GOLD) for px, py in ((-1.905, -0.9), (-0.635, 0.9), (0.635, -0.9), (1.905, 0.9))]
+write("LED_PL9823_5mm", x)

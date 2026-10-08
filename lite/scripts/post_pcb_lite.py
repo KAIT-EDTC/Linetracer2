@@ -4,10 +4,10 @@
 Only SYMBOLS on the board (lower elementary school): build-order numbers, +/- and polarity pictures, the 3rd colour
 band of each resistor, short part names.  What they mean and the steps are in the assembly manual
 (lite/docs/assembly.md).  Build order (one kind of part per step, lowest parts first):
-   1 ちゃ resistors (100) x4   2 だいだい resistors (10k) x3   3 あか resistors (1k) x3   4 diode   5 0.1uF caps
-   6 transistor   7 LED   8 button   9 buzzer   10 battery connector   11 motor driver   12 XIAO
-   13 470uF caps (the tallest: last, so they do not get in the way of the XIAO's joints)   14 sensors (bottom)
-   15 motors (after the frames are on)
+   1 ちゃ resistors (100) x4   2 だいだい resistors (10k) x3   3 あか resistors (1k) x2   4 diode   5 0.1uF caps x3
+   6 transistor   7 button   8 buzzer   9 battery connector   10 motor driver   11 XIAO
+   12 full-colour LEDs x5 (8.7 mm tall)   13 470uF caps (the tallest: last, so they do not get in the way of the
+   XIAO's joints)   14 sensors (bottom)   15 motors (after the frames are on)
 Japanese text is 1.3 mm or bigger (smaller kana fail the stroke-width check); symbols use the stroke font.
 NOTE: run only once on a freshly routed board (build_pcb.py does this).
 """
@@ -232,7 +232,7 @@ def silk(b):
         text(b, "S%d" % (i + 1), x, 6.7, 0.8)
 
     # ---- resistors: colour of the 3rd band on the body; the key in the front-right corner -----------------------
-    for ref in ("R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10"):
+    for ref in ("R1", "R2", "R3", "R4", "R5", "R6", "R7", "R9", "R10"):
         fp = FPS[ref]
         (x1, y1), (x2, y2) = pad_xy(fp, "1"), pad_xy(fp, "2")
         w = BAND3[fp.GetValue()]
@@ -242,23 +242,19 @@ def silk(b):
 
     # ---- small parts ---------------------------------------------------------------------------------------
     num(b, 4, 80.9, 42.2)                                   # diode
-    num(b, 5, 50.0, 58.6)                                   # 0.1uF x2 (on the motor tracks)
+    num(b, 5, 50.0, 58.6)                                   # 0.1uF (C3 / C4 on the motor tracks ...
+    num(b, 5, 36.0, 36.4)                                   # ... and C5 beside the full-colour LEDs)
     num(b, 6, 21.2, 9.6)                                    # transistor
-    ax, ay = pad_xy(FPS["D2"], "2")                         # LED: anode = front pad
-    led_picture(b, ax + 5.6, ay - 5.1)                      # its "+" (long leg) ends level with the anode pad
-    kx, ky = pad_xy(FPS["D2"], "1")                         # cathode = square pad = short leg
-    text(b, "-", kx + 2.6, ky, 1.6, bold=True)
-    num(b, 7, ax + 4.6, ay + 4.8)
     sp = [p.GetPosition() for p in FPS["SW1"].Pads()]
     cx = sum(pcbnew.ToMM(q.x) for q in sp) / len(sp) - G.OX     # centre of the 4 legs
     cy = sum(pcbnew.ToMM(q.y) for q in sp) / len(sp) - G.OY
-    num(b, 8, cx, cy)                                       # in the middle of the button
+    num(b, 7, cx, cy)                                       # in the middle of the button
     text(b, "スタート", cx + 0.1, cy + 5.7, 1.7, jp=True)     # under the button
 
     # ---- buzzer ------------------------------------------------------------------------------------------------
     bx, by = pad_xy(FPS["BZ1"], "1")                        # + (front pad)
     text(b, "+", bx - 2.3, by, 1.6, bold=True)
-    num(b, 9, bx + 3.6, by + 2.5)
+    num(b, 8, bx + 3.6, by + 2.5)
     text(b, "ブザー", bx, by + 7.6, 1.5, jp=True)
 
     # ---- battery connector, big capacitors ---------------------------------------------------------------------
@@ -267,24 +263,25 @@ def silk(b):
     text(b, "+", jx, jy - 3.25, 1.0, bold=True)
     text(b, "-", jx + 2.5, jy - 3.25, 1.0, bold=True)
     text(b, "でんち", jx + 1.25, jy + 2.3, 1.3, jp=True)
-    num(b, 10, jx + 5.5, jy + 4.7)
-    # the 470 uF cans are the tallest parts: soldered LAST (13), after the driver (11) and the XIAO (12)
+    num(b, 9, jx + 5.5, jy + 4.7)
+    # the 470 uF cans are the tallest parts: soldered LAST (13), after the driver (10), the XIAO (11) and the LEDs (12)
     for ref, (nx, ny), po in (("C1", (62.0, 47.0), True), ("C2", (69.7, 48.4), False)):
         electrolytic(b, FPS[ref], plus_outside=po)
         num(b, 13, nx, ny)
 
     # ---- modules --------------------------------------------------------------------------------------------
-    num(b, 11, 41.6, LL.U2_Y)
+    num(b, 10, 41.6, LL.U2_Y)
     text(b, "モーター", 50.6, LL.U2_Y - 1.05, 1.3, jp=True)
     text(b, "ドライバー", 50.6, LL.U2_Y + 1.15, 1.3, jp=True)
     text(b, "VM", 57.7, LL.U2_R - 1.9, 1.1, bold=True)    # same word as on the module, next to its VM pins
     ux, uy = LL.XIAO_C
-    num(b, 12, ux - 7.4, uy - 3.0)
+    num(b, 11, ux - 7.4, uy - 3.0)
     text(b, "マイコン", ux - 0.6, uy - 3.0, 2.0, jp=True)
     text(b, "XIAO ESP32C6", ux - 0.6, uy + 0.4, 1.0)
     text(b, "USB", ux + 7.6, uy + 4.0, 1.0)
-    text(b, "Linetracer2", 49.8, 26.0, 1.3, bold=True)
-    text(b, "Lite rev.L3", 49.8, 28.4, 1.0)
+    # full-colour LEDs: the footprint brings the outline and the dot at the GND hole (= the longest leg)
+    num(b, 12, 49.5, 22.3)
+    text(b, "Linetracer2 Lite rev.L3", 46.0, 39.3, 1.0)
 
     # ---- motors: pads in the frames' cut-outs ---------------------------------------------------------------
     num(b, 15, 50.0, 64.0)

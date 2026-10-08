@@ -23,9 +23,9 @@ import asm3d  # noqa: E402
 import layout_lite as LL  # noqa: E402
 
 # build order (= the circled numbers on the board, lite/docs/assembly.md)
-STEPS = {1: ["R1", "R2", "R3", "R9"], 2: ["R4", "R5", "R6"], 3: ["R7", "R8", "R10"], 4: ["D1"], 5: ["C3", "C4"],
-         6: ["Q1"], 7: ["D2"], 8: ["SW1"], 9: ["BZ1"], 10: ["J1"], 11: ["U2"], 12: ["U1"], 13: ["C1", "C2"],
-         14: ["PS1", "PS2", "PS3"]}
+STEPS = {1: ["R1", "R2", "R3", "R9"], 2: ["R4", "R5", "R6"], 3: ["R7", "R10"], 4: ["D1"], 5: ["C3", "C4", "C5"],
+         6: ["Q1"], 7: ["SW1"], 8: ["BZ1"], 9: ["J1"], 10: ["U2"], 11: ["U1"], 12: ["D2", "D3", "D4", "D5", "D6"],
+         13: ["C1", "C2"], 14: ["PS1", "PS2", "PS3"]}
 S = 11.0                       # px per mm
 X0, X1, Y0, Y1 = 17.5, 82.5, 0.0, 68.0          # board area shown (the rear is under the gearbox)
 LIGHT = (-0.35, 0.45, 1.0)
