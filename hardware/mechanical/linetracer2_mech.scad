@@ -70,24 +70,21 @@ WALL_RELIEF = true;                    // hole in the outer wall for a long moto
 SHAFT_LONG = 0.9;                      // worst case: shaft 0.5 mm longer than nominal + 0.4 mm end play
 HANG_Z   = 0.0;                        // lowest point (flat bottom -> prints without supports)
 AXLE_D   = 2.0;
-AXLE_L   = 20.0;                       // brass rod, 2 mm
-// D-cut (2026-10-09): a press fit of PLA on a smooth 2 mm rod holds only about the motor's stall torque through the
-// gear (5 x 4.7 = 24 mN m) and gets weaker as PLA creeps or when a hole prints a little big.  The teacher files a flat
-// on the axle (AXLE_FLAT deep, AXLE_FLAT_L long from the outer end; the inner 3 mm stay round in the blind bearing),
-// the 40T gear and the wheel have D holes -> they can not slip.  AXLE_FLAT = 0 gives the old round holes.
-AXLE_FLAT = 0.3;                       // depth of the flat (1.7 mm across the flat)
-AXLE_FLAT_L = 17.0;                    // length of the flat from the outer (wheel) end: wheel hub .. past the gear
-AXLE_FLAT_CLR = 0.08;                  // D hole: its flat sits this much further out than the axle's
-module axle_hole(d, h) {               // round press-fit hole, with the D flat when AXLE_FLAT > 0
-    intersection() {
-        cylinder(d = d, h = h);
-        if (AXLE_FLAT > 0) translate([-5, -5, -1]) cube([5 + AXLE_D / 2 - AXLE_FLAT + AXLE_FLAT_CLR, 10, h + 2]);
-    }
-}
-module axle_rod() difference() {       // the axle along +z from its outer end (assembly views)
-    cylinder(d = AXLE_D, h = AXLE_L);
-    if (AXLE_FLAT > 0) translate([AXLE_D / 2 - AXLE_FLAT, -2, -1]) cube([2, 4, AXLE_FLAT_L + 1]);
-}
+AXLE_L   = 18.0;                       // brass rod, 2 mm: from inside the wheel (x 1.3) to the blind bearing end
+// Hex drive (2026-10-09): a press fit of PLA on a smooth 2 mm rod holds only about the motor's stall torque through the
+// gear (5 x 4.7 x 0.85 = 20 mN m), and a printed 2 mm hole varies +-0.1 mm -> some gears would slip.  So the torque
+// does not go through the axle at all: the WHEEL has a hub that passes through the outer wall (round, the wall is its
+// bearing) and ends in a HEX that fits a hex hole in the 40T gear.  The round brass axle only holds the parts in line
+// (press fit in the wheel, free in the gear, blind bearing in the frame).  No metal work (the D-cut was too fiddly).
+HUB_D   = 5.0;                         // round part of the wheel hub, inside the outer wall
+HUB_HEX = 4.0;                         // hex across flats, inside the gear
+HUB_HEX_CLR = 0.1;                     // gear hex hole = HUB_HEX + this (slip fit)
+HUB_BORE = HUB_D + 0.4;                // the outer wall's bearing for the hub
+HUB_X0 = GEAR_X0 - 0.1;                // hub: round from the wheel face to here, hex from here ...
+HUB_X1 = GEAR_X1 - 0.2;                // ... to here (0.2 short of the bottom of the gear's hex hole)
+module hex2d(af) circle(d = af / cos(30), $fn = 6);
+module axle_rod() cylinder(d = AXLE_D, h = AXLE_L);          // the axle along +z from its outer end (assembly views)
+
 AXLE_END_X = 19.3;                     // blind end of the axle hole (axle pushed in until it stops)
 WHEEL_X1 = 7.2;                        // inner face of the wheel (0.3 mm from the spacer boss)
 TOWER_D  = 9.6;
@@ -228,8 +225,8 @@ module frame_left(lbl = true) {
             translate([NOTCH_X - 0.5, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 6, h = FRONT_X0 - NOTCH_X + 0.5);
             // outer axle wall (in the wheel notch) with spacer bosses on both faces
             rbox([OUTER_X0, OUTER_Y0, HANG_Z], [OUTER_X1 - OUTER_X0, 100.5 - OUTER_Y0, AXIS_Z + 4 - HANG_Z], 0.9);
-            translate([WHEEL_X1 + 0.3, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 6, h = OUTER_X0 - WHEEL_X1 - 0.3 + 0.01);
-            translate([OUTER_X1 - 0.01, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 6, h = GEAR_X0 - 0.2 - OUTER_X1 + 0.01);
+            translate([WHEEL_X1 + 0.3, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = HUB_BORE + 2.2, h = OUTER_X0 - WHEEL_X1 - 0.3 + 0.01);
+            translate([OUTER_X1 - 0.01, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = HUB_BORE + 2.2, h = GEAR_X0 - 0.2 - OUTER_X1 + 0.01);
             // lower front bar under the pinion, rear bar behind the spur gear
             rbox([OUTER_X0, 72.5, HANG_Z], [FRONT_X0 - OUTER_X0, 4.5, 6.0 - HANG_Z], 1.0);
             rbox([OUTER_X0, 99.0, HANG_Z], [FRONT_X0 + BOSS_L - OUTER_X0, 1.5, AXIS_Z + 9 - HANG_Z], 0.7);
@@ -247,6 +244,8 @@ module frame_left(lbl = true) {
         translate([PLATE_X0 - 1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = PLATE_HOLE_D, h = FRONT_X0 - PLATE_X0 + 1);   // pinion passes
         // axle hole (2.0 mm axle -> 2.15 mm hole), blind at AXLE_END_X
         translate([-1, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = AXLE_D + 0.15, h = AXLE_END_X + 1);
+        // the wheel's hub turns in the outer wall (its spacer rings included)
+        translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = HUB_BORE, h = GEAR_X0 - WHEEL_X1);
         // room for pinion and spur gear between the walls
         translate([OUTER_X1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0])
             cylinder(d = MOD * (PINION_T + 2) + 2 * CLR + 1, h = PLATE_X0 - 0.5 - OUTER_X1);
@@ -377,7 +376,8 @@ module gear40() {
             linear_extrude(GEAR_X1 - GEAR_X0) gear2d(MOD, SPUR_T, 20, GEAR_BACKLASH);
             cylinder(d = 7, h = GEAR_X1 - GEAR_X0 + GEAR_HUB_L);
         }
-        translate([0, 0, -1]) axle_hole(AXLE_D - 0.05, 20);
+        translate([0, 0, -1]) cylinder(d = AXLE_D + 0.2, h = 20);                          // axle: free
+        translate([0, 0, -1]) linear_extrude(1 + GEAR_X1 - GEAR_X0) hex2d(HUB_HEX + HUB_HEX_CLR);   // the wheel's hex
         for (a = [0 : 60 : 359]) rotate(a) translate([6.0, 0, -1]) cylinder(d = 3.4, h = 10);
     }
 }
@@ -392,14 +392,19 @@ module wheel() {
             // rim with 0.5 mm chamfers on both outer edges (child safety; the tyre groove is not touched)
             rotate_extrude() polygon([[0, 0], [RIM_D / 2 - 0.5, 0], [RIM_D / 2, 0.5], [RIM_D / 2, WHEEL_W - 0.5],
                                       [RIM_D / 2 - 0.5, WHEEL_W], [0, WHEEL_W]]);
-            cylinder(d = 8, h = WHEEL_W + 2 - 0.5);               // hub (outer side), chamfered end
-            translate([0, 0, WHEEL_W + 2 - 0.5]) cylinder(d1 = 8, d2 = 7, h = 0.5);
+            // hub on the INNER side (local -z = towards the gear): round through the outer wall, then the hex that
+            // drives the wheel from the 40T gear; 0.4 mm chamfer at the tip
+            translate([0, 0, -(HUB_X0 - WHEEL_X1)]) cylinder(d = HUB_D, h = HUB_X0 - WHEEL_X1 + 0.01);
+            translate([0, 0, -(HUB_X1 - WHEEL_X1) + 0.4]) linear_extrude(HUB_X1 - HUB_X0 - 0.4 + 0.01) hex2d(HUB_HEX);
+            translate([0, 0, -(HUB_X1 - WHEEL_X1)]) linear_extrude(0.4, scale = HUB_HEX / (HUB_HEX - 0.8))
+                hex2d(HUB_HEX - 0.8);
         }
         translate([0, 0, (WHEEL_W - GROOVE_W) / 2]) difference() {
             cylinder(d = RIM_D + 1, h = GROOVE_W);
             translate([0, 0, -1]) cylinder(d = GROOVE_D, h = GROOVE_W + 2);
         }
-        translate([0, 0, -1]) axle_hole(AXLE_D - 0.1, WHEEL_W + 4);   // press fit on the 2 mm axle (D flat)
+        translate([0, 0, -(HUB_X1 - WHEEL_X1) - 1]) cylinder(d = AXLE_D + 0.2, h = HUB_X1 - WHEEL_X1 + 1);   // free in the hub
+        translate([0, 0, -0.01]) cylinder(d = AXLE_D - 0.1, h = WHEEL_W + 1);   // press fit on the 2 mm axle (holds it)
         for (a = [0:60:359]) rotate([0, 0, a]) translate([7.5, 0, -1]) cylinder(d = 4.5, h = WHEEL_W + 2);
     }
 }
@@ -550,24 +555,6 @@ module bead(H = SKID_H) translate([caster_xb(BALL_D), caster_yb(H, BALL_D), cast
 
 module caster_print(H = SKID_H) { caster_housing(H); caster_ball(H); }
 module caster_bead(H = SKID_H)  { caster_housing(H, BALL_D, BALL_LIP, slit = true); }
-
-// ---------------------------------------------------------------- axle filing jig (teacher)
-// The 20 mm axle goes in from the guard end until it stops at the wall; AXLE_FLAT of it sticks up over the open part
-// (AXLE_FLAT_L long).  File it with a flat metal file until the file runs on the plastic, turn the jig over for the
-// next one.  The guard (1.5 mm higher) keeps the file off the 3 mm that must stay round.  Prints flat, groove up.
-module axle_jig() {
-    L0 = 2; L1 = L0 + AXLE_FLAT_L; L2 = L0 + AXLE_L + 1; T = 6;
-    difference() {
-        union() {
-            rbox([0, -6, 0], [L2, 12, T], 1.5);
-            rbox([0, -6, 0], [L0, 12, T + 1.5], 0.5);                    // stop wall
-            rbox([L1, -6, 0], [L2 - L1, 12, T + 1.5], 0.5);             // guard over the round end
-        }
-        translate([L0, 0, T + AXLE_FLAT - AXLE_D / 2]) rotate([0, 90, 0]) cylinder(d = AXLE_D + 0.15, h = L2, $fn = 32);
-        translate([L0 + 3, -4.0, T - 0.4]) linear_extrude(1) text("1.7", size = 2.5, halign = "left", valign = "center",
-                                                                   font = "Liberation Sans:style=Bold");   // across the flat
-    }
-}
 
 // ---------------------------------------------------------------- Lite ball caster (rev.L3 default, in the skid hole (50, 11))
 // The Lite board is 7.5 mm above the floor at the skid hole, so the ball fits UNDER the board.  Same split pin as
@@ -910,7 +897,7 @@ if (part == "frame_left") frame_right();
 else if (part == "frame_right") frame_left();
 else if (part == "deck") translate([0, 0, DECK_TOP]) mirror([0, 0, 1]) deck();      // upside down for printing
 else if (part == "gear40") gear40();
-else if (part == "wheel") wheel();
+else if (part == "wheel") translate([0, 0, WHEEL_W]) mirror([0, 0, 1]) wheel();     // outer face on the bed, hub up
 else if (part == "tire_tpu") tire_tpu();
 else if (part == "skid") skid();
 else if (part == "skid_clip") translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) skid_clip();   // lying on its side
@@ -932,21 +919,12 @@ else if (part == "caster_lite_print45") { assert(LITE, "run with -D LITE=true");
 else if (part == "caster_lite_bead") { assert(LITE, "run with -D LITE=true"); translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) caster_lite_bead(); }
 else if (part == "caster_lite_bead6") { assert(LITE, "run with -D LITE=true"); assert(lc_big_ok(SKID_H, BALL_D, LB6_CLR), "bead does not fit");
     translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) caster_lite_bead6(); }
-else if (part == "axle_jig") axle_jig();
 else if (part == "check_caster_lite_bead6_sensor") intersection() { lc_at() { caster_lite_bead6(); lite_bead6(); } sensors_grown(0.3); }
 else if (part == "check_caster_lite_bead6_ball") intersection() { caster_lite_bead6(); lite_bead6(); }
 else if (part == "check_caster_lite_bead6_floor") intersection() { lc_at() caster_lite_bead6(); floor_below(CHECK_FLOOR_UP); }
-else if (part == "check_axle_dflat") intersection() {     // the filed axle clears the D flats of gear and wheel
-    union() {
-        gear40();
-        translate([0, 0, 30]) wheel();
-    }
-    union() {
-        translate([0, 0, AXLE_END_X - AXLE_L - GEAR_X0]) axle_rod();                    // in the gear's frame
-        translate([0, 0, 30 + WHEEL_X1 - (AXLE_END_X - AXLE_L)]) mirror([0, 0, 1]) axle_rod();   // in the wheel's
-    }
-    // only the strip in front of the flat (|y| < 0.6, x > 0.5): there the round press fit (r >= 0.975) is not involved
-    translate([0.5, -0.6, -20]) cube([5, 1.2, 80]);
+else if (part == "check_hub_gear") intersection() {      // the wheel's hex slides into the gear's hex hole
+    translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40();
+    translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel();
 }
 else if (part == "check_caster_lite_sensor") intersection() { lc_at() { caster_lite_print(); caster_lite_print45(); } sensors_grown(0.3); }
 else if (part == "check_caster_lite_bead_sensor") intersection() { lc_at() { caster_lite_bead(); lite_bead(); } sensors_grown(0.3); }
