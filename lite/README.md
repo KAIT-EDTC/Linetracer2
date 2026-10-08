@@ -303,7 +303,7 @@ D6 (GPIO16/TX) ── R8 1kΩ ── 赤 LED D2 ── GND        （LED は 1 �
 
 ## 5. 部品表（1 台分）
 
-機械可読の部品表: `hardware/kicad/bom/Linetracer2-Lite_bom.csv`。価格は秋月のサイトで確認（2026-10-05）、≒ は目安。
+**秋月のリンクつきの部品表と 10 台分の注文リスト: [docs/bom.md](docs/bom.md)**。機械可読の部品表: `hardware/kicad/bom/Linetracer2-Lite_bom.csv`。価格は秋月のサイトで確認（2026-10-05）、≒ は目安。
 
 ### 5.1 基板に載る部品（すべて秋月）
 
