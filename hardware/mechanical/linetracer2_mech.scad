@@ -71,6 +71,23 @@ SHAFT_LONG = 0.9;                      // worst case: shaft 0.5 mm longer than n
 HANG_Z   = 0.0;                        // lowest point (flat bottom -> prints without supports)
 AXLE_D   = 2.0;
 AXLE_L   = 20.0;                       // brass rod, 2 mm
+// D-cut (2026-10-09): a press fit of PLA on a smooth 2 mm rod holds only about the motor's stall torque through the
+// gear (5 x 4.7 = 24 mN m) and gets weaker as PLA creeps or when a hole prints a little big.  The teacher files a flat
+// on the axle (AXLE_FLAT deep, AXLE_FLAT_L long from the outer end; the inner 3 mm stay round in the blind bearing),
+// the 40T gear and the wheel have D holes -> they can not slip.  AXLE_FLAT = 0 gives the old round holes.
+AXLE_FLAT = 0.3;                       // depth of the flat (1.7 mm across the flat)
+AXLE_FLAT_L = 17.0;                    // length of the flat from the outer (wheel) end: wheel hub .. past the gear
+AXLE_FLAT_CLR = 0.08;                  // D hole: its flat sits this much further out than the axle's
+module axle_hole(d, h) {               // round press-fit hole, with the D flat when AXLE_FLAT > 0
+    intersection() {
+        cylinder(d = d, h = h);
+        if (AXLE_FLAT > 0) translate([-5, -5, -1]) cube([5 + AXLE_D / 2 - AXLE_FLAT + AXLE_FLAT_CLR, 10, h + 2]);
+    }
+}
+module axle_rod() difference() {       // the axle along +z from its outer end (assembly views)
+    cylinder(d = AXLE_D, h = AXLE_L);
+    if (AXLE_FLAT > 0) translate([AXLE_D / 2 - AXLE_FLAT, -2, -1]) cube([2, 4, AXLE_FLAT_L + 1]);
+}
 AXLE_END_X = 19.3;                     // blind end of the axle hole (axle pushed in until it stops)
 WHEEL_X1 = 7.2;                        // inner face of the wheel (0.3 mm from the spacer boss)
 TOWER_D  = 9.6;
@@ -360,7 +377,7 @@ module gear40() {
             linear_extrude(GEAR_X1 - GEAR_X0) gear2d(MOD, SPUR_T, 20, GEAR_BACKLASH);
             cylinder(d = 7, h = GEAR_X1 - GEAR_X0 + GEAR_HUB_L);
         }
-        translate([0, 0, -1]) cylinder(d = AXLE_D - 0.05, h = 20);
+        translate([0, 0, -1]) axle_hole(AXLE_D - 0.05, 20);
         for (a = [0 : 60 : 359]) rotate(a) translate([6.0, 0, -1]) cylinder(d = 3.4, h = 10);
     }
 }
@@ -382,7 +399,7 @@ module wheel() {
             cylinder(d = RIM_D + 1, h = GROOVE_W);
             translate([0, 0, -1]) cylinder(d = GROOVE_D, h = GROOVE_W + 2);
         }
-        translate([0, 0, -1]) cylinder(d = AXLE_D - 0.1, h = WHEEL_W + 4);   // press fit on 2 mm axle
+        translate([0, 0, -1]) axle_hole(AXLE_D - 0.1, WHEEL_W + 4);   // press fit on the 2 mm axle (D flat)
         for (a = [0:60:359]) rotate([0, 0, a]) translate([7.5, 0, -1]) cylinder(d = 4.5, h = WHEEL_W + 2);
     }
 }
@@ -534,6 +551,24 @@ module bead(H = SKID_H) translate([caster_xb(BALL_D), caster_yb(H, BALL_D), cast
 module caster_print(H = SKID_H) { caster_housing(H); caster_ball(H); }
 module caster_bead(H = SKID_H)  { caster_housing(H, BALL_D, BALL_LIP, slit = true); }
 
+// ---------------------------------------------------------------- axle filing jig (teacher)
+// The 20 mm axle goes in from the guard end until it stops at the wall; AXLE_FLAT of it sticks up over the open part
+// (AXLE_FLAT_L long).  File it with a flat metal file until the file runs on the plastic, turn the jig over for the
+// next one.  The guard (1.5 mm higher) keeps the file off the 3 mm that must stay round.  Prints flat, groove up.
+module axle_jig() {
+    L0 = 2; L1 = L0 + AXLE_FLAT_L; L2 = L0 + AXLE_L + 1; T = 6;
+    difference() {
+        union() {
+            rbox([0, -6, 0], [L2, 12, T], 1.5);
+            rbox([0, -6, 0], [L0, 12, T + 1.5], 0.5);                    // stop wall
+            rbox([L1, -6, 0], [L2 - L1, 12, T + 1.5], 0.5);             // guard over the round end
+        }
+        translate([L0, 0, T + AXLE_FLAT - AXLE_D / 2]) rotate([0, 90, 0]) cylinder(d = AXLE_D + 0.15, h = L2, $fn = 32);
+        translate([L0 + 3, -4.0, T - 0.4]) linear_extrude(1) text("1.7", size = 2.5, halign = "left", valign = "center",
+                                                                   font = "Liberation Sans:style=Bold");   // across the flat
+    }
+}
+
 // ---------------------------------------------------------------- Lite ball caster (rev.L3 default, in the skid hole (50, 11))
 // The Lite board is 7.5 mm above the floor at the skid hole, so the ball fits UNDER the board.  Same split pin as
 // skid_clip(), same coordinates (z = 0 PCB bottom, z = H floor under the hole, y = PCB y - 11), printed LYING ON ITS
@@ -653,8 +688,18 @@ module caster_lite_bead(H = SKID_H) { caster_lite_housing(H, LITE_BEAD_D, LITE_B
 module lite_bead(H = SKID_H, loaded = false)
     translate([caster_xb(LITE_BEAD_D), 0, loaded ? lc_zb(H, LITE_BEAD_D) : lc_zc(H, LITE_BEAD_D, LITE_BEAD_CLR)])
         sphere(d = LITE_BEAD_D, $fn = 48);
-// all three casters (for the zone / sensor / pcb checks)
-module caster_lite_all() { caster_lite_print(); caster_lite_print45(); caster_lite_bead(); lite_bead(); }
+// DAISO pearl-like bead 6 mm (BALL_D, the same beads as the standard board's caster_bead), pressed in from the
+// floor side, BEHIND the pin like caster_lite_print (same housing, with the slit lips of the bead versions).
+LB6_CLR = LITE_BEAD_CLR;
+function lb6_yb(H) = lc_yb(H, BALL_D, LB6_CLR);
+module caster_lite_bead6(H = SKID_H)
+    caster_lite_housing(H, BALL_D, LB6_CLR, BALL_LIP, lb6_yb(H), LC_XTOP, slit = true);
+module lite_bead6(H = SKID_H, loaded = false)
+    translate([caster_xb(BALL_D), lb6_yb(H), loaded ? lc_zb(H, BALL_D, lb6_yb(H)) : lc_zc(H, BALL_D, LB6_CLR, lb6_yb(H))])
+        sphere(d = BALL_D, $fn = 48);
+// all the Lite casters (for the zone / sensor / pcb checks)
+module caster_lite_all() { caster_lite_print(); caster_lite_print45(); caster_lite_bead(); lite_bead();
+                           caster_lite_bead6(); lite_bead6(); }
 
 // ---------------------------------------------------------------- simple models for the assembly / checks
 module battery_box() {
@@ -717,7 +762,8 @@ if (LITE) {
     // name, D, clr, lip, yb, xtop
     for (v = [["caster_lite_print", lc_big_d(SKID_H), BALL_CLR, PRINT_LIP, lc_yb(SKID_H, lc_big_d(SKID_H)), LC_XTOP],
               ["caster_lite_print45", lc_print_d(SKID_H), BALL_CLR, PRINT_LIP, 0, 99],
-              ["caster_lite_bead", LITE_BEAD_D, LITE_BEAD_CLR, BALL_LIP, 0, 99]])
+              ["caster_lite_bead", LITE_BEAD_D, LITE_BEAD_CLR, BALL_LIP, 0, 99],
+              ["caster_lite_bead6", BALL_D, LB6_CLR, BALL_LIP, lb6_yb(SKID_H), LC_XTOP]])
         let (d = v[1], clr = v[2], lip = v[3], yb = v[4], zb = lc_zb(SKID_H, d, yb), ro = d / 2 + clr + CASTER_WALL,
              roof = yb == 0 ? lc_roof(SKID_H, d) : zb - d / 2,
              x1 = max(min(v[5], lc_xmax(d, clr)), caster_xb(d) + d / 2, LC_TOP[1]),
@@ -746,7 +792,7 @@ module pcb() {                     // standard: 100 x 100 with the rear notches;
 module drive_side() {              // left side: gears, axle, wheel, tyre
     color("gold") pinion8();                                    // Tamiya 8T, outer face flush with the shaft tip
     color("white") translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40();
-    color("goldenrod") translate([AXLE_END_X - AXLE_L, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 2, h = AXLE_L);
+    color("goldenrod") translate([AXLE_END_X - AXLE_L, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) axle_rod();
     color("orange") translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel();
     if (LITE)                      // TPU tyre, centred in the groove
         color("black") translate([WHEEL_X1 - WHEEL_W / 2 + 1.7, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) tire_tpu();
@@ -757,13 +803,14 @@ module drive_side() {              // left side: gears, axle, wheel, tyre
 
 DECK_VARIANT = "screw";                // "screw" | "clip"
 SKID_VARIANT = "clip";                 // standard board: "clip" | "caster_print" | "caster_bead"  (front support)
-LITE_SUPPORT = "caster_print";         // Lite board:     "caster_print" (default, rev.L3) | "caster_print45" | "caster_bead" | "skid"
+LITE_SUPPORT = "caster_print";         // Lite board:     "caster_print" (default, rev.L3) | "caster_print45" | "caster_bead" | "caster_bead6" | "skid"
 module front_support() {
     assert(SKID_VARIANT == "clip" || !LITE, "Lite: choose the front support with LITE_SUPPORT");
     if (LITE) translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) {      // balls shown pushed up (loaded)
         if (LITE_SUPPORT == "caster_print") { color("white") caster_lite_print_housing(); color("orange") caster_lite_print_ball(loaded = true); }
         else if (LITE_SUPPORT == "caster_print45") { color("white") caster_lite_print45_housing(); color("orange") caster_lite_print45_ball(loaded = true); }
         else if (LITE_SUPPORT == "caster_bead") { color("white") caster_lite_bead(); color("silver") lite_bead(loaded = true); }
+        else if (LITE_SUPPORT == "caster_bead6") { color("white") caster_lite_bead6(); color("ivory") lite_bead6(loaded = true); }
         else color("white") skid_clip();
     }
     else translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) {
@@ -883,6 +930,24 @@ else if (part == "check_casterbead_ball") intersection() { caster_bead(); bead()
 else if (part == "caster_lite_print") { assert(LITE, "run with -D LITE=true"); translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) caster_lite_print(); }
 else if (part == "caster_lite_print45") { assert(LITE, "run with -D LITE=true"); translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) caster_lite_print45(); }
 else if (part == "caster_lite_bead") { assert(LITE, "run with -D LITE=true"); translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) caster_lite_bead(); }
+else if (part == "caster_lite_bead6") { assert(LITE, "run with -D LITE=true"); assert(lc_big_ok(SKID_H, BALL_D, LB6_CLR), "bead does not fit");
+    translate([0, 0, -CLIP_X0]) rotate([0, -90, 0]) caster_lite_bead6(); }
+else if (part == "axle_jig") axle_jig();
+else if (part == "check_caster_lite_bead6_sensor") intersection() { lc_at() { caster_lite_bead6(); lite_bead6(); } sensors_grown(0.3); }
+else if (part == "check_caster_lite_bead6_ball") intersection() { caster_lite_bead6(); lite_bead6(); }
+else if (part == "check_caster_lite_bead6_floor") intersection() { lc_at() caster_lite_bead6(); floor_below(CHECK_FLOOR_UP); }
+else if (part == "check_axle_dflat") intersection() {     // the filed axle clears the D flats of gear and wheel
+    union() {
+        gear40();
+        translate([0, 0, 30]) wheel();
+    }
+    union() {
+        translate([0, 0, AXLE_END_X - AXLE_L - GEAR_X0]) axle_rod();                    // in the gear's frame
+        translate([0, 0, 30 + WHEEL_X1 - (AXLE_END_X - AXLE_L)]) mirror([0, 0, 1]) axle_rod();   // in the wheel's
+    }
+    // only the strip in front of the flat (|y| < 0.6, x > 0.5): there the round press fit (r >= 0.975) is not involved
+    translate([0.5, -0.6, -20]) cube([5, 1.2, 80]);
+}
 else if (part == "check_caster_lite_sensor") intersection() { lc_at() { caster_lite_print(); caster_lite_print45(); } sensors_grown(0.3); }
 else if (part == "check_caster_lite_bead_sensor") intersection() { lc_at() { caster_lite_bead(); lite_bead(); } sensors_grown(0.3); }
 else if (part == "check_caster_lite_pcb") intersection() { translate([0, 0, -0.01]) lc_at() caster_lite_all(); pcb(); }
@@ -901,7 +966,8 @@ else if (part == "check_caster_lite_floor") intersection() { lc_at() caster_lite
 else if (part == "check_caster_lite45_floor") intersection() { lc_at() caster_lite_print45_housing(); floor_below(CHECK_FLOOR_UP); }
 else if (part == "check_caster_lite_bead_floor") intersection() { lc_at() caster_lite_bead(); floor_below(CHECK_FLOOR_UP); }
 else if (part == "check_caster_lite_ballfloor") intersection() {      // loaded balls do not go below the floor
-    lc_at() { caster_lite_print_ball(loaded = true); caster_lite_print45_ball(loaded = true); lite_bead(loaded = true); }
+    lc_at() { caster_lite_print_ball(loaded = true); caster_lite_print45_ball(loaded = true); lite_bead(loaded = true);
+              lite_bead6(loaded = true); }
     floor_below(CHECK_FLOOR_UP - 0.02); }
 else if (part == "check_caster_lite_zone") intersection() { lc_at() caster_lite_all(); lite_zone_outside(); }
 else if (part == "check_skidclip_lite_zone") intersection() { lc_at() skid_clip(); lite_zone_outside(); }

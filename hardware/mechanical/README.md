@@ -17,8 +17,8 @@
 |---------|------|----|------|-------------------|------|
 | `frame_left.stl` / `frame_right.stl` | ギヤボックス枠（モーターのゆりかご＋軸受け＋柱）。**「L」を左、「R」を右**に付ける | 各 1 | PLA | 0.20 mm Standard、壁 3、インフィル 30%、サポートなし | 8.9 cm³ ×2 |
 | `deck.stl` | デッキ（電池ボックスの台。モーターの押さえも兼ねる） | 1 | PLA | 0.20 mm Standard、壁 3、インフィル 25%。**上下逆さ（電池側がベッド）**で書き出し済み | 7.7 cm³ |
-| `gear40.stl` | 平歯車 40T（m0.5） | 2 | PLA | **0.08 mm Extra Fine**、壁 4、インフィル 40%（壁の生成はクラシック・Arachne どちらでもよい）。ハブが上 | 1.0 cm³ ×2 |
-| `wheel.stl` | 車輪（O リング P-24 をはめる） | 2 | PLA | 0.16 mm、壁 3、インフィル 40%。ハブが上 | 3.4 cm³ ×2 |
+| `gear40.stl` | 平歯車 40T（m0.5）。**穴は D 形**（車軸の平らな面に合わせる、§2.7） | 2 | PLA | **0.08 mm Extra Fine**、壁 4、インフィル 40%（壁の生成はクラシック・Arachne どちらでもよい）。ハブが上 | 1.0 cm³ ×2 |
+| `wheel.stl` | 車輪（O リング P-24 をはめる）。**穴は D 形**（§2.7） | 2 | PLA | 0.16 mm、壁 3、インフィル 40%。ハブが上 | 3.4 cm³ ×2 |
 | `skid_clip_h40.stl` | **スキッド（ツメで差し込む、高さ 4.0 mm、標準）** | 1 | PETG（PLA も可） | 0.12 mm、壁 3、インフィル 40%。**横倒し**で書き出し済み（ツメが層に沿って曲がるので折れにくい） | 0.14 cm³ |
 | `skid_clip_h35.stl` / `skid_clip_h45.stl` | 同（センサー高さ調整用 3.5 / 4.5 mm） | 予備 | 同上 | 同上 | |
 | `skid_clip_h75.stl` | **Lite 用スキッド（高さ 7.5 mm、ボールキャスターの代わりに使える）**。センサー LBR-127HLD が 5.6 mm と背が高いので前を持ち上げる（ロボットは後ろに 2.9° 傾く、センサーと床 約 2.25 mm） | 1（Lite のみ） | 同上 | 同上 | |
@@ -30,6 +30,8 @@
 | `caster_lite_print_h70.stl` / `caster_lite_print_h80.stl` | 同（センサー高さ調整用 7.0 / 8.0 mm、玉 φ5.5 / φ6） | 予備 | 同上 | 同上 | |
 | `caster_lite_print45_h75.stl`（`_h70` / `_h80`） | Lite 用ボールキャスターの小さい版（玉 φ4.5（φ4.0 / φ5.0）がピンの真下。向きを気にしなくてよいが、床とのすき間が小さい） | (1) | 同上 | 同上 | 0.2 cm³ |
 | `caster_lite_bead_h75.stl`（`_h70` / `_h80`） | Lite 用ボールキャスター（試作・**先生用**）: 受けだけ印刷、**φ4 の玉**（鋼球またはビーズ）を押し込む | (1) | 同上 | 同上 | 0.15 cm³ |
+| `caster_lite_bead6_h75.stl`（`_h80`） | **Lite 用ボールキャスター: ダイソーのパール調ビーズ φ6 を押し込む**（2026-10-09）。標準と同じ形で玉がピンの後ろ、床〜受け 1.1 mm（§2.4） | (1) | 同上 | 同上 | 0.3 cm³ |
+| `axle_jig.stl` | **車軸をけずる治具（先生用）**: 真鍮の車軸に平らな面（D カット）を付けるときのゲージ（§2.7） | 1（授業に 1 こ） | PLA | 0.20 mm、そのままの向き（みぞが上） | 2 cm³ |
 | `deck_clip.stl` | **ツメ版デッキ（任意・試作）**: 電池ボックスをねじではなく 4 本のツメで押さえる | (1) | PLA / PETG | 0.20 mm、壁 3、インフィル 25%。**そのままの向き（ツメが上）**。ツメが左右対称でないので、実物どおりの向きで書き出してある（上の注意） | 9.0 cm³ |
 | `tire_tpu.stl` | TPU タイヤ（O リングの代わり、任意） | (2) | TPU 95A | 0.20 mm、インフィル 100%、ゆっくり | 1.0 cm³ |
 | `linetracer2_mech.scad` | 上記の元データ（OpenSCAD、寸法はすべてパラメータ） | — | | | |
@@ -121,12 +123,13 @@ Lite は基板の下〜床が 7.5 mm あるので、**玉を基板の下**に入
 
 （横から見た断面。左から `caster_lite_print`（標準、φ6 がピンの後ろ）、`caster_lite_print45`（φ4.5 がピンの真下）、`caster_lite_bead`（φ4 を押し込む）。左が前（黒いのは真ん中のセンサー）。床は後ろに向かって上がって見える（ロボットが後ろに 2.9° 傾くため）。玉は重さで受けの天井に押し付けられた位置）
 
-| | `caster_lite_print_h75.stl`（**標準**） | `caster_lite_print45_h75.stl`（小さい版） | `caster_lite_bead_h75.stl`（先生用） |
-|---|---|---|---|
-| 玉 | **φ6** を一緒に印刷（ピンの 5.4 mm 後ろ）。**取り出せない** | φ4.5 を一緒に印刷（ピンの真下）。取り出せない | **φ4** の玉を床側から押し込む（ベアリング用の鋼球 φ4（モノタロウなど）か φ4 のビーズ。**買ったらノギスで測り**、4.0 mm でなければ `LITE_BEAD_D` を変える） |
-| 床〜受けの下面（玉が押し上げられた状態、まわり全部同じ） | **0.89 mm** | 0.37 mm | 0.40 mm |
-| 基板の裏で使う範囲 | x 48.8〜54.55、y 7.7〜20.56 | x 48.8〜54.4、y 7.6〜14.4 | x 48.8〜53.8、y 7.7〜14.3 |
-| 向き | **玉が後ろ（車輪の側）**。基板に当たる面の **矢印がピン（前）を向く**。逆向きは真ん中のセンサーに当たって入らない | どの向きでもよい | どの向きでもよい |
+| | `caster_lite_print_h75.stl`（**標準**） | `caster_lite_print45_h75.stl`（小さい版） | `caster_lite_bead_h75.stl`（先生用） | `caster_lite_bead6_h75.stl`（ダイソーのビーズ） |
+|---|---|---|---|---|
+| 玉 | **φ6** を一緒に印刷（ピンの 5.4 mm 後ろ）。**取り出せない** | φ4.5 を一緒に印刷（ピンの真下）。取り出せない | **φ4** の玉を床側から押し込む（ベアリング用の鋼球 φ4（モノタロウなど）か φ4 のビーズ。**買ったらノギスで測り**、4.0 mm でなければ `LITE_BEAD_D` を変える） | **ダイソーのパール調ビーズ φ6**（標準版の `caster_bead` と同じ）を床側から押し込む（ピンの 5.35 mm 後ろ）。**ノギスで測り**、6.0 mm でなければ `BALL_D` を変える。玉はなめらかでよく転がるが、糸の穴が床に来たときに少し段がつく |
+| 床〜受けの下面（玉が押し上げられた状態、まわり全部同じ） | **0.89 mm** | 0.37 mm | 0.40 mm | **1.1 mm** |
+| 基板の裏で使う範囲 | x 48.8〜54.55、y 7.7〜20.56 | x 48.8〜54.4、y 7.6〜14.4 | x 48.8〜53.8、y 7.7〜14.3 | x 48.8〜54.55、y 7.7〜20.4 |
+| 向き | **玉が後ろ（車輪の側）**。基板に当たる面の **矢印がピン（前）を向く**。逆向きは真ん中のセンサーに当たって入らない | どの向きでもよい | どの向きでもよい | 標準と同じ（矢印がピンを向く） |
+| 高さ | 7.0 / 7.5 / 8.0 | 7.0 / 7.5 / 8.0 | 7.0 / 7.5 / 8.0 | **7.5 / 8.0 だけ**（7.0 では φ6 の天井が足りない） |
 
 | 高さ（同じ名前のスキッドと同じ） | 傾き | センサーと床 | `caster_lite_print`（玉・床〜受け） | `caster_lite_print45` | `caster_lite_bead` |
 |---|---|---|---|---|---|
@@ -189,6 +192,26 @@ OpenSCAD で確かめたこと（`check_pinion_plate`・`check_motor_slide`・`c
 
 その他の機械部品: 真鍮丸棒 φ2×20 mm（車軸）×2、タミヤ 8T ピニオン（15289）×2、O リング P-24 ×2、FA-130RA ×2、電池ボックス BH-331-3ASTH（`docs/05_bom.md`）。
 
+### 2.7 車軸がすべらないように（D カット、2026-10-09）
+
+「丸い車軸だと、平歯車や車輪がすべるのでは？六角や芋ねじは要る？」という質問に答えて計算した。
+
+| 場面 | 車軸にかかるねじれ（トルク）の目安 |
+|---|---|
+| モーターが止められたとき（3 V の停動 4.7 mN·m × 歯車 5 倍 × 効率 0.85） | **約 20 mN·m**（いちばん大きい） |
+| ふつうに走る・ぶつかってタイヤがすべるとき（ロボット 約 200 g、駆動輪に 78 %、TPU タイヤ μ 約 1、半径 16 mm） | **約 12 mN·m**（これ以上はタイヤが床ですべる） |
+| 平歯車（穴 φ1.95、長さ 4.8 mm）の圧入がもちこたえる力（PLA がなじんだあとの面圧 3 MPa・摩擦 0.25 と仮定） | **約 20 mN·m**（ぎりぎり） |
+| 車輪（穴 φ1.9、長さ 8.5 mm） | 約 40 mN·m |
+
+- **平歯車の圧入はぎりぎり**。しかも 0.4 mm ノズルで印刷した φ2 の穴は ±0.1 mm くらいばらつくので、ゆるい個体ではすぐすべり、きつい個体では割れる。PLA は押されたままだと少しずつゆるむ（クリープ）。→ **すべり止めは要る**。
+- ミニ四駆はつるつるの φ2 の軸に圧入だが、あれは寸法のそろった射出成形の部品だからもつ。
+- **芋ねじ（M2）**: φ7 のハブに M2 のねじ穴は小さく、印刷したねじ山はすぐつぶれる。ねじ・六角レンチが小さく、子どもには向かない → 使わない。
+- **六角の軸**: φ2 前後の六角棒はホームセンターで手に入りにくい → 使わない。
+- **D カット（採用）**: 真鍮の車軸の片側に**平らな面を 0.3 mm**（平らな所の幅 1.7 mm）、外側の端から **17 mm**（車輪のハブ〜平歯車の先まで）付け、平歯車と車輪の穴を D 形にした。平らな面どうしで回すので、圧入がゆるくてもすべらない（圧入は抜け止めだけ）。内側の 3 mm は丸いまま（奥の止まり穴の軸受け）。外側の壁の穴（φ2.15）は平らな所で回るが、速さが低いので問題ない。
+- けずり方（先生、1 本 2〜3 分）: `axle_jig.stl` を印刷し、20 mm に切った車軸を**ガードの側の穴から入れて、奥のかべに当たるまで**押す。上に 0.3 mm 出ている所を、**平らな金属やすりで、やすりがプラスチックに当たるまで**けずる（ガードがあるので内側の 3 mm はけずれない）。ノギスで平らな所が **1.7 mm** になっていれば OK（治具に「1.7」と刻んである）。バリは紙やすりで取る。
+- 入れ方: 平歯車を枠に入れ、**車軸の平らな面を平歯車の穴の平らな所に合わせて**差す（合っていないと入らない）。車輪も同じ。
+- 前の丸い穴にもどすときは `-D AXLE_FLAT=0` で書き出す。
+
 ## 3. 寸法の決め方
 
 - OpenSCAD の座標は **基板の座標そのまま**（x: 右、y: 後ろ、z: 基板上面 = 0）。基板のねじ穴 (30,62)(30,96)(70,62)(70,96) と一致する。
@@ -215,13 +238,15 @@ for c in check_deck_motor check_deck_frame check_frame_motor check_box_frame che
 done
 # モーターの入れ方（§2.5）: ピニオンが板の穴を通る、モーターを滑らせる、上からはめる、ピニオンが平歯車に入る
 # ＋ 軸が長いモーターでも外かべに当たらない（§2.6）
-for c in check_pinion_plate check_motor_slide check_motor_drop check_pinion_spur check_shaft_wall; do
+# ＋ 車軸の平らな面と、平歯車・車輪の D 形の穴（§2.7）
+for c in check_pinion_plate check_motor_slide check_motor_drop check_pinion_spur check_shaft_wall check_axle_dflat; do
   $OS -D "part=\"$c\"" -o /tmp/$c.stl linetracer2_mech.scad 2>&1 | grep -q "empty" && echo "$c OK" || echo "$c NG"
 done
 # Lite 用キャスター（§2.4）。-D SKID_H=7.0 / 8.0 でも、-D LC_DEBUG_MIRROR=true（印刷した向き＝鏡うつし）でも「空」を確認済み
-for c in check_caster_lite_sensor check_caster_lite_bead_sensor check_caster_lite_pcb check_caster_lite_ball \
-         check_caster_lite45_ball check_caster_lite_bead_ball check_caster_lite_pocketwall check_caster_lite_pocketroot \
-         check_caster_lite_floor check_caster_lite45_floor check_caster_lite_bead_floor check_caster_lite_ballfloor \
+for c in check_caster_lite_sensor check_caster_lite_bead_sensor check_caster_lite_bead6_sensor check_caster_lite_pcb check_caster_lite_ball \
+         check_caster_lite45_ball check_caster_lite_bead_ball check_caster_lite_bead6_ball check_caster_lite_pocketwall \
+         check_caster_lite_pocketroot check_caster_lite_floor check_caster_lite45_floor check_caster_lite_bead_floor \
+         check_caster_lite_bead6_floor check_caster_lite_ballfloor \
          check_caster_lite_zone check_skidclip_lite_zone; do
   $OS -D LITE=true -D "part=\"$c\"" -o /tmp/$c.stl linetracer2_mech.scad 2>&1 | grep -q "empty" && echo "$c OK" || echo "$c NG"
 done
@@ -236,6 +261,8 @@ done
 | `check_motor_drop` | 10.5 mm ずらして上からはめるとき、ツメ（ゆりかごの壁の軸より上）以外に当たらない | `-D MOTOR_SLIDE=9.4`。ツメも含めると「空でない」（ツメが本当にある） |
 | `check_pinion_spur` | ピニオンの歯を軸に沿って滑らせても平歯車の歯に当たらない | `-D PINION_PHASE=0`（半歯ずれ） |
 | `check_shaft_wall` | 軸が 0.9 mm 長い（データシートの +0.5 とガタ 0.4）モーターでも、軸の先とピニオンが外かべに当たらない | `-D WALL_RELIEF=false`（逃げ穴なし）。※ `-D WALL_RELIEF=false -D SHAFT_LONG=0` は空 |
+| `check_axle_dflat` | 平らな面を付けた車軸が、平歯車・車輪の D 形の穴の平らな所に当たらない（丸い所は圧入） | `-D AXLE_FLAT_CLR=-0.1`、`-D AXLE_FLAT=0.2 -D AXLE_FLAT_CLR=-0.05`（車軸のけずりが浅い） |
+| `check_caster_lite_bead6_ball` / `_bead6_floor` / `_bead6_sensor` | ダイソーのビーズ φ6 の版も、玉と受けが離れ、床・センサーに当たらない | `-D LITE_BEAD_CLR=-0.05`、`-D CHECK_FLOOR_UP=1.15`（1.05 では空 → 計算 1.1 mm と合う） |
 | `check_deck_motor` / `check_deckclip_motor` | デッキ（リブを含む）がモーターに当たらない | `-D MOTOR_STOP_W=2.4`（リブが後ろの出っぱりに当たる）、`-D DECK_UNDER=17.7` |
 | `check_caster_lite_sensor` / `_bead_sensor` | 受け・玉がセンサー（＋0.3 mm）に当たらない | `-D 'LC_DEBUG_SHIFT=[0,-1.2,0]'` / `[0,-1.5,0]`（前へ 1.2 / 1.5 mm）、`-D LC_DEBUG_ROT=180`（標準を逆向き） |
 | `check_caster_lite_pcb` | 基板に食いこまない（ピンは φ3.2 の穴の中） | `-D 'LC_DEBUG_SHIFT=[0,0,-0.1]'`（0.1 mm 上へ） |

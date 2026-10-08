@@ -8,7 +8,7 @@ include <linetracer2_mech.scad>
 part = "none";                       // (the included file draws nothing)
 piece = "none";
 LITE = true;
-LITE_SUPPORT = "caster_print";       // Lite: "skid" | "caster_print" | "caster_bead"
+LITE_SUPPORT = "caster_print";       // Lite: "skid" | "caster_print" | "caster_bead" | "caster_bead6"
 
 module both_sides() { children(); translate([100, 0, 0]) mirror([1, 0, 0]) children(); }
 
@@ -27,7 +27,7 @@ else if (piece == "motor_terminal") both_sides()
 else if (piece == "pinion") both_sides() pinion8();
 else if (piece == "gear") both_sides() translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40();
 else if (piece == "axle") both_sides()
-    translate([AXLE_END_X - AXLE_L, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 2, h = AXLE_L);
+    translate([AXLE_END_X - AXLE_L, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) axle_rod();
 else if (piece == "wheel") both_sides() translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel();
 else if (piece == "tyre") both_sides() {
     if (LITE) translate([WHEEL_X1 - WHEEL_W / 2 + 1.7, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) tire_tpu();
@@ -38,11 +38,13 @@ else if (piece == "support") translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror(
     if (!LITE) skid_clip();
     else if (LITE_SUPPORT == "caster_print") caster_lite_housing();
     else if (LITE_SUPPORT == "caster_bead") caster_lite_bead();
+    else if (LITE_SUPPORT == "caster_bead6") caster_lite_bead6();
     else skid_clip();
 }
 else if (piece == "support_ball") translate([SKID_XY[0], SKID_XY[1], -PCB_T]) mirror([0, 0, 1]) {
     if (LITE && LITE_SUPPORT == "caster_print") caster_lite_ball(loaded = true);
     else if (LITE && LITE_SUPPORT == "caster_bead") lite_bead(loaded = true);
+    else if (LITE && LITE_SUPPORT == "caster_bead6") lite_bead6(loaded = true);
 }
 else if (piece == "screws") {
     for (h = all_holes()) translate([h[0], h[1], -PCB_T]) screw_pan(20);        // M3x20 from the PCB bottom
