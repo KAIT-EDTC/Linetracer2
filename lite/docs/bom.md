@@ -25,7 +25,7 @@
 | J1 | XH コネクター ベース付ポスト 2P B2B-XH-A | 1 | [112247](https://akizukidenshi.com/catalog/g/g112247/) | 1 個 ¥10 | ¥10 |
 | | | | | **小計** | **≒¥1,912** |
 
-- （やり方 B）XIAO を抜き差しして使い回すなら、7 ピンのピンソケット 2 本も要る。
+- （やり方 B）XIAO を抜き差しして使い回すなら、**ピンソケット(メス) 1×7(7P) FH-1x7SG/RH** [104285](https://akizukidenshi.com/catalog/g/g104285/)（1 個 ¥20）を 2 個（1 台 ¥40）。高さ 8.5 mm の分 XIAO が上がる（USB の上の端が基板から約 15 mm）が、枠・デッキ・電池ボックス・モーター・ねじには当たらない（2026-10-09 に 3D モデルで確認）。
 - 基板そのものは特注（JLCPCB など、30 枚で 1 枚 ≒¥80）。Gerber: [`../hardware/Linetracer2-Lite_rev.L3_gerber.zip`](../hardware/Linetracer2-Lite_rev.L3_gerber.zip)。
 
 ## 2. 機械部品（1 台分）
