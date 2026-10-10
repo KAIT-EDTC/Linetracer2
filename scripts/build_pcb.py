@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Regenerate the PCB and keep the best of N autorouter runs.
-    python3 build_pcb.py 6                     # standard board
-    LT2_VARIANT=lite python3 build_pcb.py 6    # Lite board
+"""Regenerate the PCB.
+    python3 build_pcb.py 6                     # standard board: keep the best of 6 autorouter runs
+    LT2_VARIANT=lite python3 build_pcb.py      # Lite board: hand-drawn routes (lite/scripts/layout_lite.py)
 
 placement -> route signals (GND excluded) -> lock -> route GND -> GND pours -> post (silk etc.) -> DRC
 Freerouting is not deterministic; each attempt is scored (must be fully connected with no
@@ -87,6 +87,18 @@ def main(n):
     print(open(RPT).read().split("** Found")[0][-200:])
 
 
+def main_lite():
+    """Lite board: hand-drawn routes (lite/scripts/layout_lite.py), deterministic - no autorouter."""
+    for cmd in (("./kpy", GEN), ("./kpy", os.path.join(LITE_SCRIPTS, "route_lite.py")), ("./kpy", POST, "silk")):
+        out = run(*cmd)
+        print(out.strip().splitlines()[-1] if out.strip() else "(no output)")
+    run("./kc", "pcb", "drc", "--severity-all", "--refill-zones", "--schematic-parity", "-o", RPT, PCB)
+    print(open(RPT).read().split("** Ignored")[0][-200:])
+
+
 if __name__ == "__main__":
     run("python3", "gen_project.py")
-    main(int(sys.argv[1]) if len(sys.argv) > 1 else 6)
+    if VARIANT == "lite":
+        main_lite()
+    else:
+        main(int(sys.argv[1]) if len(sys.argv) > 1 else 6)

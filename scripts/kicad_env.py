@@ -2,7 +2,7 @@
 
 Two boards are generated from the same scripts; pick one with the environment variable LT2_VARIANT:
   (unset) / std : standard rev.A1  -> hardware/kicad/        Linetracer2.*
-  lite          : low-cost Lite    -> lite/hardware/kicad/   Linetracer2-Lite.*
+  lite          : Lite (rev.L3)    -> lite/hardware/kicad/   Linetracer2-Lite.*
                   (everything of the Lite board lives under lite/; its generators are in lite/scripts/)
 """
 import glob

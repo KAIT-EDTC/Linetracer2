@@ -7,15 +7,17 @@ import time
 
 robot = Robot()
 m = robot.motors
-print("battery: %.2f V" % robot.battery.read(8))
 
-for name, l, r in (("forward", 40, 40), ("back", -40, -40), ("turn right", 40, -40), ("turn left", -40, 40)):
-    print(name)
-    t0 = time.ticks_ms()
-    while time.ticks_diff(time.ticks_ms(), t0) < 1500:
-        m.run(l, r)            # ゆっくり加速する（ソフトスタート）
-        time.sleep_ms(5)
-    m.brake()
-    time.sleep(0.5)
-m.stop()
-print("done")
+try:
+    for name, l, r in (("forward", 40, 40), ("back", -40, -40), ("turn right", 40, -40), ("turn left", -40, 40)):
+        print(name)
+        t0 = time.ticks_ms()
+        while time.ticks_diff(time.ticks_ms(), t0) < 1500:
+            m.run(l, r)            # ゆっくり加速する（ソフトスタート）
+            time.sleep_ms(5)
+        m.brake()
+        time.sleep(0.5)
+    m.stop()
+    print("done")
+finally:
+    m.off()                     # Ctrl-C でも モーターを止める

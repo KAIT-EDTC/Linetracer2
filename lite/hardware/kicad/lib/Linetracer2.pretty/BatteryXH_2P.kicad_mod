@@ -65,8 +65,8 @@
 		(uuid "eaf5bff3-80d8-58ee-9877-7b32afbf52c5")
 	)
 	(fp_rect
-		(start -4.4 -2.95)
-		(end 6.9 5.2)
+		(start -2.95 -2.95)
+		(end 5.45 3.8)
 		(stroke
 			(width 0.05)
 			(type solid)
@@ -132,7 +132,7 @@
 	)
 	(pad "1" thru_hole rect
 		(at 0 0)
-		(size 1.8 2.2)
+		(size 1.5 2.4)
 		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
@@ -140,7 +140,7 @@
 	)
 	(pad "2" thru_hole oval
 		(at 2.5 0)
-		(size 1.8 2.2)
+		(size 1.5 2.4)
 		(drill 1)
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers no)
