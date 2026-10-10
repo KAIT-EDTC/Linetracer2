@@ -1,7 +1,7 @@
 // Pieces of the assembled robot, one colour each, in assembly position (PCB coordinates, z = 0 on the PCB top).
 // Used by scripts/export_assembly.sh to build the whole-robot STL / GLB (the board itself comes from KiCad).
 //   openscad -D 'piece="frames"' -D 'LITE=true' -o frames.stl assembly_export.scad
-// piece = frames | deck | box | motor_can | motor_cap | motor_terminal | pinion | gear | axle | wheel | tyre
+// piece = frames | deck | box | motor_can | motor_cap | motor_terminal | pinion | gear | wheel (with its printed axle) | tyre
 //       | support | support_ball | screws | nuts | none
 include <linetracer2_mech.scad>
 
@@ -26,8 +26,6 @@ else if (piece == "motor_terminal") both_sides()
     for (s = [-1, 1]) translate([CAN_X1, MOTOR_Y + s * 9.2 - 0.6, AXIS_Z - 1.5]) cube([3.5, 1.2, 3]);
 else if (piece == "pinion") both_sides() pinion8();
 else if (piece == "gear") both_sides() translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40();
-else if (piece == "axle") both_sides()
-    translate([AXLE_END_X - AXLE_L, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) axle_rod();
 else if (piece == "wheel") both_sides() translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel();
 else if (piece == "tyre") both_sides() {
     if (LITE) translate([WHEEL_X1 - WHEEL_W / 2 + 1.7, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) tire_tpu();

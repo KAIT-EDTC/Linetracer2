@@ -29,7 +29,7 @@ python3 "$ROOT/lite/scripts/step_images.py" "$T/board.wrl" | tail -1
 echo "== mechanical pieces (OpenSCAD, LITE_SUPPORT=$SUPPORT)"
 # piece:colour (sRGB hex)
 PIECES="frames:#f08c28 deck:#3fa9f5 box:#4d4d4d motor_can:#c8c8cc motor_cap:#f2f2f2 motor_terminal:#d9a620
-pinion:#d9a620 gear:#f5f5f5 axle:#b8860b wheel:#ffd23f tyre:#1a1a1a support:#f5f5f5 support_ball:#ff7f00
+pinion:#d9a620 gear:#f5f5f5 wheel:#ffd23f tyre:#1a1a1a support:#f5f5f5 support_ball:#ff7f00
 screws:#b0b0b8 nuts:#b0b0b8"
 ARGS=""
 for pc in $PIECES; do

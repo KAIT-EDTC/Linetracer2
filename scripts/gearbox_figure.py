@@ -31,14 +31,12 @@ LITE = true;
 view = "top";
 module below() translate([-50, -50, -50]) cube([300, 300, 50 + AXIS_Z]);     // keep z <= shaft height
 module behind() translate([-50, MOTOR_Y, -50]) cube([300, 100, 200]);        // keep y >= motor axis
-module axle() translate([AXLE_END_X - AXLE_L, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 2, h = AXLE_L);
 module spur() translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40();
 if (view == "top") {
     color("orange") render() intersection() { frame_left(lbl = false); below(); }
     color("silver") render() intersection() { motor_left(); below(); }
     color("gold") render() intersection() { pinion8(); below(); }
     color("white") render() intersection() { spur(); below(); }
-    color("peru") render() intersection() { axle(); below(); }
     color("yellow") render() intersection() { translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel(); below(); }
     color("dimgray") render() intersection() { translate([WHEEL_X1 - WHEEL_W / 2 + 1.7, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) tire_tpu(); below(); }
     color("deepskyblue") render() intersection() { motor_stop(); below(); }
@@ -48,7 +46,6 @@ if (view == "side") {
     color("silver") motor_left();
     color("gold") pinion8();
     color("white") spur();
-    color("peru") axle();
 }
 if (view == "front") {
     color("orange") render() intersection() { frames(); behind(); }
@@ -138,7 +135,7 @@ def main():
     label(d, "ピニオン 8T", (40, 110), fa(13.0, 74.0))
     label(d, "外かべの にげ穴 φ6.5\n（軸が長くても当たらない）", (20, 190), fa(9.5, 73.0))
     label(d, "平歯車 40T", (300, 850), fa(13.5, 97.0))
-    label(d, "車軸 φ2", (470, 600), fa(18.5, 88.0))
+    label(d, "車軸 φ3.5（車輪と一体）", (440, 600), fa(18.5, 88.0))
     label(d, "車輪・タイヤ", (20, 850), fa(3.7, 102.0))
     label(d, "モーターの板", (290, 95), fa(18.6, 64.5))
     label(d, "デッキの\nリブ", (990, 420), fa(50.5, 78.0))
@@ -149,7 +146,7 @@ def main():
     side = ImageOps.mirror(side)
     d = ImageDraw.Draw(side)
     label(d, "にげ穴 φ6.5\n（中にピニオン）", (16, 300), (300, 222))
-    label(d, "車軸", (560, 395), (545, 345))
+    label(d, "ハブの穴", (520, 395), (545, 345))
     label(d, "平歯車 40T", (470, 12), (520, 70))
     label(d, "外かべ", (380, 395), (420, 330))
     d.text((16, 12), "← まえ", font=font(24), fill=(20, 20, 20))

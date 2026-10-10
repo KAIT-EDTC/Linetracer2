@@ -18,7 +18,8 @@
 // !! part "frame_right" exports frame_left() (engraved "R"); deck_clip (claws not symmetric) is exported mirrored.
 // (0,0) is the front-left corner of the board.  Floor is at z = -5.6 (PCB bottom 4.0 mm).
 //
-// Drive: FA-130RA + Tamiya 8T pinion (m0.5) -> printed 40T spur (m0.5) on a 2 mm axle, 5:1, wheel ~32 mm.
+// Drive: FA-130RA + Tamiya 8T pinion (m0.5) -> printed 40T spur (m0.5), 5:1, wheel ~32 mm.  No metal axle: the
+// wheel is printed in one piece with its hub, the hex that drives it and a 3.5 mm stub axle (see PIN_D).
 // Everything is held by screws (no tape):
 //   4 x M3x20 pan  : from the PCB bottom, through the PCB and the frame towers, into nuts in the deck
 //   2 x M3x8  flat : battery box floor -> deck (nuts in the deck)
@@ -69,23 +70,36 @@ OUTER_Y0 = 70.0;                       // its front end (was 73.0: room around t
 WALL_RELIEF = true;                    // hole in the outer wall for a long motor shaft (false = positive control)
 SHAFT_LONG = 0.9;                      // worst case: shaft 0.5 mm longer than nominal + 0.4 mm end play
 HANG_Z   = 0.0;                        // lowest point (flat bottom -> prints without supports)
-AXLE_D   = 2.0;
-AXLE_L   = 18.0;                       // brass rod, 2 mm: from inside the wheel (x 1.3) to the blind bearing end
-// Hex drive (2026-10-09): a press fit of PLA on a smooth 2 mm rod holds only about the motor's stall torque through the
-// gear (5 x 4.7 x 0.85 = 20 mN m), and a printed 2 mm hole varies +-0.1 mm -> some gears would slip.  So the torque
-// does not go through the axle at all: the WHEEL has a hub that passes through the outer wall (round, the wall is its
-// bearing) and ends in a HEX that fits a hex hole in the 40T gear.  The round brass axle only holds the parts in line
-// (press fit in the wheel, free in the gear, blind bearing in the frame).  No metal work (the D-cut was too fiddly).
+// Printed axle (2026-10-10): no brass rod any more.  The WHEEL is one printed piece: rim, round hub (turns in the
+// outer wall), HEX (drives it from the 40T gear: the torque goes printed part to printed part, see README 2.7) and
+// a round STUB AXLE PIN_D thick that turns in a blind bearing in the motor plate.  The user found the fits a bit
+// tight, so the clearances are larger than in the brass version, and the two bearings that are printed as
+// horizontal holes in the frame get a pointed (teardrop) top: the roof of a printed horizontal hole sags and makes
+// it tight, a 45 deg point prints clean and only adds room above the shaft (the gear mesh is horizontal).
+// Clearances are on the diameter.  More radial play also lets the 40T gear move away from the pinion, so they are
+// kept moderate (worst case at the gear ~0.2 mm, the 8T/40T m0.5 mesh still has 0.8 of its 1.0 mm working depth).
+// Like before, nothing locks the wheel axially except the fits (it is pushed in from the outside).
 HUB_D   = 5.0;                         // round part of the wheel hub, inside the outer wall
 HUB_HEX = 4.0;                         // hex across flats, inside the gear
-HUB_HEX_CLR = 0.1;                     // gear hex hole = HUB_HEX + this (slip fit)
-HUB_BORE = HUB_D + 0.4;                // the outer wall's bearing for the hub
+HUB_HEX_CLR = 0.2;                     // gear hex hole = HUB_HEX + this (was 0.1: too tight)
+HUB_BORE = HUB_D + 0.5;                // the outer wall's bearing for the hub (was + 0.4), teardrop top
 HUB_X0 = GEAR_X0 - 0.1;                // hub: round from the wheel face to here, hex from here ...
-HUB_X1 = GEAR_X1 - 0.2;                // ... to here (0.2 short of the bottom of the gear's hex hole)
+HUB_X1 = GEAR_X1 - 0.2;                // ... to here (0.2 short of the end of the gear's hex hole)
+PIN_D   = 3.5;                         // printed stub axle (the brass rod was 2.0)
+PIN_BORE = PIN_D + 0.35;               // blind bearing in the motor plate, teardrop top
+PIN_GEAR_CLR = 0.4;                    // the pin passes the gear's hub: free
+PIN_TIP_CLR = 0.4;                     // the pin tip stops this far from the bottom of the blind hole
+AXIAL_CLR = 0.5;                       // wheel <-> outer wall boss and boss <-> gear (was 0.3 / 0.2)
 module hex2d(af) circle(d = af / cos(30), $fn = 6);
-module axle_rod() cylinder(d = AXLE_D, h = AXLE_L);          // the axle along +z from its outer end (assembly views)
+// hole along local +z with a 45 deg roof pointing to local -x, which rotate([0, 90, 0]) turns into world +z (up):
+// round bottom (the bearing), pointed top (prints without sagging)
+module teardrop(d, h) linear_extrude(h) intersection() {      // point cut flat 0.4 mm above the round (short bridge)
+    union() { circle(d = d); rotate(135) square(d / 2); }
+    translate([-(d / 2 + 0.4), -d]) square(2 * d);
+}
 
-AXLE_END_X = 19.3;                     // blind end of the axle hole (axle pushed in until it stops)
+AXLE_END_X = 19.3;                     // blind end of the stub axle's bearing in the motor plate
+PIN_X1 = AXLE_END_X - PIN_TIP_CLR;     // tip of the printed stub axle
 WHEEL_X1 = 7.2;                        // inner face of the wheel (0.3 mm from the spacer boss)
 TOWER_D  = 9.6;
 TOWER_TOP = 15.0;                      // = deck bottom
@@ -225,8 +239,8 @@ module frame_left(lbl = true) {
             translate([NOTCH_X - 0.5, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 6, h = FRONT_X0 - NOTCH_X + 0.5);
             // outer axle wall (in the wheel notch) with spacer bosses on both faces
             rbox([OUTER_X0, OUTER_Y0, HANG_Z], [OUTER_X1 - OUTER_X0, 100.5 - OUTER_Y0, AXIS_Z + 4 - HANG_Z], 0.9);
-            translate([WHEEL_X1 + 0.3, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = HUB_BORE + 2.2, h = OUTER_X0 - WHEEL_X1 - 0.3 + 0.01);
-            translate([OUTER_X1 - 0.01, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = HUB_BORE + 2.2, h = GEAR_X0 - 0.2 - OUTER_X1 + 0.01);
+            translate([WHEEL_X1 + AXIAL_CLR, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = HUB_BORE + 2.2, h = OUTER_X0 - WHEEL_X1 - AXIAL_CLR + 0.01);
+            translate([OUTER_X1 - 0.01, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = HUB_BORE + 2.2, h = GEAR_X0 - AXIAL_CLR - OUTER_X1 + 0.01);
             // lower front bar under the pinion, rear bar behind the spur gear
             rbox([OUTER_X0, 72.5, HANG_Z], [FRONT_X0 - OUTER_X0, 4.5, 6.0 - HANG_Z], 1.0);
             rbox([OUTER_X0, 99.0, HANG_Z], [FRONT_X0 + BOSS_L - OUTER_X0, 1.5, AXIS_Z + 9 - HANG_Z], 0.7);
@@ -242,10 +256,10 @@ module frame_left(lbl = true) {
         translate([FRONT_X0 - 1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = BOSS_D + 0.3, h = BOSS_L + 2);
         translate([0, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 3.0, h = 30);
         translate([PLATE_X0 - 1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = PLATE_HOLE_D, h = FRONT_X0 - PLATE_X0 + 1);   // pinion passes
-        // axle hole (2.0 mm axle -> 2.15 mm hole), blind at AXLE_END_X
-        translate([-1, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = AXLE_D + 0.15, h = AXLE_END_X + 1);
+        // bearing for the wheel's printed stub axle in the motor plate, blind at AXLE_END_X (teardrop: no sagging roof)
+        translate([PLATE_X0 - 1, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) teardrop(PIN_BORE, AXLE_END_X - PLATE_X0 + 1);
         // the wheel's hub turns in the outer wall (its spacer rings included)
-        translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = HUB_BORE, h = GEAR_X0 - WHEEL_X1);
+        translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) teardrop(HUB_BORE, GEAR_X0 - WHEEL_X1);
         // room for pinion and spur gear between the walls
         translate([OUTER_X1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0])
             cylinder(d = MOD * (PINION_T + 2) + 2 * CLR + 1, h = PLATE_X0 - 0.5 - OUTER_X1);
@@ -254,8 +268,8 @@ module frame_left(lbl = true) {
         // 10.5.  The wheel covers this hole from the outside.
         if (WALL_RELIEF) translate([OUTER_X0 - 1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0])
             cylinder(d = MOD * (PINION_T + 2) + 2 * CLR + 1, h = OUTER_X1 - OUTER_X0 + 2);
-        translate([GEAR_X0 - 0.2, AXLE_Y, AXIS_Z]) rotate([0, 90, 0])
-            cylinder(d = MOD * (SPUR_T + 2) + 2 * CLR + 1, h = PLATE_X0 - (GEAR_X0 - 0.2));
+        translate([GEAR_X0 - AXIAL_CLR, AXLE_Y, AXIS_Z]) rotate([0, 90, 0])
+            cylinder(d = MOD * (SPUR_T + 2) + 2 * CLR + 1, h = PLATE_X0 - (GEAR_X0 - AXIAL_CLR));
         // motor pads M1 (+ relief holes) and C5 must stay free
         translate([37.5, 57.0, -1]) cube([12, 10.5, 10]);
         // M3 screw holes (screw from the PCB bottom; the nut is in the deck)
@@ -369,14 +383,15 @@ module deck_clip() {
 }
 
 // ---------------------------------------------------------------- 40T spur gear (printed)
-// m0.5, 40 teeth, pressure angle 20 deg.  Outer face on the bed, hub on top.  Press fit on the 2 mm axle.
+// m0.5, 40 teeth, pressure angle 20 deg.  Outer face on the bed, hub on top.  Driven onto the wheel's hex (the hex
+// hole is on the outer face); the wheel's stub axle passes through the hub.
 module gear40() {
     difference() {
         union() {
             linear_extrude(GEAR_X1 - GEAR_X0) gear2d(MOD, SPUR_T, 20, GEAR_BACKLASH);
             cylinder(d = 7, h = GEAR_X1 - GEAR_X0 + GEAR_HUB_L);
         }
-        translate([0, 0, -1]) cylinder(d = AXLE_D + 0.2, h = 20);                          // axle: free
+        translate([0, 0, -1]) cylinder(d = PIN_D + PIN_GEAR_CLR, h = 20);                  // the wheel's stub axle: free
         translate([0, 0, -1]) linear_extrude(1 + GEAR_X1 - GEAR_X0) hex2d(HUB_HEX + HUB_HEX_CLR);   // the wheel's hex
         for (a = [0 : 60 : 359]) rotate(a) translate([6.0, 0, -1]) cylinder(d = 3.4, h = 10);
     }
@@ -398,13 +413,15 @@ module wheel() {
             translate([0, 0, -(HUB_X1 - WHEEL_X1) + 0.4]) linear_extrude(HUB_X1 - HUB_X0 - 0.4 + 0.01) hex2d(HUB_HEX);
             translate([0, 0, -(HUB_X1 - WHEEL_X1)]) linear_extrude(0.4, scale = HUB_HEX / (HUB_HEX - 0.8))
                 hex2d(HUB_HEX - 0.8);
+            // printed stub axle: from inside the hex to PIN_X1 (turns in the blind bearing of the motor plate),
+            // 0.5 mm chamfer at the tip
+            translate([0, 0, -(PIN_X1 - WHEEL_X1) + 0.5]) cylinder(d = PIN_D, h = PIN_X1 - HUB_X1 + 0.01);
+            translate([0, 0, -(PIN_X1 - WHEEL_X1)]) cylinder(d1 = PIN_D - 1.0, d2 = PIN_D, h = 0.5 + 0.01);
         }
         translate([0, 0, (WHEEL_W - GROOVE_W) / 2]) difference() {
             cylinder(d = RIM_D + 1, h = GROOVE_W);
             translate([0, 0, -1]) cylinder(d = GROOVE_D, h = GROOVE_W + 2);
         }
-        translate([0, 0, -(HUB_X1 - WHEEL_X1) - 1]) cylinder(d = AXLE_D + 0.2, h = HUB_X1 - WHEEL_X1 + 1);   // free in the hub
-        translate([0, 0, -0.01]) cylinder(d = AXLE_D - 0.1, h = WHEEL_W + 1);   // press fit on the 2 mm axle (holds it)
         for (a = [0:60:359]) rotate([0, 0, a]) translate([7.5, 0, -1]) cylinder(d = 4.5, h = WHEEL_W + 2);
     }
 }
@@ -776,10 +793,9 @@ module pcb() {                     // standard: 100 x 100 with the rear notches;
     }
 }
 
-module drive_side() {              // left side: gears, axle, wheel, tyre
+module drive_side() {              // left side: gears, wheel (with its printed axle), tyre
     color("gold") pinion8();                                    // Tamiya 8T, outer face flush with the shaft tip
     color("white") translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40();
-    color("goldenrod") translate([AXLE_END_X - AXLE_L, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) axle_rod();
     color("orange") translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel();
     if (LITE)                      // TPU tyre, centred in the groove
         color("black") translate([WHEEL_X1 - WHEEL_W / 2 + 1.7, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) tire_tpu();
@@ -975,6 +991,11 @@ else if (part == "check_shaft_wall") intersection() {    // the longest allowed 
 }
 else if (part == "check_pinion_spur") intersection() { translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40(); pinion_slide_teeth(); }
 else if (part == "check_wheel_frame") intersection() { translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel(); frame_left(); }
+// the wheel pushed in from the outside: every position on the way in (0.25 mm steps) vs. the frame and the gear
+else if (part == "check_wheel_insert") intersection() {
+    for (d = [0 : 0.25 : PIN_X1 - OUTER_X0 + 0.5]) translate([WHEEL_X1 - d, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel();
+    union() { frame_left(); translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40(); }
+}
 else if (part == "exploded") exploded();
 else if (part == "none") { }                    // for include <> from other files
 else assembly();
