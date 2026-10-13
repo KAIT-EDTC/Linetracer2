@@ -41,12 +41,12 @@ PCB_T      = 1.6;
 FLOOR_Z    = -5.6;          // floor relative to PCB top
 AXLE_Y     = 88;            // must match gen_pcb.py
 // gear centre distance: 12.0 (m0.5 x (8 + 40) / 2) + GEAR_CD_ADD.  2026-10-13: the printed mesh was a little too
-// tight (crunchy when the wheel is turned by hand) -> the motor moves 0.1 mm forward, away from the axle.  Contact
-// ratio 1.51 (12.0) -> 1.32 (12.1); still above 1.1 with the 0.2 mm worst-case bearing play.  If it is still
-// crunchy, try 0.15 (contact ratio 1.23); if it is loose / skips, 0.05.  The PCB (gen_pcb.py) keeps 76.0: only
+// tight (crunchy when the wheel is turned by hand) -> the motor moves 0.15 mm forward, away from the axle (0.10 was
+// tried first; the user asked for 0.15).  Contact ratio 1.51 (12.0) -> 1.23 (12.15); with the 0.2 mm worst-case
+// bearing play pulling the gears apart it drops to about 0.9, so do not go further.  If it is loose / skips, 0.10.  The PCB (gen_pcb.py) keeps 76.0: only
 // its silk outline uses it.
-GEAR_CD_ADD = 0.10;
-MOTOR_Y    = AXLE_Y - (0.5 * (8 + 40) / 2 + GEAR_CD_ADD);   // motor shaft line (75.9)
+GEAR_CD_ADD = 0.15;
+MOTOR_Y    = AXLE_Y - (0.5 * (8 + 40) / 2 + GEAR_CD_ADD);   // motor shaft line (75.85)
 AXIS_Z     = 10.4;          // wheel radius 16 - 5.6
 NOTCH_X    = 17.5;          // PCB edge in the rear notch (left side)
 HOLES      = [[30, 62], [30, 96]];   // M3 holes (left frame); right frame = mirrored (70, ..)
