@@ -12,7 +12,7 @@ import os
 
 import sexpr
 from sexpr import Q
-from kicad_env import LIBDIR, uid, sym_dir, fp_dir
+from kicad_env import LIBDIR, uid, sym_dir
 
 FONT = "(effects (font (size 1.27 1.27)))"
 
@@ -70,8 +70,9 @@ def sym_module():
         "\n    ".join(pins))
 
 
-def sym_reflector():
-    """Letex LBR-123F reflective photo sensor. 1=A 2=K 3=E 4=C."""
+def sym_reflector(name="LBR-123F", datasheet="https://akizukidenshi.com/goodsaffix/lbr-123f.pdf",
+                  descr="Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)"):
+    """Letex reflective photo sensor (LBR-123F, LBR-127HLD: same pin numbers). 1=A 2=K 3=E 4=C."""
     g = """
     (rectangle (start -5.08 3.81) (end 5.08 -3.81) (stroke (width 0.254) (type default)) (fill (type background)))
     (polyline (pts (xy -5.08 2.54) (xy -2.54 2.54) (xy -2.54 1.016)) (stroke (width 0) (type default)) (fill (type none)))
@@ -89,7 +90,7 @@ def sym_reflector():
 """
     pins = [pin("passive", -7.62, 2.54, 0, "A", "1"), pin("passive", -7.62, -2.54, 0, "K", "2"),
             pin("passive", 7.62, -2.54, 180, "E", "3"), pin("passive", 7.62, 2.54, 180, "C", "4")]
-    return """(symbol "LBR-123F"
+    return """(symbol "%s"
   (pin_names (offset 0.254) (hide yes))
   (exclude_from_sim no) (in_bom yes) (on_board yes)
   %s
@@ -97,18 +98,58 @@ def sym_reflector():
   %s
   %s
   %s
-  (symbol "LBR-123F_0_1"%s  )
-  (symbol "LBR-123F_1_1"
+  (symbol "%s_0_1"%s  )
+  (symbol "%s_1_1"
     %s
   )
   (embedded_fonts no)
 )""" % (
+        name,
         prop("Reference", "PS", -5.08, 5.08, justify="left"),
-        prop("Value", "LBR-123F", -5.08, -5.08, justify="left"),
-        prop("Footprint", "Linetracer2:LBR-123F", 0, -7.62, hide=True),
-        prop("Datasheet", "https://akizukidenshi.com/goodsaffix/lbr-123f.pdf", 0, -10.16, hide=True),
-        prop("Description", "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-123F (TPR-105F successor)", 0, -12.7, hide=True),
-        g, "\n    ".join(pins))
+        prop("Value", name, -5.08, -5.08, justify="left"),
+        prop("Footprint", "Linetracer2:" + name, 0, -7.62, hide=True),
+        prop("Datasheet", datasheet, 0, -10.16, hide=True),
+        prop("Description", descr, 0, -12.7, hide=True),
+        name, g, name, "\n    ".join(pins))
+
+
+def sym_xiao():
+    """Seeed Studio XIAO ESP32C6 (14 castellated pins). Drawn like the board seen from above with the USB up:
+    left 1..7 = D0..D6, right 14..8 = 5V, GND, 3V3, D10..D7.  Names: GPIO number / XIAO name."""
+    left = [("1", "GPIO0/A0/D0"), ("2", "GPIO1/A1/D1"), ("3", "GPIO2/A2/D2"), ("4", "GPIO21/D3"),
+            ("5", "GPIO22/SDA/D4"), ("6", "GPIO23/SCL/D5"), ("7", "GPIO16/TX/D6")]
+    right = [("14", "5V", "power_in"), ("13", "GND", "power_in"), ("12", "3V3", "power_out"),
+             ("11", "GPIO18/MOSI/D10", "bidirectional"), ("10", "GPIO20/MISO/D9", "bidirectional"),
+             ("9", "GPIO19/SCK/D8", "bidirectional"), ("8", "GPIO17/RX/D7", "bidirectional")]
+    ys = [7.62, 5.08, 2.54, 0, -2.54, -5.08, -7.62]
+    pins = [pin("bidirectional", -22.86, y, 0, n, num) for (num, n), y in zip(left, ys)]
+    pins += [pin(k, 22.86, y, 180, n, num) for (num, n, k), y in zip(right, ys)]
+    return """(symbol "XIAO_ESP32C6"
+  (pin_names (offset 1.016))
+  (exclude_from_sim no) (in_bom yes) (on_board yes)
+  %s
+  %s
+  %s
+  %s
+  %s
+  %s
+  (symbol "XIAO_ESP32C6_0_1"
+    (rectangle (start -20.32 10.16) (end 20.32 -10.16) (stroke (width 0.254) (type default)) (fill (type background)))
+    (rectangle (start -3.81 12.7) (end 3.81 10.16) (stroke (width 0.254) (type default)) (fill (type none)))
+  )
+  (symbol "XIAO_ESP32C6_1_1"
+    %s
+  )
+  (embedded_fonts no)
+)""" % (
+        prop("Reference", "U", 0, 15.24),
+        prop("Value", "XIAO_ESP32C6", 0, -12.7),
+        prop("Footprint", "Linetracer2:XIAO_ESP32C6_Header", 0, -15.24, hide=True),
+        prop("Datasheet", "https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/", 0, -17.78, hide=True),
+        prop("Description", "Seeed Studio XIAO ESP32C6 (ESP32-C6, Wi-Fi 6 / BLE 5 / 802.15.4). 5V pin = USB VBUS = power input "
+             "(through an external diode), 3V3 = output of the on-board regulator", 0, -20.32, hide=True),
+        prop("ki_keywords", "XIAO ESP32C6 Seeed module castellated", 0, 0, hide=True),
+        "\n    ".join(pins))
 
 
 def sym_pico():
@@ -141,9 +182,45 @@ def sym_pico():
     return sexpr.dump(src, 1)
 
 
+def sym_pl9823():
+    """PL9823 (5 mm NeoPixel-type full-colour LED, Akizuki 108411).  1 = GND, 2 = DO, 3 = VDD, 4 = DIN.
+    Drawn like KiCad's WS2812: data in left, data out right, VDD on top, GND at the bottom."""
+    pins = [pin("power_in", 0, -7.62, 90, "GND", "1"), pin("output", 7.62, 0, 180, "DO", "2"),
+            pin("power_in", 0, 7.62, 270, "VDD", "3"), pin("input", -7.62, 0, 0, "DIN", "4")]
+    g = """
+    (rectangle (start -5.08 5.08) (end 5.08 -5.08) (stroke (width 0.254) (type default)) (fill (type background)))
+    (circle (center 1.27 0) (radius 2.286) (stroke (width 0.254) (type default)) (fill (type none)))
+    (polyline (pts (xy 0.508 0.762) (xy 2.032 0.762) (xy 1.27 -0.762) (xy 0.508 0.762)) (stroke (width 0.2) (type default)) (fill (type outline)))
+    (polyline (pts (xy 0.508 -0.762) (xy 2.032 -0.762)) (stroke (width 0.2) (type default)) (fill (type none)))
+    (text "RGB" (at -2.286 0 0) (effects (font (size 1 1))))
+"""
+    return """(symbol "PL9823"
+  (pin_names (offset 0.254))
+  (exclude_from_sim no) (in_bom yes) (on_board yes)
+  %s
+  %s
+  %s
+  %s
+  %s
+  (symbol "PL9823_0_1"%s  )
+  (symbol "PL9823_1_1"
+    %s
+  )
+  (embedded_fonts no)
+)""" % (
+        prop("Reference", "D", -5.08, 6.35, justify="left"),
+        prop("Value", "PL9823", 1.27, -6.35, justify="left"),
+        prop("Footprint", "Linetracer2:LED_PL9823_5mm", 0, -10.16, hide=True),
+        prop("Datasheet", "https://akizukidenshi.com/goodsaffix/pl9823.pdf", 0, -12.7, hide=True),
+        prop("Description", "5 mm full-colour LED with controller (NeoPixel type, 800 kHz), supply 4.5-6 V", 0, -15.24, hide=True),
+        g, "\n    ".join(pins))
+
+
 def write_symbols():
     txt = "(kicad_symbol_lib\n\t(version 20241209)\n\t(generator \"linetracer2_gen\")\n\t(generator_version \"9.0\")\n"
-    for s in (sym_module(), sym_reflector()):
+    lbr127 = sym_reflector("LBR-127HLD", "https://akizukidenshi.com/goodsaffix/lbr127hld.pdf",
+                           "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
+    for s in (sym_module(), sym_reflector(), lbr127, sym_xiao(), sym_pl9823()):
         node = sexpr.parse(s)
         txt += sexpr.dump(node, 1) + "\n"
     txt += sym_pico() + "\n)\n"
@@ -185,6 +262,10 @@ class FP:
         self.items.append('(fp_arc (start %s %s) (mid %s %s) (end %s %s) (stroke (width %s) (type solid)) (layer "%s") (uuid "%s"))'
                           % (sx, sy, mx, my, ex, ey, w, layer, self._u()))
 
+    def poly(self, pts, layer="F.SilkS", w=0.1, fill=True):
+        self.items.append('(fp_poly (pts %s) (stroke (width %s) (type solid)) (fill %s) (layer "%s") (uuid "%s"))'
+                          % (" ".join("(xy %s %s)" % p for p in pts), w, "yes" if fill else "no", layer, self._u()))
+
     def text(self, s, x, y, layer="F.SilkS", size=1.0, thick=0.15, justify=None, rot=0):
         j = " (justify %s)" % justify if justify else ""
         self.items.append('(fp_text user "%s" (at %s %s %s) (layer "%s") (uuid "%s") (effects (font (size %s %s) (thickness %s))%s))'
@@ -200,6 +281,17 @@ class FP:
         dr = "(drill %s (offset %s %s))" % (drill, offset[0], offset[1]) if offset else "(drill %s)" % drill
         self.items.append('(pad "%s" thru_hole %s (at %s %s) (size %s %s) %s (layers "*.Cu" "*.Mask")%s (uuid "%s"))'
                           % (num, shape, x, y, sx, sy, dr, extra, self._u()))
+
+    def keepout(self, name, layers, x1, y1, x2, y2, pads=False):
+        """Rectangular rule area inside the footprint: no tracks, vias or copper pour (pads only if pads=True)."""
+        self.tail.append(
+            '(zone (layers %s) (uuid "%s") (name "%s") (hatch full 0.5) (connect_pads (clearance 0)) '
+            '(min_thickness 0.25) (keepout (tracks not_allowed) (vias not_allowed) (pads %s) '
+            '(copperpour not_allowed) (footprints allowed)) (placement (enabled no) (sheetname "")) '
+            '(fill (thermal_gap 0.5) (thermal_bridge_width 0.5) (island_removal_mode 0)) '
+            '(polygon (pts (xy %s %s) (xy %s %s) (xy %s %s) (xy %s %s))))'
+            % (" ".join('"%s"' % la for la in layers), self._u(), name, "allowed" if pads else "not_allowed",
+               x1, y1, x2, y1, x2, y2, x1, y2))
 
     def write(self, ref_xy, val_xy, ref_layer="F.SilkS"):
         out = ['(footprint "%s"' % self.name,
@@ -273,19 +365,53 @@ def fp_reflector():
     f.write((0, -3.2), (0, 3.2))
 
 
+def fp_lbr127hld():
+    """LBR-127HLD.  Drawn as seen from the lens face (datasheet "Top View"): photo transistor left
+    (3 = E, 4 = C), LED right (1 = A, 2 = K), corner chamfer c0.5 next to pin 1.
+    Leads 0.5 mm square, 4.1 mm (x) x 2.54 mm (y).  Place this footprint on the BOTTOM side."""
+    f = FP("LBR-127HLD",
+           "Letex LBR-127HLD reflective sensor, body 8.7 x 4.5 x 5.6 mm, leads 4.1 x 2.54 mm. Mount on bottom side (lens to floor)",
+           "photo reflector line sensor LBR-127HLD")
+    f.pad("1", 2.05, -1.27, "rect", 1.6, 1.6, 0.9)      # A  (LED)
+    f.pad("2", 2.05, 1.27, "circle", 1.6, 1.6, 0.9)     # K
+    f.pad("3", -2.05, -1.27, "circle", 1.6, 1.6, 0.9)   # E  (photo transistor)
+    f.pad("4", -2.05, 1.27, "circle", 1.6, 1.6, 0.9)    # C
+    # body 8.7 x 4.5 with the c0.5 chamfer at the pin-1 corner
+    f.line(-4.35, -2.25, 3.85, -2.25)
+    f.line(3.85, -2.25, 4.35, -1.75)
+    f.line(4.35, -1.75, 4.35, 2.25)
+    f.line(4.35, 2.25, -4.35, 2.25)
+    f.line(-4.35, 2.25, -4.35, -2.25)
+    # chamfered corner (= pin 1, LED side): a filled triangle pointing at it, just outside the body
+    f.poly([(4.65, -2.55), (5.85, -2.55), (4.65, -1.35)])
+    # lens colours, inside the outline at each end: the photo transistor has a BLACK lens (filled dot), the IR LED
+    # a CLEAR lens (open circle).  (Akizuki: the look can change between lots -> the chamfer / the long leads are
+    # the reliable marks, see the assembly manual.)  Kept 0.15 mm off the pad openings.
+    f.circle(-3.5, 0, 0.45, w=0.1, fill=True)   # filled = black lens (photo transistor)
+    f.circle(3.5, 0, 0.42, w=0.16)              # open = clear lens (IR LED)
+    f.rect(-4.35, -2.25, 4.35, 2.25, layer="F.Fab", w=0.1)
+    for x in (-1.8, 1.8):
+        f.circle(x, 0, 1.45, layer="F.Fab", w=0.1)     # lens windows (diameter 2.9)
+    f.text("PT", -1.8, 0, layer="F.Fab", size=0.6, thick=0.1)
+    f.text("LED", 1.8, 0, layer="F.Fab", size=0.6, thick=0.1)
+    f.rect(-4.6, -2.8, 6.1, 2.5, layer="F.CrtYd", w=0.05)
+    f.write((0, -3.4), (0, 3.4))
+
+
 def fp_battery_xh():
     f = FP("BatteryXH_2P",
            "Battery input, JST XH 2P (B2B-XH-A) header OR direct wire soldering. Symmetric silk: orient by wire colour (red=+)",
            "battery JST XH B2B-XH-A")
-    f.pad("1", 0, 0, "rect", 1.8, 2.2, 1.0)
-    f.pad("2", 2.5, 0, "oval", 1.8, 2.2, 1.0)
+    # 1.5 mm wide pads: 1.0 mm between + and - (1.8 mm pads left only 0.7 mm: a solder bridge here shorts the cells)
+    f.pad("1", 0, 0, "rect", 1.5, 2.4, 1.0)
+    f.pad("2", 2.5, 0, "oval", 1.5, 2.4, 1.0)
     f.rect(-2.45, -2.45, 4.95, 3.3)
     f.text("+", -3.4, 0, size=1.5, thick=0.3)
     f.text("-", 5.9, 0, size=1.5, thick=0.3)
     f.text("RED", 0, 4.4, size=0.8, thick=0.15)
     f.text("BLK", 2.5, 4.4, size=0.8, thick=0.15)
     f.rect(-2.45, -2.45, 4.95, 3.3, layer="F.Fab", w=0.1)
-    f.rect(-4.4, -2.95, 6.9, 5.2, layer="F.CrtYd", w=0.05)
+    f.rect(-2.95, -2.95, 5.45, 3.8, layer="F.CrtYd", w=0.05)     # body + 0.5 mm (the +/- and RED/BLK texts may overhang)
     f.write((1.25, -3.6), (1.25, 6.2))
 
 
@@ -324,57 +450,73 @@ def fp_buzzer():
     f.write((3.8, -7.4), (3.8, 7.6))
 
 
-def fp_pico_direct():
-    """Raspberry Pi Pico / Pico 2 soldered FLAT on the board without pin headers (Lite board).
+def fp_buzzer_pkm13():
+    """Murata PKM13EPYH4000-A0 (Akizuki 104118): 13 mm passive piezo, 2 pins 5.0 mm apart, + marked on the
+    part.  Lite board: only this buzzer, so only its two holes (the standard board has a 3-hole footprint)."""
+    f = FP("Buzzer_PKM13_P5.0",
+           "Passive piezo sounder 13 mm Murata PKM13EPYH4000-A0, pin pitch 5.0 mm",
+           "buzzer piezo PKM13EPYH4000")
+    f.pad("1", 0, 0, "rect", 1.8, 1.8, 1.0)
+    f.pad("2", 5.0, 0, "circle", 1.8, 1.8, 1.0)
+    f.circle(2.5, 0, 6.6)                         # body (13 mm) on the silkscreen
+    f.circle(2.5, 0, 6.5, layer="F.Fab", w=0.1)
+    f.text("+", 0, -2.2, size=1.4, thick=0.25)
+    f.circle(2.5, 0, 6.9, layer="F.CrtYd", w=0.05)
+    f.write((2.5, -7.6), (2.5, 7.6))
 
-    Origin = module centre, USB at the top (-y), pin 1 top-left (as KiCad Module:RaspberryPi_Pico_*).
-    Each pin is ONE through-hole pad: the hole sits under the Pico's own hole (a pin header still fits),
-    and the copper is stretched 1.9 mm outwards past the Pico's edge, so the iron touches the board pad
-    and the castellated half-hole of the Pico at the same time.
-    Copied from the KiCad footprint RaspberryPi_Pico_Common_Unspecified: the holes for the USB
-    connector legs that stick out under the Pico, and the copper keep-outs under the bare test
-    pads on the Pico's bottom (TP1..TP7, debug pads) - no tracks / vias / pour may touch them."""
-    f = FP("RaspberryPi_Pico_DirectSolder",
-           "Raspberry Pi Pico / Pico 2 soldered flat (no pin header): one THT pad per pin, copper stretched "
-           "1.9 mm past the module edge for castellation soldering. Keep-outs from RaspberryPi_Pico_Common_Unspecified",
-           "Raspberry Pi Pico castellated direct solder no header")
-    PITCH, X, PAD_L, PAD_W, OFF = 2.54, 8.89, 4.3, 1.7, 1.35     # pad spans 8.09 .. 12.39 from the centre
-    for i in range(20):
-        y = round(-24.13 + PITCH * i, 3)
-        f.pad(str(i + 1), -X, y, "roundrect" if i == 0 else "oval", PAD_L, PAD_W, 1.0, offset=(-OFF, 0))
-        f.pad(str(40 - i), X, y, "oval", PAD_L, PAD_W, 1.0, offset=(OFF, 0))
-    stock = sexpr.parse(open(os.path.join(fp_dir(), "Module.pretty",
-                                          "RaspberryPi_Pico_Common_Unspecified.kicad_mod")).read())
-    for p in sexpr.find_all(stock, "pad"):
-        if p[2] == "np_thru_hole":                               # USB connector legs
-            at, size = sexpr.find(p, "at"), sexpr.find(p, "size")
-            f.pad("", at[1], at[2], None, size[1], size[2], size[1], kind="np_thru_hole")
-    for z in sexpr.find_all(stock, "zone"):
-        name = str(sexpr.find(z, "name")[1])
-        if name.startswith("Pad Keep Out"):
-            z = copy.deepcopy(z)
-            u = sexpr.find(z, "uuid")
-            u[1] = Q(f._u())
-            # the USB leg holes (no copper) reach into the TP2/TP3 areas: forbid copper, not holes
-            sexpr.find(sexpr.find(z, "keepout"), "pads")[1] = "allowed"
-            f.tail.append(sexpr.dump(z))
-    f.tail.append('(model "${KICAD10_3DMODEL_DIR}/Module.3dshapes/RaspberryPi_Pico.step" '
-                  '(offset (xyz 0 0 0)) (scale (xyz 1 1 1)) (rotate (xyz 0 0 0)))')
-    # module outline 21 x 51 (+ USB connector overhang 1.3 mm).  The USB end lies on the board edge,
-    # so the silkscreen only shows the far end and the pin-1 mark.
-    f.rect(-10.5, -25.5, 10.5, 25.5, layer="F.Fab", w=0.1)
-    f.rect(-4.0, -26.8, 4.0, -25.5, layer="F.Fab", w=0.1)
-    f.line(-10.5, 25.5, 10.5, 25.5)
-    f.text("1", -13.4, -24.13, size=1.0, thick=0.15)
-    f.rect(-12.75, -27.05, 12.75, 25.75, layer="F.CrtYd", w=0.05)
-    f.write((0, 27.0), (0, 28.5))
 
+def fp_xiao_header():
+    """Seeed Studio XIAO ESP32C6 on two 1x7 pin headers (Lite rev.L3: the user wants pin headers, not flat
+    soldering).  Origin = centre of the pin pattern, USB at the top (-y), pin 1 (D0) top-left.
+    The module sits 2.5 mm above the board on the header plastic, so its bottom test pads and the USB legs
+    can not touch the board (no keep-outs needed for them).  The copper keep-out under the chip antenna
+    (+4 mm past the module end) stays, for Wi-Fi / BLE."""
+    f = FP("XIAO_ESP32C6_Header",
+           "Seeed Studio XIAO ESP32C6 on 2 x 1x7 pin headers (2.54 mm, rows 15.24 mm apart). Antenna copper keep-out",
+           "Seeed XIAO ESP32C6 pin header")
+    for i in range(7):
+        y = round(-7.62 + 2.54 * i, 3)
+        f.pad(str(i + 1), -7.62, y, "rect" if i == 0 else "circle", 1.7, 1.7, 1.0)
+        f.pad(str(14 - i), 7.62, y, "circle", 1.7, 1.7, 1.0)
+    f.keepout("XIAO antenna", ["F.Cu", "B.Cu"], -8.9, 8.75, 8.9, 14.4)
+    # module outline 17.8 x 21.0 (the pin rows are inside it); USB-C receptacle 1.5 mm past the top end
+    f.rect(-8.9, -10.55, 8.9, 10.43)
+    f.rect(-8.9, -10.55, 8.9, 10.43, layer="F.Fab", w=0.1)
+    f.rect(-4.47, -12.05, 4.47, -4.75, layer="F.Fab", w=0.1)
+    f.rect(0.5, 8.3, 5.7, 10.3, layer="F.Fab", w=0.1)
+    f.text("ANT", 3.1, 9.3, layer="F.Fab", size=0.6, thick=0.1)
+    f.text("1", -7.62, -9.4, size=1.0, thick=0.15)
+    f.rect(-9.15, -12.3, 9.15, 10.7, layer="F.CrtYd", w=0.05)
+    f.write((0, 12.0), (0, 13.5))
+
+
+def fp_pl9823():
+    """PL9823-F5 (5 mm full-colour LED with controller).  Its legs come out in one row, 1.27 mm apart:
+    DIN, VDD, GND (the longest leg), DO.  The holes are staggered (+-0.9 mm) so that children can solder them
+    without bridges (the legs only need a small bend).  Origin = LED centre.  All pads round (1.4 mm) so that the
+    outline (r 3.05) fits the 5.8 mm flange and the LEDs can sit close to the board edge.
+    The dot INSIDE the outline, right beside the GND hole, marks the LONGEST leg (a PL9823 put in the wrong way
+    round gets VDD and GND swapped)."""
+    f = FP("LED_PL9823_5mm",
+           "PL9823-F5 5 mm addressable RGB LED (DIN VDD GND DO, 1.27 mm), staggered holes, dot = GND (longest leg)",
+           "LED RGB PL9823 NeoPixel WS2812 5mm")
+    for num, x, y in (("4", -1.905, -0.9), ("3", -0.635, 0.9), ("1", 0.635, -0.9), ("2", 1.905, 0.9)):
+        f.pad(num, x, y, "circle", 1.4, 1.4, 0.9)
+    f.circle(0, 0, 3.05)                             # flange (5.8 mm)
+    f.circle(0.635, -2.3, 0.3, w=0.1, fill=True)     # beside the GND hole = longest leg
+    f.circle(0, 0, 2.9, layer="F.Fab", w=0.1)
+    f.text("DIN", -1.905, -2.1, layer="F.Fab", size=0.5, thick=0.08)
+    f.circle(0, 0, 3.2, layer="F.CrtYd", w=0.05)
+    f.write((0, -4.3), (0, 4.3))
 
 def write_footprints():
-    fp_pico_direct()
+    fp_pl9823()
+    fp_xiao_header()
+    fp_buzzer_pkm13()
     fp_buzzer()
     fp_module()
     fp_reflector()
+    fp_lbr127hld()
     fp_battery_xh()
     fp_motor_pads()
 

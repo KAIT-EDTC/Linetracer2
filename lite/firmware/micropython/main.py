@@ -2,9 +2,18 @@
 #
 #   START short press : 1st time = auto calibration (robot spins on the line)
 #                       after that = run.  Press START again to stop.
-#   START long press  : change speed level 1..3 (hold until the Pico's LED lights, then let go;
-#                       the red LED blinks the new level)
-#   red LED on        : ready (the Lite board has no power LED)
+#   START long press  : change speed level 1..3 (hold until the LEDs go out, then let go;
+#                       the buzzer beeps and 1..3 LEDs light yellow)
+#   LEDs (6, full colour, 3 down each side): green = ready, blue = calibrating, red = calibration failed,
+#                       while running: lights run front -> rear on each side as fast as that wheel turns
+#                       (red when the line is lost)
+#   buzzer            : a short tune at power-on, "pi-pi-pi-PI" before it starts, a low tone when something failed
+#                       (the buzzer is on the START button's pin: it can not see a press while it sounds)
+#                       (hold START while switching on = quiet mode: no sound, the LED blinks instead)
+#   On USB alone the motors have NO power (they run from the batteries only): switch the battery box ON.
+#
+# The board can not measure the battery: when the cells run down the robot gets slower, and when they are
+# nearly empty the XIAO restarts as the motors start (the LEDs go out) -> put in new cells.
 #
 # Put the robot on the line before pressing START.
 
@@ -33,8 +42,13 @@ def run_course(base, kp, kd):
     t_prev = time.ticks_us()
     robot.led.value(0)
     robot.wait_release()
+    n = 0
+    left = right = base
     while not robot.start_pressed():
         pos = s.position()
+        n += 1
+        if n % 10 == 0:                     # running lights (about 0.3 ms, so not every time)
+            robot.led.flow(left, right, "cyan" if pos is not None else "red")
         now = time.ticks_us()
         dt = max(1, time.ticks_diff(now, t_prev)) / 1000.0   # ms
         t_prev = now
@@ -45,7 +59,8 @@ def run_course(base, kp, kd):
             if time.ticks_diff(time.ticks_ms(), lost_since) > 800:
                 break                       # gave up (off the course)
             turn = 60 if s.last_pos > 0 else -60
-            m.run(base * 0.3 + turn, base * 0.3 - turn)
+            left, right = base * 0.3 + turn, base * 0.3 - turn
+            m.run(left, right)
             continue
         lost_since = None
         err = pos                           # -1000 .. +1000  (+ = line is right)
@@ -53,43 +68,57 @@ def run_course(base, kp, kd):
         d_f += (d - d_f) * 0.3              # smooth it: with 3 sensors the position moves in steps
         last_err = err
         steer = kp * err + kd * d_f
-        m.run(base + steer, base - steer)
+        left, right = base + steer, base - steer
+        m.run(left, right)
     m.brake()
     time.sleep_ms(300)
     m.stop()
     robot.led.value(1)
 
 
-robot.blink(1)
-ok, v = robot.battery_ok()
-if robot.battery.usb():
-    print("USB connected (battery not measured). Motors run only with the battery switch ON.")
-else:
-    print("battery %.2f V" % v)
-if not ok:
-    robot.blink(5, 60)                      # low battery
+if robot.start_pressed():                   # START held at power-on -> quiet mode
+    robot.volume = 0
+    robot.blink(2, 100)
+    robot.wait_release()
+robot.melody([(1047, 120), (1319, 120), (1568, 200)])     # hello
+print("Linetracer2 Lite (XIAO ESP32C6). Motors run only with the battery switch ON.")
 robot.led.value(1)                          # ready
 
-while True:
-    kind = robot.wait_press()
-    if kind == "long":
-        level = level % len(LEVELS) + 1
-        print("level", level)
-        time.sleep_ms(300)
-        robot.led.value(0)
-        time.sleep_ms(300)
-        robot.blink(level, 200)
-        robot.led.value(1)
-        continue
-    if not s.calibrated():
-        robot.led.value(0)
-        ok = robot.auto_calibrate()
-        print("calibrated" if ok else "calibration failed", s.lo, s.hi)
-        if not ok:
-            robot.blink(4, 300)
-        robot.led.value(1)
-        continue
-    robot.blink(3, 80)                      # ready...
-    base, kp, kd = LEVELS[level]
-    run_course(base, kp, kd)
-    robot.wait_release()
+try:
+    while True:
+        kind = robot.wait_press()
+        if kind == "long":
+            level = level % len(LEVELS) + 1
+            print("level", level)
+            time.sleep_ms(300)
+            robot.led.value(0)
+            time.sleep_ms(300)
+            robot.led.count(level)          # 1..3 yellow LEDs on each side
+            for _ in range(level):
+                robot.beep(2000, 120)
+                time.sleep_ms(150)
+            time.sleep_ms(600)
+            robot.led.value(1)
+            continue
+        if not s.calibrated():
+            robot.led.fill("blue")              # calibrating
+            robot.beep(2000, 60)                # take your hand off the robot ...
+            time.sleep_ms(1000)                 # ... it starts to turn in 1 second
+            ok = robot.auto_calibrate()
+            print("calibrated" if ok else "calibration failed", s.lo, s.hi)
+            if not ok:
+                robot.led.fill("red")
+                robot.beep(400, 600)            # low tone = failed
+                time.sleep_ms(1000)
+            else:
+                robot.melody([(1568, 100), (2093, 200)])
+            robot.led.value(1)
+            continue
+        for f in (2000, 2000, 2000, 4000):      # pi-pi-pi-PI ... go!
+            robot.beep(f, 80 if f < 4000 else 250)
+            time.sleep_ms(250)
+        base, kp, kd = LEVELS[level]
+        run_course(base, kp, kd)
+        robot.wait_release()
+finally:
+    m.off()                                 # Ctrl-C in Thonny: motors off, driver in standby

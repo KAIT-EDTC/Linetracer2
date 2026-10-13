@@ -1,0 +1,155 @@
+(footprint "LED_PL9823_5mm"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "PL9823-F5 5 mm addressable RGB LED (DIN VDD GND DO, 1.27 mm), staggered holes, dot = GND (longest leg)")
+	(tags "LED RGB PL9823 NeoPixel WS2812 5mm")
+	(property "Reference" "REF**"
+		(at 0 -4.3 0)
+		(layer "F.SilkS")
+		(uuid "ddd9bf18-b26d-50f2-8726-5a5bdc7e1809")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "LED_PL9823_5mm"
+		(at 0 4.3 0)
+		(layer "F.Fab")
+		(uuid "607f2775-3bd4-5020-adff-83a217a39ee8")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "ccae7401-4a76-535f-9dcc-123dd7c612ff")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" "PL9823-F5 5 mm addressable RGB LED (DIN VDD GND DO, 1.27 mm), staggered holes, dot = GND (longest leg)"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "d9342158-3c50-560c-9630-b5299038ad00")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_circle
+		(center 0 0)
+		(end 3.05 0)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "b2ee2d48-0c34-5b79-9c63-e5534639aca9")
+	)
+	(fp_circle
+		(center 0.635 -2.3)
+		(end 0.935 -2.3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill yes)
+		(layer "F.SilkS")
+		(uuid "854fad2b-1379-5cfa-8691-53b0c521d01a")
+	)
+	(fp_circle
+		(center 0 0)
+		(end 3.2 0)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "86281f40-edb7-5a86-bfdd-e59c12a7f2ab")
+	)
+	(fp_circle
+		(center 0 0)
+		(end 2.9 0)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "ec70dbb2-a945-50dd-9bdb-c3be7d4cd800")
+	)
+	(fp_text user "DIN"
+		(at -1.905 -2.1 0)
+		(layer "F.Fab")
+		(uuid "db61e4ec-0c3c-5295-bb3d-2baf7896cd3a")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.08)
+			)
+		)
+	)
+	(pad "1" thru_hole circle
+		(at 0.635 -0.9)
+		(size 1.4 1.4)
+		(drill 0.9)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "eb8247a0-1c6d-52e4-a62a-8fec4f49a282")
+	)
+	(pad "2" thru_hole circle
+		(at 1.905 0.9)
+		(size 1.4 1.4)
+		(drill 0.9)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "a1ff62e6-2647-5c00-a84e-267876425122")
+	)
+	(pad "3" thru_hole circle
+		(at -0.635 0.9)
+		(size 1.4 1.4)
+		(drill 0.9)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "6a8b9b3a-337f-5243-a3aa-f1acca746462")
+	)
+	(pad "4" thru_hole circle
+		(at -1.905 -0.9)
+		(size 1.4 1.4)
+		(drill 0.9)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "a5a67cd2-da6b-531c-bdd1-1bdf2c623aee")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/lib/3d/LED_PL9823_5mm.wrl"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)
