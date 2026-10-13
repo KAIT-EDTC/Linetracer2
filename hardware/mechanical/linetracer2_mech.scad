@@ -41,12 +41,12 @@ PCB_T      = 1.6;
 FLOOR_Z    = -5.6;          // floor relative to PCB top
 AXLE_Y     = 88;            // must match gen_pcb.py
 // gear centre distance: 12.0 (m0.5 x (8 + 40) / 2) + GEAR_CD_ADD.  2026-10-13: the printed mesh was a little too
-// tight (crunchy when the wheel is turned by hand) -> the motor moves 0.15 mm forward, away from the axle (0.10 was
-// tried first; the user asked for 0.15).  Contact ratio 1.51 (12.0) -> 1.23 (12.15); with the 0.2 mm worst-case
-// bearing play pulling the gears apart it drops to about 0.9, so do not go further.  If it is loose / skips, 0.10.  The PCB (gen_pcb.py) keeps 76.0: only
-// its silk outline uses it.
-GEAR_CD_ADD = 0.15;
-MOTOR_Y    = AXLE_Y - (0.5 * (8 + 40) / 2 + GEAR_CD_ADD);   // motor shaft line (75.85)
+// tight (crunchy when the wheel is turned by hand) -> the motor moves 0.1 mm forward, away from the axle, and the
+// 40T teeth are thinner (GEAR_BACKLASH 0.15).  Contact ratio 1.51 (12.0) -> 1.32 (12.1).  0.15 was tried and put
+// back: 1.23, and with the 0.2 mm worst-case bearing play pulling the gears apart it drops to about 0.9.
+// The PCB (gen_pcb.py) keeps 76.0: only its silk outline uses it.
+GEAR_CD_ADD = 0.10;
+MOTOR_Y    = AXLE_Y - (0.5 * (8 + 40) / 2 + GEAR_CD_ADD);   // motor shaft line (75.9)
 AXIS_Z     = 10.4;          // wheel radius 16 - 5.6
 NOTCH_X    = 17.5;          // PCB edge in the rear notch (left side)
 HOLES      = [[30, 62], [30, 96]];   // M3 holes (left frame); right frame = mirrored (70, ..)
@@ -74,7 +74,7 @@ TERM_NOTCH = true;                     // notch in the cradle walls for the tabs
 PINION_T = 8;  SPUR_T = 40;  MOD = 0.5;
 GEAR_X0 = 11.5; GEAR_X1 = 15.5;        // spur gear face (outer face on the print bed)
 GEAR_HUB_L = 0.8;                      // hub on the inner side (11.5 .. 16.3)
-GEAR_BACKLASH = 0.10;                  // tooth thinning for printing (mm on the pitch circle)
+GEAR_BACKLASH = 0.15;                  // tooth thinning for printing (mm on the pitch circle; 0.10 until 2026-10-13: crunchy)
 CLR = 0.25;                            // printing clearance
 
 // frame
