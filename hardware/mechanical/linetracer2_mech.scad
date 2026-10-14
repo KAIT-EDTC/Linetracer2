@@ -99,14 +99,14 @@ HANG_Z   = 0.0;                        // lowest point (flat bottom -> prints wi
 HUB_D   = 5.0;                         // round part of the wheel hub, inside the outer wall
 HUB_HEX = 4.0;                         // hex across flats, inside the gear
 HUB_HEX_CLR = 0.2;                     // gear hex hole = HUB_HEX + this (was 0.1: too tight)
-HUB_BORE = HUB_D + 0.5;                // the outer wall's bearing for the hub (was + 0.4), teardrop top
+HUB_BORE = HUB_D + 0.30;               // the outer wall's bearing for the hub, teardrop top (+0.4 brass, +0.5 until 2026-10-14)
 HUB_X0 = GEAR_X0 - 0.1;                // hub: round from the wheel face to here, hex from here ...
 HUB_X1 = GEAR_X1 - 0.2;                // ... to here (0.2 short of the end of the gear's hex hole)
 PIN_D   = 3.5;                         // printed stub axle (the brass rod was 2.0)
-PIN_BORE = PIN_D + 0.35;               // blind bearing in the motor plate, teardrop top
+PIN_BORE = PIN_D + 0.25;               // blind bearing in the motor plate, teardrop top (+0.35 until 2026-10-14)
 PIN_GEAR_CLR = 0.4;                    // the pin passes the gear's hub: free
 PIN_TIP_CLR = 0.4;                     // the pin tip stops this far from the bottom of the blind hole
-AXIAL_CLR = 0.5;                       // wheel <-> outer wall boss and boss <-> gear (was 0.3 / 0.2)
+AXIAL_CLR = 0.4;                       // wheel <-> outer wall boss and boss <-> gear (was 0.3 / 0.2, then 0.5 until 2026-10-14)
 module hex2d(af) circle(d = af / cos(30), $fn = 6);
 // hole along local +z with a 45 deg roof pointing to local -x, which rotate([0, 90, 0]) turns into world +z (up):
 // round bottom (the bearing), pointed top (prints without sagging)
@@ -115,9 +115,22 @@ module teardrop(d, h) linear_extrude(h) intersection() {      // point cut flat 
     translate([-(d / 2 + 0.4), -d]) square(2 * d);
 }
 
-AXLE_END_X = 19.3;                     // blind end of the stub axle's bearing in the motor plate
+// 2026-10-14 (wheel wobble): the wheel is carried by two short bearings only (the hub in the outer wall, the stub axle
+// in the motor plate).  The play of the wheel's axis is about (hub clearance + pin clearance) / span, and it shows
+// at the rim multiplied by the 14.8 mm radius.  Smaller clearances, a longer pin bearing (blind end 19.3 -> 19.9,
+// 0.6 mm of wall left in front of the motor can) and less axial float; the echo below prints the numbers.
+AXLE_END_X = 19.9;                     // blind end of the stub axle's bearing in the motor plate
 PIN_X1 = AXLE_END_X - PIN_TIP_CLR;     // tip of the printed stub axle
 WHEEL_X1 = 7.2;                        // inner face of the wheel (0.3 mm from the spacer boss)
+// worst-case wobble of the wheel (both bearings at opposite ends of their clearance): a = hub half play, b = pin half
+// play, span = distance between the two bearing centres, lever = hub bearing centre -> wheel centre plane
+_WB_A = (HUB_BORE - HUB_D) / 2;  _WB_B = (PIN_BORE - PIN_D) / 2;
+_WB_C1 = (WHEEL_X1 + AXIAL_CLR + GEAR_X0 - AXIAL_CLR) / 2;           // hub bearing centre (spacer bosses)
+_WB_C2 = (PLATE_X0 + AXLE_END_X) / 2;                                // pin bearing centre (a bit deeper than the pin tip)
+_WB_SPAN = _WB_C2 - _WB_C1;  _WB_LEVER = _WB_C1 - WHEEL_X1 + 3.5;    // wheel centre plane = 3.5 mm outside WHEEL_X1
+echo(str("wheel play (worst case): sideways at the wheel ", round(100 * (_WB_A * (1 + _WB_LEVER / _WB_SPAN) + _WB_B * _WB_LEVER / _WB_SPAN)) / 100,
+         " mm each way, rim sways +-", round(100 * (_WB_A + _WB_B) / _WB_SPAN * 14.8) / 100, " mm, gear centre +-",
+         round(100 * (_WB_A * (1 - (GEAR_X0 + 2 - _WB_C1) / _WB_SPAN) + _WB_B * (GEAR_X0 + 2 - _WB_C1) / _WB_SPAN)) / 100, " mm"));
 TOWER_D  = 9.6;
 TOWER_TOP = 15.0;                      // = deck bottom
 TOWER_FRONT_CLIP = 65.6;               // front tower must not reach into the motor can
