@@ -465,7 +465,7 @@ robot.motors.battery_volt = 3.7 # 電池の電圧（決め打ち）。ニッケ�
 | USB だけつないでいる | **モーターは動かない**（モーターの電源は電池だけ。D1 があるので USB からは来ない）。キャリブレーションは必ず「失敗」になる |
 | 走り出すと LED が消えて止まる（XIAO がリセット） | 電池が少ない → 電池を替える |
 
-授業のサンプル: `01_led_blink.py`、`02_button.py`、`03_sensor_monitor.py`、`04_motor_test.py`、`05_simple_tracer.py`、**`06_buzzer.py`（ドレミ）**、**`07_rgb_led.py`（フルカラー LED: 色・流れる光・線のある側）**、**`08_test_pads.py`（先生用: テストパッドを測るとき）**。
+**`00_xiao_check.py`（先生用: 基板に付ける前に、XIAO だけで「ライントレーサーで使う所」を調べる。D0〜D10 のはんだブリッジ・ショート、PWM 20 kHz × 4 ＋ブザー、フルカラー LED の信号、センサーを読む速さ、ジャンパー線 1 本で ADC D0〜D2）**。授業のサンプル: `01_led_blink.py`、`02_button.py`、`03_sensor_monitor.py`、`04_motor_test.py`、`05_simple_tracer.py`、**`06_buzzer.py`（ドレミ）**、**`07_rgb_led.py`（フルカラー LED: 色・流れる光・線のある側）**、**`08_test_pads.py`（先生用: テストパッドを測るとき）**。
 
 ---
 
