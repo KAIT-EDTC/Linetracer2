@@ -61,6 +61,25 @@
 
 ---
 
+## プログラムの書き込みかた（Thonny）
+
+はじめの 1 回だけ 1〜3、そのあとは 4〜5 をくり返す。
+
+1. **Thonny を入れる**（thonny.org。Windows / Mac）。
+2. **XIAO に MicroPython を入れる**: XIAO を USB でつなぎ、Thonny の「ツール → オプション → インタプリタ」で **MicroPython (ESP32)** を選ぶ →
+   右下の「**MicroPython をインストールまたは更新（esptool）**」→ ポート（`USB JTAG/serial debug unit` など）、family **ESP32-C6**、variant **Espressif • ESP32-C6** を選んで「インストール」。
+   - 書き込めないとき: XIAO の **B（BOOT）ボタンを押したまま USB をさす** → もう一度インストール → 終わったら USB をさし直す。
+   - くわしくは `../README.md` §8.1（esptool で書くときのコマンドもある）。
+3. 下の「シェル」に `>>>` が出れば OK（出ないときは赤い **STOP** ボタン）。`print("hello")` と打って Enter → `hello` と出る。
+4. **`linetracer.py` を XIAO に保存**（ステップ 1 から使う。1 回でよい）: Thonny の「表示 → ファイル」で左上に PC のファイル、左下に XIAO の中身が出る。
+   PC の `lite/firmware/micropython/linetracer.py` を右クリック →「**/ にアップロード**」。
+5. **試すプログラムを開いて ▶（実行、F5）**: `examples/00_xiao_check.py` などを Thonny で開いて ▶ を押す。PC のファイルがそのまま XIAO で動く（XIAO に保存しなくてよい）。止めるときは **STOP**。
+
+- **`main.py` はまだ XIAO に保存しない**。`main.py` という名前のファイルは、電源を入れると勝手に動き出す（ボタンでモーターが回る）。ブレッドボードで試している間は ▶ で動かし、全部そろってから保存する。
+- まちがえて保存したら、「表示 → ファイル」の XIAO 側で `main.py` を右クリック →「削除」。
+
+---
+
 ## ステップ 0: XIAO だけ（配線なし）
 
 - `examples/00_xiao_check.py` を動かす（**ブレッドボードにさす前**、XIAO を USB だけにつないで）。ピン・PWM・ADC などを調べ、「ぜんぶ OK」か NG の場所を表示する。
