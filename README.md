@@ -57,6 +57,7 @@ rev.L2（2026-10-05）でマイコンを **Seeed Studio XIAO ESP32C6**、セン�
 | [docs/08_knowledge.md](docs/08_knowledge.md) | 知見メモ（部品のクセ、買い方、KiCad/Freerouting/OpenSCAD のハマりどころ、設計判断） |
 | [lite/README.md](lite/README.md) | **Lite rev.L3**（XIAO ESP32C6 ＋ LBR-127HLD ＋ ブザー。変更点と理由、配線のルール、コスト比較、回路・基板・部品表・組み立て・ソフトの違い） |
 | [lite/docs/assembly.md](lite/docs/assembly.md) | Lite の組み立て手順書（基板の記号の見かた、つくる順番 ①〜⑮） |
+| [lite/docs/breadboard.md](lite/docs/breadboard.md) | Lite の部品をブレッドボードで 1 種類ずつ試す配線（ボタン・ブザー → フルカラー LED → センサー → モーター）と、動かすプログラム |
 | [lite/hardware/Linetracer2-Lite_assembly.stl](lite/hardware/Linetracer2-Lite_assembly.stl) | **Lite のロボット全体の 3D**（基板・部品・枠・モーター・ギヤ・電池ボックス・キャスター。STL、ブラウザで回して見られる。色つきは同じ名前の `.glb`） |
 | [hardware/mechanical/README.md](hardware/mechanical/README.md) | 3D プリント部品と P1S の印刷設定、ねじの一覧 |
 | [hardware/mechanical/assembly.stl](hardware/mechanical/assembly.stl) | 全体を組み立てた 3D（STL、ブラウザで回して見られる） |
