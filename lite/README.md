@@ -5,7 +5,7 @@
 > **枠・デッキ・平歯車・車輪の 3D プリント部品、ねじ、モーター、電池ボックス、枠のねじ穴は標準版と共通**。違うのは基板（外形と中身）・ソフト・**前の支え（高さ 7.5 mm のボールキャスターかスキッド）**。
 > **Lite のファイルはすべてこの `lite/` フォルダの中**（下のパスは `lite/` からの相対パス）。標準版のファイル（リポジトリ直下の `hardware/` `docs/` `firmware/`）とは混ざらない。
 > 回路図: `hardware/kicad/Linetracer2-Lite.kicad_sch`（PDF: `docs/Linetracer2-Lite_schematic.pdf`）
-> 製造データ: `hardware/Linetracer2-Lite_rev.L3_gerber.zip`　ソフト: `firmware/micropython/`　組み立て手順書: [`docs/assembly.md`](docs/assembly.md)
+> 製造データ: `hardware/Linetracer2-Lite_rev.L3_gerber.zip`　ソフト: `firmware/micropython/`（Arduino C++ 版: [`firmware/arduino/`](firmware/arduino/README.md)）　組み立て手順書: [`docs/assembly.md`](docs/assembly.md)
 > **ロボット全体の 3D モデル**: `hardware/Linetracer2-Lite_assembly.stl`（GitHub 上でそのまま回して見られる）、色つき `hardware/Linetracer2-Lite_assembly.glb`。部品付き基板だけの STEP: `hardware/kicad/Linetracer2-Lite_pcb.step`
 > 前の版 rev.L2（XIAO じか付け、自動配線）は git の履歴とプルリクエスト #3 に、rev.L1（Pico ＋ LBR-123F）はコミット `1db5a53` に残っている。
 
@@ -466,6 +466,11 @@ robot.motors.battery_volt = 3.7 # 電池の電圧（決め打ち）。ニッケ�
 | 走り出すと LED が消えて止まる（XIAO がリセット） | 電池が少ない → 電池を替える |
 
 授業のサンプル: `01_led_blink.py`、`02_button.py`、`03_sensor_monitor.py`、`04_motor_test.py`、`05_simple_tracer.py`、**`06_buzzer.py`（ドレミ）**、**`07_rgb_led.py`（フルカラー LED: 色・流れる光・線のある側）**、**`08_test_pads.py`（先生用: テストパッドを測るとき）**。
+
+
+### 8.3 Arduino（C++）版（`firmware/arduino/`、2026-10-27）
+
+同じ基板を Arduino IDE（esp32 3.x、ボード XIAO_ESP32C6）で動かす版。ライブラリ `Linetracer2Lite` とスケッチ 3 つ: **`01_LineTrace`**（`main.py` と同じ操作）、**`02_SelfTest`**（先生用の動作チェック: LED・ブザー・ボタン・センサー・モーター・Wi-Fi）、**`03_WiFiControl`**（ロボットが Wi-Fi の電波を出し、スマホのブラウザでラジコンのように動かす）。入れ方と使い方は [`firmware/arduino/README.md`](firmware/arduino/README.md)。Arduino で書き込むと MicroPython は消える（戻すときは §8.1）。
 
 ---
 
