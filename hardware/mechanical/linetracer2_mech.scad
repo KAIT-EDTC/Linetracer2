@@ -466,6 +466,9 @@ module wheel() {
 }
 
 // optional tyre printed in TPU 95A instead of the O-ring (same groove)
+// tread: straight grooves across the tyre (vertical when printed flat -> no supports).
+// The lands keep the 31.2 mm outer diameter, so TYRE_R and the sensor height do not change.
+TREAD_N = 30; TREAD_W = 1.0; TREAD_D = 0.6;   // 30 grooves, 1.0 wide (pitch 3.3 mm), 0.6 deep (3.0 mm of TPU left)
 module tire_tpu() {
     difference() {
         hull() {
@@ -473,6 +476,8 @@ module tire_tpu() {
             cylinder(d = 30.4, h = 3.4);
         }
         translate([0, 0, -1]) cylinder(d = 24.0, h = 6);
+        for (i = [0:TREAD_N - 1]) rotate([0, 0, i * 360 / TREAD_N])
+            translate([31.2 / 2 - TREAD_D, -TREAD_W / 2, -1]) cube([2, TREAD_W, 6]);
     }
 }
 
