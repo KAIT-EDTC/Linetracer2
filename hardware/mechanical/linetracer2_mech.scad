@@ -40,7 +40,13 @@ $fn = 64;
 PCB_T      = 1.6;
 FLOOR_Z    = -5.6;          // floor relative to PCB top
 AXLE_Y     = 88;            // must match gen_pcb.py
-MOTOR_Y    = 76;            // motor shaft line (AXLE_Y - 12)
+// gear centre distance: 12.0 (m0.5 x (8 + 40) / 2) + GEAR_CD_ADD.  2026-10-13: the printed mesh was a little too
+// tight (crunchy when the wheel is turned by hand) -> the motor moves 0.1 mm forward, away from the axle, and the
+// 40T teeth are thinner (GEAR_BACKLASH 0.15).  Contact ratio 1.51 (12.0) -> 1.32 (12.1).  0.15 was tried and put
+// back: 1.23, and with the 0.2 mm worst-case bearing play pulling the gears apart it drops to about 0.9.
+// The PCB (gen_pcb.py) keeps 76.0: only its silk outline uses it.
+GEAR_CD_ADD = 0.10;
+MOTOR_Y    = AXLE_Y - (0.5 * (8 + 40) / 2 + GEAR_CD_ADD);   // motor shaft line (75.9)
 AXIS_Z     = 10.4;          // wheel radius 16 - 5.6
 NOTCH_X    = 17.5;          // PCB edge in the rear notch (left side)
 HOLES      = [[30, 62], [30, 96]];   // M3 holes (left frame); right frame = mirrored (70, ..)
@@ -52,12 +58,23 @@ BOSS_D = 6.0; BOSS_L = 1.7;            // front bearing boss
 REAR_BOSS_X1 = 49.0;
 SHAFT_TIP_X = 11.0;
 MOTOR_TOP = AXIS_Z + CAN_H / 2;        // 17.9
+// Solder terminals (2026-10-13 re-measure): the old model (3.5 x 1.2 x 3 at x 45.3.., 9.8 mm from the axis) stayed
+// INSIDE the can outline (r 10.05) and behind the can, but the real tabs are wider and stick out past the sides of
+// the can at its rear edge, so they hit the rear end of the cradle walls (x 44.8, r 10.15 .. 11.85).  They are now
+// a generous keep-out box (worst case of the parts at hand, not a nominal drawing):
+TERM_X0 = CAN_X1 - 2.5;                // 42.8: the tab's root is in the end cap, which sits inside the can's rear edge
+TERM_X1 = REAR_BOSS_X1 - 0.2;          // 48.8
+TERM_R0 = 8.5;                         // from the end cap ...
+TERM_R  = 12.5;                        // ... out to 12.5 mm from the axis (the old model: 9.8)
+TERM_HZ = 3.0;                         // half width of the tab (6 mm, centred on the axis height; the old model: 1.5)
+TERM_CLR = 0.4;                        // air around the tabs in the frame
+TERM_NOTCH = true;                     // notch in the cradle walls for the tabs (false = positive control)
 
 // gears m0.5
 PINION_T = 8;  SPUR_T = 40;  MOD = 0.5;
 GEAR_X0 = 11.5; GEAR_X1 = 15.5;        // spur gear face (outer face on the print bed)
 GEAR_HUB_L = 0.8;                      // hub on the inner side (11.5 .. 16.3)
-GEAR_BACKLASH = 0.10;                  // tooth thinning for printing (mm on the pitch circle)
+GEAR_BACKLASH = 0.15;                  // tooth thinning for printing (mm on the pitch circle; 0.10 until 2026-10-13: crunchy)
 CLR = 0.25;                            // printing clearance
 
 // frame
@@ -82,14 +99,14 @@ HANG_Z   = 0.0;                        // lowest point (flat bottom -> prints wi
 HUB_D   = 5.0;                         // round part of the wheel hub, inside the outer wall
 HUB_HEX = 4.0;                         // hex across flats, inside the gear
 HUB_HEX_CLR = 0.2;                     // gear hex hole = HUB_HEX + this (was 0.1: too tight)
-HUB_BORE = HUB_D + 0.5;                // the outer wall's bearing for the hub (was + 0.4), teardrop top
+HUB_BORE = HUB_D + 0.30;               // the outer wall's bearing for the hub, teardrop top (+0.4 brass, +0.5 until 2026-10-14)
 HUB_X0 = GEAR_X0 - 0.1;                // hub: round from the wheel face to here, hex from here ...
 HUB_X1 = GEAR_X1 - 0.2;                // ... to here (0.2 short of the end of the gear's hex hole)
 PIN_D   = 3.5;                         // printed stub axle (the brass rod was 2.0)
-PIN_BORE = PIN_D + 0.35;               // blind bearing in the motor plate, teardrop top
+PIN_BORE = PIN_D + 0.25;               // blind bearing in the motor plate, teardrop top (+0.35 until 2026-10-14)
 PIN_GEAR_CLR = 0.4;                    // the pin passes the gear's hub: free
 PIN_TIP_CLR = 0.4;                     // the pin tip stops this far from the bottom of the blind hole
-AXIAL_CLR = 0.5;                       // wheel <-> outer wall boss and boss <-> gear (was 0.3 / 0.2)
+AXIAL_CLR = 0.4;                       // wheel <-> outer wall boss and boss <-> gear (was 0.3 / 0.2, then 0.5 until 2026-10-14)
 module hex2d(af) circle(d = af / cos(30), $fn = 6);
 // hole along local +z with a 45 deg roof pointing to local -x, which rotate([0, 90, 0]) turns into world +z (up):
 // round bottom (the bearing), pointed top (prints without sagging)
@@ -98,9 +115,22 @@ module teardrop(d, h) linear_extrude(h) intersection() {      // point cut flat 
     translate([-(d / 2 + 0.4), -d]) square(2 * d);
 }
 
-AXLE_END_X = 19.3;                     // blind end of the stub axle's bearing in the motor plate
+// 2026-10-14 (wheel wobble): the wheel is carried by two short bearings only (the hub in the outer wall, the stub axle
+// in the motor plate).  The play of the wheel's axis is about (hub clearance + pin clearance) / span, and it shows
+// at the rim multiplied by the 14.8 mm radius.  Smaller clearances, a longer pin bearing (blind end 19.3 -> 19.9,
+// 0.6 mm of wall left in front of the motor can) and less axial float; the echo below prints the numbers.
+AXLE_END_X = 19.9;                     // blind end of the stub axle's bearing in the motor plate
 PIN_X1 = AXLE_END_X - PIN_TIP_CLR;     // tip of the printed stub axle
 WHEEL_X1 = 7.2;                        // inner face of the wheel (0.3 mm from the spacer boss)
+// worst-case wobble of the wheel (both bearings at opposite ends of their clearance): a = hub half play, b = pin half
+// play, span = distance between the two bearing centres, lever = hub bearing centre -> wheel centre plane
+_WB_A = (HUB_BORE - HUB_D) / 2;  _WB_B = (PIN_BORE - PIN_D) / 2;
+_WB_C1 = (WHEEL_X1 + AXIAL_CLR + GEAR_X0 - AXIAL_CLR) / 2;           // hub bearing centre (spacer bosses)
+_WB_C2 = (PLATE_X0 + AXLE_END_X) / 2;                                // pin bearing centre (a bit deeper than the pin tip)
+_WB_SPAN = _WB_C2 - _WB_C1;  _WB_LEVER = _WB_C1 - WHEEL_X1 + 3.5;    // wheel centre plane = 3.5 mm outside WHEEL_X1
+echo(str("wheel play (worst case): sideways at the wheel ", round(100 * (_WB_A * (1 + _WB_LEVER / _WB_SPAN) + _WB_B * _WB_LEVER / _WB_SPAN)) / 100,
+         " mm each way, rim sways +-", round(100 * (_WB_A + _WB_B) / _WB_SPAN * 14.8) / 100, " mm, gear centre +-",
+         round(100 * (_WB_A * (1 - (GEAR_X0 + 2 - _WB_C1) / _WB_SPAN) + _WB_B * (GEAR_X0 + 2 - _WB_C1) / _WB_SPAN)) / 100, " mm"));
 TOWER_D  = 9.6;
 TOWER_TOP = 15.0;                      // = deck bottom
 TOWER_FRONT_CLIP = 65.6;               // front tower must not reach into the motor can
@@ -164,11 +194,15 @@ module motor_left() {
     color("silver") along_x(CAN_X0, CAN_X1 - CAN_X0) can_profile();
     color("white") translate([CAN_X1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0])
         cylinder(d = 10, h = REAR_BOSS_X1 - CAN_X1);
-    // terminals on the rounded sides of the end cap
-    color("gold") for (s = [-1, 1]) translate([CAN_X1, MOTOR_Y + s * 9.2 - 0.6, AXIS_Z - 1.5]) cube([3.5, 1.2, 3]);
+    color("gold") motor_terminals();
     color("silver") translate([FRONT_X0, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = BOSS_D, h = BOSS_L);
     color("gray") translate([SHAFT_TIP_X, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 2, h = FRONT_X0 - SHAFT_TIP_X);
 }
+
+// solder terminals on the rounded sides of the end cap (keep-out box, see TERM_*); dx = shift along +x
+module motor_terminals(dx = 0, sides = [-1, 1]) for (s = sides)
+    translate([TERM_X0 + dx, MOTOR_Y + (s > 0 ? TERM_R0 : -TERM_R), AXIS_Z - TERM_HZ])
+        cube([TERM_X1 - TERM_X0, TERM_R - TERM_R0, 2 * TERM_HZ]);
 
 module gear_disc(teeth, x0, x1, y, col) {
     color(col) translate([x0, y, AXIS_Z]) rotate([0, 90, 0])
@@ -221,6 +255,7 @@ FRAME_LABEL_XY = [40.5, 94.5];
 module frame_label(t, x) translate([x, FRAME_LABEL_XY[1], BASE_T - 0.4]) linear_extrude(1)
     text(t, size = 6, font = "Liberation Sans:style=Bold", halign = "center", valign = "center");
 
+TERM_NOTCH_X0 = min(TERM_X0, 100 - (TERM_X1 + MOTOR_SLIDE)) - TERM_CLR;   // 40.3
 module frame_left(lbl = true) {
     difference() {
         union() {
@@ -251,6 +286,10 @@ module frame_left(lbl = true) {
         translate([NOTCH_X, 0, -PCB_T]) cube([100, 120, PCB_T]);
         // motor can, boss, shaft, terminals
         along_x(CAN_X0 - 0.01, CAN_X1 - CAN_X0 + 10) offset(delta = 0.1) can_profile();
+        // notch at the rear end of the cradle walls, open to the outside: room for the solder terminals (and the
+        // soldered wires) of this motor, and of the OTHER motor while it is laid in shifted by MOTOR_SLIDE (its rear
+        // end is then over this cradle: x 100 - (TERM_X1 + MOTOR_SLIDE) = 40.7).  The wall below z 7.0 stays.
+        if (TERM_NOTCH) translate([TERM_NOTCH_X0, MOTOR_Y - CAN_R - WALL - 1, AXIS_Z - TERM_HZ - TERM_CLR]) cube([CAN_X1, CAN_W + 2 * WALL + 2, 20]);
         // no snap interference next to the front tower (the tower makes the wall stiff there)
         along_x(HOLES[0][0] - TOWER_D / 2 - 0.5, TOWER_D + 1) offset(delta = 0.3) can_profile();
         translate([FRONT_X0 - 1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = BOSS_D + 0.3, h = BOSS_L + 2);
@@ -875,7 +914,7 @@ SLIDE_END = 0;                         // positive control: < 0 pushes the motor
 module motor_parts(dx = 0, pin_d = MOD * (PINION_T + 2) + PIN_MARGIN) translate([dx, 0, 0]) {
     along_x(CAN_X0, CAN_X1 - CAN_X0) can_profile();                                                    // can
     translate([CAN_X1, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 10, h = REAR_BOSS_X1 - CAN_X1);  // rear boss
-    for (s = [-1, 1]) translate([CAN_X1, MOTOR_Y + s * 9.2 - 0.6, AXIS_Z - 1.5]) cube([3.5, 1.2, 3]);       // terminals
+    motor_terminals();                                                                                    // terminals
     motor_front(0, pin_d);
 }
 module motor_front(dx = 0, pin_d = MOD * (PINION_T + 2) + PIN_MARGIN) translate([dx, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) {
@@ -887,7 +926,7 @@ module motor_front(dx = 0, pin_d = MOD * (PINION_T + 2) + PIN_MARGIN) translate(
 module motor_slide_sweep(dx0, dx1) {
     hull() { along_x(CAN_X0 + dx0, CAN_X1 - CAN_X0) can_profile(); along_x(CAN_X0 + dx1, CAN_X1 - CAN_X0) can_profile(); }
     hull() for (d = [dx0, dx1]) translate([CAN_X1 + d, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = 10, h = REAR_BOSS_X1 - CAN_X1);
-    for (s = [-1, 1]) hull() for (d = [dx0, dx1]) translate([CAN_X1 + d, MOTOR_Y + s * 9.2 - 0.6, AXIS_Z - 1.5]) cube([3.5, 1.2, 3]);
+    for (s = [-1, 1]) hull() for (d = [dx0, dx1]) motor_terminals(d, [s]);
     hull() for (d = [dx0, dx1]) translate([d, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) translate([0, 0, FRONT_X0]) cylinder(d = BOSS_D, h = BOSS_L);
     hull() for (d = [dx0, dx1]) translate([d, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) translate([0, 0, SHAFT_TIP_X]) cylinder(d = MOD * (PINION_T + 2) + PIN_MARGIN, h = 4);
 }
@@ -897,7 +936,7 @@ module motor_drop_sweep() {
     hull() for (z = [0, 25]) translate([0, 0, z]) motor_front(MOTOR_SLIDE);
     hull() for (z = [0, 25]) translate([MOTOR_SLIDE, 0, z]) along_x(CAN_X0, CAN_X1 - CAN_X0) can_profile();
     hull() for (z = [0, 25]) translate([MOTOR_SLIDE, MOTOR_Y, AXIS_Z + z]) rotate([0, 90, 0]) translate([0, 0, CAN_X1]) cylinder(d = 10, h = REAR_BOSS_X1 - CAN_X1);
-    for (s = [-1, 1]) hull() for (z = [0, 25]) translate([CAN_X1 + MOTOR_SLIDE, MOTOR_Y + s * 9.2 - 0.6, AXIS_Z - 1.5 + z]) cube([3.5, 1.2, 3]);
+    for (s = [-1, 1]) hull() for (z = [0, 25]) translate([0, 0, z]) motor_terminals(MOTOR_SLIDE, [s]);
 }
 module snap_lips() translate([CAN_X0 + 0.5 - 0.01, MOTOR_Y - CAN_R - WALL - 0.01, AXIS_Z]) cube([CAN_X1 - CAN_X0 - 1.0 + 0.02, CAN_W + 2 * WALL + 0.02, 2.2 + 0.01]);
 module pinion_round(dx) translate([SHAFT_TIP_X + dx, MOTOR_Y, AXIS_Z]) rotate([0, 90, 0]) cylinder(d = MOD * (PINION_T + 2) + PIN_MARGIN, h = 4);
@@ -989,6 +1028,12 @@ else if (part == "check_shaft_wall") intersection() {    // the longest allowed 
         translate([0, 0, SHAFT_TIP_X]) cylinder(d = MOD * (PINION_T + 2) + 0.1, h = 4);
     }
 }
+// the left motor laid in shifted by MOTOR_SLIDE: its rear end (boss + terminals) is then over the OTHER cradle
+// (the right frame, before the right motor is in), whose walls do not flex for it -> no snap exception here
+else if (part == "check_terminal_other") intersection() { frame_right(); union() {
+    for (s = [-1, 1]) hull() for (z = [0, 25]) translate([0, 0, z]) motor_terminals(MOTOR_SLIDE, [s]);
+    hull() for (z = [0, 25]) translate([CAN_X1 + MOTOR_SLIDE, MOTOR_Y, AXIS_Z + z]) rotate([0, 90, 0]) cylinder(d = 10, h = REAR_BOSS_X1 - CAN_X1);
+} }
 else if (part == "check_pinion_spur") intersection() { translate([GEAR_X0, AXLE_Y, AXIS_Z]) rotate([0, 90, 0]) gear40(); pinion_slide_teeth(); }
 else if (part == "check_wheel_frame") intersection() { translate([WHEEL_X1, AXLE_Y, AXIS_Z]) rotate([0, -90, 0]) wheel(); frame_left(); }
 // the wheel pushed in from the outside: every position on the way in (0.25 mm steps) vs. the frame and the gear
