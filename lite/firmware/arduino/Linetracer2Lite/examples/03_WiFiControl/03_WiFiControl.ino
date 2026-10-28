@@ -17,6 +17,7 @@
 
 const char* PASSWORD = "edtc1234";  // 8 文字 以上。かえてよい
 const uint32_t WATCHDOG_MS = 1000;  // これだけ スマホから 合図が ないと 止まる
+const bool REVERSE = true;          // パッドを 上に たおすと 後ろに 走るとき true（前と 後ろを 入れかえる。回る 向きは そのまま）
 
 Robot robot;
 LineFollower follower(robot);
@@ -116,6 +117,7 @@ void handleNotFound() {
 void setup() {
   Serial.begin(115200);
   robot.begin();
+  robot.motors.reverse = REVERSE;
   robot.led.fill(Colors::PURPLE);
 
   uint8_t mac[6];
