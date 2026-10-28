@@ -97,6 +97,9 @@ class Motors {
   void off();      // coast + driver in standby
   void recover();  // STBY L -> H clears a latched over-current shutdown (called by run() every 100 ms)
   Motor left, right;
+  // true = front and rear swapped (left/right motors swapped and both inverted): use it when run(30, 30) drives
+  // the robot backwards although it still turns the right way
+  bool reverse = false;
   float maxVolt = lt2::MAX_MOTOR_VOLT;
   float batteryVolt = lt2::BATTERY_VOLT;
 

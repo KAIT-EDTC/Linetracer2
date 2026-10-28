@@ -61,6 +61,11 @@ void Motors::recover() {
 float Motors::target(float pct) const { return clampf(pct / 100.0f * maxVolt / batteryVolt, -1.0f, 1.0f); }
 
 void Motors::run(float leftPct, float rightPct, float ramp) {
+  if (reverse) {
+    float l = leftPct;
+    leftPct = -rightPct;
+    rightPct = -l;
+  }
   Motor* ms[2] = {&left, &right};
   float pcts[2] = {leftPct, rightPct};
   for (int i = 0; i < 2; i++) {
