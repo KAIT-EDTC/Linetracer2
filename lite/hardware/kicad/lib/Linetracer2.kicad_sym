@@ -1337,7 +1337,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(property "Reference" "D"
-			(at -5.08 6.35 0)
+			(at -6.35 7.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1346,7 +1346,7 @@
 			)
 		)
 		(property "Value" "PL9823"
-			(at 1.27 -6.35 0)
+			(at 1.27 -7.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1383,8 +1383,8 @@
 		)
 		(symbol "PL9823_0_1"
 			(rectangle
-				(start -5.08 5.08)
-				(end 5.08 -5.08)
+				(start -6.35 6.35)
+				(end 6.35 -6.35)
 				(stroke
 					(width 0.254)
 					(type default)
@@ -1394,8 +1394,8 @@
 				)
 			)
 			(circle
-				(center 1.27 0)
-				(radius 2.286)
+				(center 0 0)
+				(radius 2.032)
 				(stroke
 					(width 0.254)
 					(type default)
@@ -1406,10 +1406,10 @@
 			)
 			(polyline
 				(pts
-					(xy 0.508 0.762)
-					(xy 2.032 0.762)
-					(xy 1.27 -0.762)
-					(xy 0.508 0.762)
+					(xy -0.762 0.762)
+					(xy 0.762 0.762)
+					(xy 0 -0.762)
+					(xy -0.762 0.762)
 				)
 				(stroke
 					(width 0.2)
@@ -1421,8 +1421,8 @@
 			)
 			(polyline
 				(pts
-					(xy 0.508 -0.762)
-					(xy 2.032 -0.762)
+					(xy -0.762 -0.762)
+					(xy 0.762 -0.762)
 				)
 				(stroke
 					(width 0.2)
@@ -1433,7 +1433,7 @@
 				)
 			)
 			(text "RGB"
-				(at -2.286 0 0)
+				(at -3.81 3.81 0)
 				(effects
 					(font
 						(size 1 1)
@@ -1443,7 +1443,7 @@
 		)
 		(symbol "PL9823_1_1"
 			(pin power_in line
-				(at 0 -7.62 90)
+				(at 0 -8.89 90)
 				(length 2.54)
 				(name "GND"
 					(effects
@@ -1461,7 +1461,7 @@
 				)
 			)
 			(pin output line
-				(at 7.62 0 180)
+				(at 8.89 0 180)
 				(length 2.54)
 				(name "DO"
 					(effects
@@ -1479,7 +1479,7 @@
 				)
 			)
 			(pin power_in line
-				(at 0 7.62 270)
+				(at 0 8.89 270)
 				(length 2.54)
 				(name "VDD"
 					(effects
@@ -1497,7 +1497,7 @@
 				)
 			)
 			(pin input line
-				(at -7.62 0 0)
+				(at -8.89 0 0)
 				(length 2.54)
 				(name "DIN"
 					(effects
