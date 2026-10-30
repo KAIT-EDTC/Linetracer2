@@ -3,11 +3,12 @@
 
 Only SYMBOLS on the board (lower elementary school): build-order numbers, +/- and polarity pictures, the 3rd colour
 band of each resistor, short part names.  What they mean and the steps are in the assembly manual
-(lite/docs/assembly.md).  Build order (one kind of part per step, lowest parts first):
-   1 ちゃ resistors (100) x4   2 だいだい resistors (10k) x3   3 あか resistors (1k) x2   4 diode   5 0.1uF caps x2
-   6 transistor   7 button   8 buzzer   9 battery connector   10 motor driver   11 XIAO
-   12 full-colour LEDs x6 (8.7 mm tall, down both sides)   13 470uF caps (the tallest: last, so they do not get in the way of the
-   XIAO's joints)   14 sensors (bottom)   15 motors (after the frames are on)
+(lite/docs/assembly.md).  Build order (one kind of part per step, lowest parts first; rev.L4):
+   1 ちゃ resistors (100) x4   2 だいだい resistors (10k) x3   3 あか resistors (1k) x2   4 diodes 1N5819 x2 (black)
+   5 diode 1N4148 (glass)   6 0.1uF caps x2   7 transistor   8 button   9 buzzer   10 battery connector
+   11 motor driver   12 XIAO   13 5 V module (でんげん, prepared by the teacher)   14 full-colour LEDs x6 (8.7 mm tall,
+   down both sides)   15 470uF cap (the tallest: last, so it does not get in the way of the XIAO's joints)
+   16 sensors (bottom)   17 motors (after the frames are on)
 Japanese text is 1.3 mm or bigger (smaller kana fail the stroke-width check); symbols use the stroke font.
 NOTE: run only once on a freshly routed board (build_pcb.py does this).
 """
@@ -60,13 +61,13 @@ def poly(b, pts, layer=F):
     b.Add(s)
 
 
-def num(b, n, x, y, layer=F, r=None):
+def num(b, n, x, y, layer=F, r=None, size=None):
     """Build-order number: a silk circle with the digit inside (stroke font; the CJK font's circled digits are
     too thin for the silkscreen rules).  Two-digit numbers get a bigger circle so that they stay readable."""
     if r is None:
         r = 1.15 if n < 10 else 1.35
     circle(b, x, y, r, layer)
-    text(b, str(n), x, y, 1.2 if n < 10 else 1.0, layer=layer)
+    text(b, str(n), x, y, size or (1.2 if n < 10 else 1.0), layer=layer)
 
 
 def hide_fp_texts(fp, words):
@@ -222,11 +223,12 @@ def silk(b):
     for i, x in enumerate(LL.SENSOR_X):
         text(b, "S%d" % (i + 1), x - 6.0, LL.SENSOR_Y, 0.9, layer=BL)    # in the gap beside the sensor body
     hide_fp_texts(FPS["U2"], ("TC78H653", "VM", "GND"))   # (the footprint's VM / GND sit on C4: drawn below instead)
-    hide_fp_texts(FPS["D1"], ("K",))
+    for ref in ("D1", "D8", "D9"):
+        hide_fp_texts(FPS[ref], ("K",))
 
     # ---- front edge ----------------------------------------------------------------------------------------
     text(b, "▲まえ", 44.0, 3.4, 1.4, jp=True)
-    num(b, 14, 56.0, 2.0)                                   # the sensors go on the BACK
+    num(b, 16, 56.0, 2.0)                                   # the sensors go on the BACK
     text(b, "うら", 56.0, 4.6, 1.3, jp=True)
     for i, x in enumerate(LL.SENSOR_X):
         text(b, "S%d" % (i + 1), x, 6.7, 0.8)
@@ -238,22 +240,25 @@ def silk(b):
         w = BAND3[fp.GetValue()]
         text(b, w, (x1 + x2) / 2, (y1 + y2) / 2, 1.1 if len(w) > 2 else 1.5,
              angle=90 if abs(x1 - x2) < 0.1 else 0, jp=True)
-    resistor_key(b, 35.4, 25.0)                             # in the middle (the right front has an LED column)
+    # under the 5 V module's outline: the resistors (1-3) go in long before the module (13) covers it
+    resistor_key(b, 42.6, 22.9)
 
     # ---- small parts ---------------------------------------------------------------------------------------
-    num(b, 4, 80.6, 51.3)                                   # diode (inside its outline)
-    num(b, 5, 50.0, 58.6)                                   # 0.1uF x2 (on the motor tracks)
-    num(b, 6, 33.0, 2.6)                                    # transistor
+    num(b, 4, 36.5, 30.6)                                   # 1N5819 x2 (inside their outlines)
+    num(b, 4, LL.PLACE["D8"][0], 39.3)
+    num(b, 5, LL.PLACE["D9"][0], 14.3, r=0.95, size=1.1)   # 1N4148 (inside its narrow outline)
+    num(b, 6, 50.0, 58.6)                                   # 0.1uF x2 (on the motor tracks)
+    num(b, 7, 33.0, 2.6)                                    # transistor
     sp = [p.GetPosition() for p in FPS["SW1"].Pads()]
     cx = sum(pcbnew.ToMM(q.x) for q in sp) / len(sp) - G.OX     # centre of the 4 legs
     cy = sum(pcbnew.ToMM(q.y) for q in sp) / len(sp) - G.OY
-    num(b, 7, cx, cy)                                       # in the middle of the button
+    num(b, 8, cx, cy)                                       # in the middle of the button
     text(b, "スタート", cx + 0.1, cy + 5.7, 1.7, jp=True)     # under the button
 
     # ---- buzzer ------------------------------------------------------------------------------------------------
     bx, by = pad_xy(FPS["BZ1"], "1")                        # + (front pad)
     text(b, "+", bx - 2.3, by, 1.6, bold=True)
-    num(b, 8, bx + 3.6, by + 2.5)
+    num(b, 9, bx + 3.6, by + 2.5)
     text(b, "ブザー", bx, by + 7.6, 1.5, jp=True)
 
     # ---- battery connector, big capacitors ---------------------------------------------------------------------
@@ -262,28 +267,31 @@ def silk(b):
     text(b, "+", jx, jy - 3.25, 1.0, bold=True)
     text(b, "-", jx + 2.5, jy - 3.25, 1.0, bold=True)
     text(b, "でんち", jx + 1.25, jy + 2.3, 1.3, jp=True)
-    num(b, 9, jx - 3.8, jy + 4.6)
-    text(b, "VBAT", 80.6, 57.4, 0.9)                        # D1's anode pad = the battery (test point)
-    # the 470 uF cans are the tallest parts: soldered LAST (13), after the driver (10), the XIAO (11) and the LEDs (12)
-    for ref, (nx, ny), po in (("C1", (62.0, 47.0), True), ("C2", (69.7, 48.4), False)):
-        electrolytic(b, FPS[ref], plus_outside=po)
-        num(b, 13, nx, ny)
+    num(b, 10, jx - 3.8, jy + 4.6)
+    text(b, "VBAT", 35.9, 35.9, 0.9)                        # D1's anode pad = the battery (test point)
+    # the 470 uF can is the tallest part: soldered LAST (15), after the driver (11), the XIAO (12), the 5 V module (13)
+    # and the LEDs (14)
+    electrolytic(b, FPS["C1"], plus_outside=True)
+    num(b, 15, 62.0, 47.0)
 
     # ---- modules --------------------------------------------------------------------------------------------
-    num(b, 10, 41.6, LL.U2_Y)
+    num(b, 11, 41.6, LL.U2_Y)
     text(b, "モーター", 50.6, LL.U2_Y - 1.05, 1.3, jp=True)
     text(b, "ドライバー", 50.6, LL.U2_Y + 1.15, 1.3, jp=True)
     text(b, "VM", 57.7, LL.U2_R - 1.9, 1.1, bold=True)    # same word as on the module, next to its VM pins
     ux, uy = LL.XIAO_C
-    num(b, 11, ux - 7.4, uy - 3.0)
+    num(b, 12, ux - 7.4, uy - 3.0)
     text(b, "マイコン", ux - 0.6, uy - 3.0, 2.0, jp=True)
     text(b, "XIAO ESP32C6", ux - 0.6, uy + 0.4, 1.0)
     text(b, "USB", ux + 7.6, uy + 4.0, 1.0)
     # full-colour LEDs (both sides): the footprint brings the outline and the dot beside the GND hole (longest leg)
-    num(b, 12, LL.LED_L - 0.1, 23.7)
-    num(b, 12, 74.4, 4.2)
-    text(b, "Linetracer2", 51.0, 30.2, 1.3, bold=True)
-    text(b, "Lite rev.L3", 51.0, 32.6, 1.0)
+    num(b, 14, LL.LED_L - 0.1, 23.7)
+    num(b, 14, 74.4, 4.2)
+    # 5 V module (rev.L4): the footprint draws where it lies and VIN / GND / OUT / EN behind the pins
+    num(b, 13, 43.0, 35.6)
+    text(b, "でんげん", 48.5, 35.6, 1.3, jp=True)
+    text(b, "Linetracer2", 73.6, 44.6, 1.3, bold=True)       # (the right rear is free since rev.L4)
+    text(b, "Lite rev.L4", 73.6, 47.0, 1.0)
 
     # ---- test pads (for the teacher's multimeter; meaning and voltages in the manual) ---------------------
     for ref, label, dx, dy in (("TP1", "GND", 3.3, 0), ("TP2", "3V3", -3.0, 0), ("TP3", "VSYS", -0.6, 1.9),
@@ -293,17 +301,17 @@ def silk(b):
         text(b, label, tx + dx, ty + dy, 0.9)
 
     # ---- motors: pads in the frames' cut-outs ---------------------------------------------------------------
-    num(b, 15, 50.0, 64.0)
+    num(b, 17, 50.0, 64.0)
     text(b, "ひだり", 43.04, 66.7, 1.3, jp=True)
     text(b, "みぎ", 56.96, 66.7, 1.3, jp=True)
 
     # ---- bottom side ----------------------------------------------------------------------------------------
-    num(b, 14, 56.8, 21.0, layer=BL)              # (the back is read mirrored: the number shows left of the text)
+    num(b, 16, 56.8, 21.0, layer=BL)              # (the back is read mirrored: the number shows left of the text)
     text(b, "センサー", 50.0, 21.0, 1.6, layer=BL, jp=True)
     text(b, "キャスター", 50.0, 17.6, 1.2, layer=BL, jp=True)
     text(b, "Linetracer2 Lite", 50.0, 74.0, 3.0, layer=BL, bold=True)
-    text(b, "rev.L3  2026-10  EDTC", 50.0, 78.6, 1.2, layer=BL)
-    text(b, "XIAO ESP32C6 + TC78H653FTG + FA-130 x2", 50.0, 81.4, 1.0, layer=BL)
+    text(b, "rev.L4  2026-10  EDTC", 50.0, 78.6, 1.2, layer=BL)
+    text(b, "XIAO ESP32C6 + TC78H653FTG + TPS63802 + FA-130 x2", 50.0, 81.4, 1.0, layer=BL)
     text(b, "こどもむけ ライントレーサー", 50.0, 85.4, 2.2, layer=BL, jp=True)
 
 

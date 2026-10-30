@@ -21,23 +21,25 @@ Raspberry Pi Pico ＋ TC78H653FTG ＋ 130 モーター ×2 の、**全部足付�
 | 性能（計算値） | 最高速度 理論 5 m/s（ソフトで 1.5〜2.5 m/s に制限）、加速 4 m/s² でモーター電流 約 1.4 A |
 | コスト（1 台） | 全部新品 約 ¥2,370、**Pico を再利用すれば 約 ¥1,500**（`docs/05_bom.md`） |
 
-## 「Linetracer2 Lite」（rev.L3：XIAO ESP32C6（ピンヘッダ）＋ LBR-127HLD ＋ ブザー ＋ フルカラー LED）
+## 「Linetracer2 Lite」（rev.L4：XIAO ESP32C6（ピンヘッダ）＋ LBR-127HLD ＋ ブザー ＋ フルカラー LED ＋ 5 V 昇降圧）
 
 標準版から部品を減らした版も用意した（詳しくは [lite/README.md](lite/README.md)）。**Lite のファイルはすべて `lite/` フォルダにまとめてあり、標準版のファイルとは混ざらない**。**枠・デッキ・平歯車・車輪の 3D プリント部品、ねじ、モーター、電池ボックスは標準版と共通**で、基板・ソフト・前の支え（Lite 用ボールキャスター）が違う。
 rev.L2（2026-10-05）でマイコンを **Seeed Studio XIAO ESP32C6**、センサーを **LBR-127HLD** に変え、rev.L3（2026-10-07）で **XIAO をピンヘッダ付けに、ブザーとフルカラー LED 6 こ・テストパッドを追加、配線を全部手で引き直し（交差なし・ビア 0）、Lite 用ボールキャスター**を作った。ロボット全体の 3D モデル（STL / GLB）もある。
+**rev.L4（2026-10-30）**: モーターに力がかかる（車輪を止める・100 % で走り出す）と電池が 2.5〜3.3 V まで下がって XIAO がリセットしていたので、**XIAO の電源を昇降圧モジュール（秋月 AE-TPS63802、5 V）で作る**ようにし、ほかの回路の問題（USB の VBUS に 470 µF、フルカラー LED の信号の電圧、ニッケル水素で動かない など）も直した（[lite/README.md](lite/README.md) §0）。**KiCad のファイル・Gerber はまだ rev.L3 のまま**（生成スクリプトは rev.L4。KiCad 10 で作り直してから発注）。
 
-| | 標準版 rev.A1 | Lite rev.L3 |
+| | 標準版 rev.A1 | Lite rev.L4 |
 |---|---|---|
 | マイコン | Pico をピンヘッダで付ける | **XIAO ESP32C6 をピンヘッダで付ける**（Wi-Fi / Bluetooth 付き） |
 | センサー | LBR-123F 6 個 ＋ マルチプレクサ TC4051BP | **LBR-127HLD 3 個を ADC に直結**（マルチプレクサなし） |
 | ボタン / LED / ブザー | 2 / 3 / オプション | **1 / フルカラー 6（PL9823、左右に 3 こずつ、信号線 1 本）/ あり（START ボタンと同じピン）**（XIAO の黄 LED も使える） |
 | タイヤ / 前の支え | O リング P-24 / スキッド 4.0 mm | **TPU の印刷タイヤ / ボールキャスター 7.5 mm**（センサーが背高なので前を上げる） |
+| マイコンの電源 | 電池 → ダイオード → Pico の VSYS（Pico の中は昇降圧） | **電池 → 昇降圧モジュール AE-TPS63802（5 V）→ ダイオード → XIAO の 5V ピン**（rev.L4。モーターで電池が下がっても XIAO が止まらない） |
 | 電池電圧の測定 | あり | **なし**（XIAO の ADC 3 本をセンサーで使い切る） |
-| はんだ付け | 約 230 か所 | **約 120 か所** |
-| 基板 / シルク | 100 × 100 mm / 英語中心 | **65 × 100 mm** / **記号だけ**（つくる順番 ①〜⑮・＋−・抵抗の色）。説明は手順書 `lite/docs/assembly.md` |
-| **1 台の部品代（全部新品）** | 約 ¥2,370 | **約 ¥2,530（+¥160）** |
+| はんだ付け | 約 230 か所 | **約 146 か所** |
+| 基板 / シルク | 100 × 100 mm / 英語中心 | **65 × 100 mm** / **記号だけ**（つくる順番 ①〜⑰・＋−・抵抗の色）。説明は手順書 `lite/docs/assembly.md` |
+| **1 台の部品代（全部新品）** | 約 ¥2,370 | **約 ¥3,530（+¥1,160。うち 5 V 昇降圧モジュール ¥780）** |
 
-> Lite rev.L3 はマイコンをピンヘッダで付ける。基板側を**ピンソケット**にすれば、標準版のようにマイコンを回収して使い回すこともできる（`lite/docs/assembly.md` §3）。
+> Lite rev.L3 / L4 はマイコンをピンヘッダで付ける。基板側を**ピンソケット**にすれば、標準版のようにマイコンを回収して使い回すこともできる（`lite/docs/assembly.md` §3）。
 
 | Lite のロボット全体（3D） | Lite の基板（3D） |
 |---|---|
@@ -55,8 +57,8 @@ rev.L2（2026-10-05）でマイコンを **Seeed Studio XIAO ESP32C6**、セン�
 | [docs/06_assembly.md](docs/06_assembly.md) | 組み立て手順書（はんだ付けの順番・チェック・ねじ止め・トラブル） |
 | [docs/07_firmware.md](docs/07_firmware.md) | ソフトウェア（MicroPython のセットアップ、ライブラリ、PD 制御の調整） |
 | [docs/08_knowledge.md](docs/08_knowledge.md) | 知見メモ（部品のクセ、買い方、KiCad/Freerouting/OpenSCAD のハマりどころ、設計判断） |
-| [lite/README.md](lite/README.md) | **Lite rev.L3**（XIAO ESP32C6 ＋ LBR-127HLD ＋ ブザー。変更点と理由、配線のルール、コスト比較、回路・基板・部品表・組み立て・ソフトの違い） |
-| [lite/docs/assembly.md](lite/docs/assembly.md) | Lite の組み立て手順書（基板の記号の見かた、つくる順番 ①〜⑮） |
+| [lite/README.md](lite/README.md) | **Lite rev.L4**（**§0: XIAO が落ちる原因と電源の作り直し**、XIAO ESP32C6 ＋ LBR-127HLD ＋ ブザー。変更点と理由、配線のルール、コスト比較、回路・基板・部品表・組み立て・ソフトの違い） |
+| [lite/docs/assembly.md](lite/docs/assembly.md) | Lite の組み立て手順書（基板の記号の見かた、つくる順番 ①〜⑰） |
 | [lite/hardware/Linetracer2-Lite_assembly.stl](lite/hardware/Linetracer2-Lite_assembly.stl) | **Lite のロボット全体の 3D**（基板・部品・枠・モーター・ギヤ・電池ボックス・キャスター。STL、ブラウザで回して見られる。色つきは同じ名前の `.glb`） |
 | [hardware/mechanical/README.md](hardware/mechanical/README.md) | 3D プリント部品と P1S の印刷設定、ねじの一覧 |
 | [hardware/mechanical/assembly.stl](hardware/mechanical/assembly.stl) | 全体を組み立てた 3D（STL、ブラウザで回して見られる） |
@@ -81,7 +83,7 @@ Linetracer2/
 │   └── mechanical/           3D プリント部品（OpenSCAD 元データ、STL、組み立て図。両方の版で共通。Lite は前の支えだけ 7.5 mm）
 ├── firmware/micropython/     ライブラリ・標準プログラム・授業用サンプル
 ├── scripts/                  回路図・基板を生成するスクリプト（再生成用。LT2_VARIANT=lite で Lite も作る）
-└── lite/                     ★ Lite 一式（rev.L3: XIAO ESP32C6 版。標準版とは別フォルダ）
+└── lite/                     ★ Lite 一式（rev.L4: XIAO ESP32C6 版。標準版とは別フォルダ）
     ├── README.md             Lite の設計書（変更点・コスト比較・組み立て・ソフト）
     ├── docs/                 回路図/組立図 PDF、3D 画像
     ├── hardware/             KiCad プロジェクト、Gerber（Linetracer2-Lite_rev.L3_gerber.zip）、ロボット全体の 3D（STL / GLB）
@@ -102,4 +104,6 @@ Linetracer2/
 - [x] 低コスト版 Lite rev.L1 の回路図・基板（ERC 0・DRC 0・警告 0）・部品表・ソフト（2026-10-05）
 - [x] Lite rev.L2（XIAO ESP32C6 ＋ LBR-127HLD）の回路図・基板・部品表・ソフト・スキッド 7.5 mm（2026-10-05）
 - [x] Lite rev.L3（XIAO をピンヘッダで、ブザー、手で引いた配線、Lite 用ボールキャスター、ロボット全体の 3D と干渉チェック）（2026-10-07）
+- [x] Lite rev.L4 の回路・配置と配線（生成スクリプト）: XIAO 用 5 V 昇降圧、USB と電源の分け方、フルカラー LED の信号の電圧（2026-10-30）
+- [ ] Lite rev.L4 を KiCad 10 で作り直す（回路図・基板・DRC・Gerber・絵・3D、`lite/README.md` §0.6・§9）
 - [ ] Lite の試作（LBR-127HLD の高さ、キャスターの転がり、3 センサーでの走り、`lite/README.md` §10）

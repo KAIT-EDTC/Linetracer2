@@ -1,6 +1,6 @@
 # linetracer.py  -  Linetracer2 Lite library for MicroPython (Seeed Studio XIAO ESP32C6)
 #
-# For the Lite board rev.L3: XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button + a buzzer on the same pin,
+# For the Lite board rev.L3 / rev.L4 (same pins): XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button + a buzzer on the same pin,
 # 6 full-colour LEDs (PL9823, NeoPixel type, 3 down each side of the board) on one data pin.
 # MicroPython: the official "ESP32_GENERIC_C6" firmware (micropython.org).
 # (The standard rev.A1 board has its own library in firmware/micropython/ at the top of the repo.)
@@ -17,7 +17,7 @@ from machine import Pin, PWM, ADC
 from neopixel import NeoPixel
 import time
 
-# ----------------------------------------------------------------- pins (PCB rev.L3)
+# ----------------------------------------------------------------- pins (PCB rev.L3 and rev.L4: the same)
 # GPIO numbers of the ESP32-C6 (XIAO pin names in the comments).
 # rev.L3 swapped D3/D4 and D8/D10 against rev.L2 (so that no tracks cross on the board).
 PIN_SENS_LED = 21          # D3   1 = IR LEDs on (through Q1)
@@ -38,6 +38,8 @@ SENSOR_PITCH_MM = 12
 MAX_MOTOR_VOLT = 3.0      # FA-130RA-2270 is rated 1.5-3.0 V. 100 % = this voltage (with BATTERY_VOLT)
 BATTERY_VOLT = 4.2        # the board can NOT measure the battery (no ADC pin left): AA alkaline x3 while
                           # driving is about 4.2 V.  NiMH x3: set 3.7.  The robot gets slower as the cells run down.
+                          # (rev.L4 feeds the XIAO from its own 5 V buck-boost: it keeps running while the motors
+                          # pull the cells down, also on NiMH.  rev.L3 restarted when a motor stalled or started hard.)
 PWM_FREQ = 20000          # 20 kHz (not audible)
 RAMP_PER_CALL = 0.04      # max change of duty per run() call (soft start, avoids ISD trip)
 LEFT_INVERT = False       # set True if the left wheel turns backwards on run(30, 30)

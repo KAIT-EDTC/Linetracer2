@@ -1,6 +1,6 @@
 # Linetracer2 Lite の Arduino（C++）版ソフト
 
-MicroPython 版（`../micropython/`）と同じことを Arduino IDE（C++）で書いたもの。ピン番号・設定・動きは MicroPython の `linetracer.py` / `main.py` と同じ（rev.L3 の基板用）。
+MicroPython 版（`../micropython/`）と同じことを Arduino IDE（C++）で書いたもの。ピン番号・設定・動きは MicroPython の `linetracer.py` / `main.py` と同じ（rev.L3・rev.L4 の基板用。ピンは同じ）。
 
 > **どちらか一方だけ**: Arduino で書き込むと XIAO の中の MicroPython は消える。MicroPython に戻すときは `lite/README.md` §8.1 のとおり書き込み直す。
 

@@ -180,7 +180,8 @@ Result testMotors() {
   robot.led.fill(Colors::OFF);
   Serial.println("  前へ の はずが 後ろに 回った 車輪は、スケッチで robot.motors.left.invert / right.invert = true");
   Serial.println("  回らない: 電池・スイッチ、モーターの はんだ、ドライバ（U2）の はんだ。とちゅうで XIAO が");
-  Serial.println("  リセットした（LED が 消えた）なら 電池が へっている");
+  Serial.println("  リセットした（LED が 消えた）なら 電池が ほとんど ない（rev.L4）。rev.L4 で 新しい 電池でも");
+  Serial.println("  リセットするなら でんげん モジュール（U3）・D1・D8 の はんだと 向き");
   return Result::Look;
 }
 

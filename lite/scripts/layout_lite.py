@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lite board rev.L3: placement + hand-drawn routes.  Pure data (no pcbnew), shared by
+"""Lite board rev.L4: placement + hand-drawn routes.  Pure data (no pcbnew), shared by
 gen_pcb_lite.py (placement), route_lite.py (tracks into the board) and the preview tool.
 
 Board coordinates (mm): x -> right, y -> rear, (0, 0) = front-left corner of the standard board; the Lite board
@@ -12,6 +12,13 @@ Routing style ("beautiful" by rule, not by an autorouter):
   * the top side (F.Cu) carries almost everything; the bottom side only the IR LED cathode bus right behind the
     sensors (they are on the bottom too) and the driver's STBY line, plus a GND pour on both sides
   * symmetric where the parts allow it: the driver sits on the centre line and fans out to both motors alike
+
+rev.L4 (5 V buck-boost for the XIAO): the module U3 (20 x 13 mm, on its 4-pin header) lies in the middle, between the
+buzzer and the XIAO's antenna end, over the 3-line bus (tracks may run under it; it sits 2.5 mm up).  D1 (battery ->
+U3) and D8 (U3 -> VSYS) stand beside it.  The battery and the 5 V reach the right rear (the driver's VM pins, the XIAO's
+5V pin) through the gap between the driver's two pin rows: the driver module sits 2.5 mm up on its headers, so two
+tracks pass under it -- the only way past the XIAO's antenna keep-out and the STBY line without crossing anything.
+The left LED column gets its supply through D9 (on the bottom cross bar), see gen_schematic_lite.py.
 """
 
 # ---------------------------------------------------------------- placement
@@ -47,12 +54,19 @@ PLACE["C3"] = (48.73 - (CAP_Y - U2_R), CAP_Y, 180, "F")   # pad 1 on OUT1's diag
 PLACE["C4"] = (53.81 + (CAP_Y - U2_R), CAP_Y, 180, "F")   # pad 1 on OUT4's diagonal, pad 2 on OUT3's
 
 # power, right rear (between the motor-input bus, the frame at y 58 and the board edge):
-# VBAT runs straight from the driver's VM pins to D1's anode; C1 and J1 hang on it with short stubs.
-# VSYS: the XIAO's 5V pin straight back onto the line C2+ -> D1's cathode.
+# VBAT runs straight from the driver's VM pins to J1; C1 hangs on it with a short stub.
 PLACE["C1"] = (64.8, 54.25, 90, "F")     # + rear (next to the VBAT line), - front
 PLACE["J1"] = (72.8, 53.0, 0, "F")       # + (red) left, - right
-PLACE["D1"] = (80.6, U2_R - 10.16, 270, "F")   # K front (VSYS), A rear = end of the VBAT line
-PLACE["C2"] = (76.35, U2_R - 10.16, 180, "F")  # + right (in line with D1's K), - left
+# rev.L4 5 V supply, in the middle: D1 (battery -> U3) and D8 (U3 -> VSYS) stand up the left side of the module.
+# U3 turned 180 deg: pins EN, OUT, GND, VIN from left to right on y U3_ROW, the body to the front (over the 3-line
+# bus and the resistor key; the parts on its top face the sky).  Body x 41.5 .. 54.5, y 19.8 .. 39.8: 2 mm off the
+# XIAO's antenna keep-out, 0.4 mm in front of the IN2 track.
+U3_ROW = 38.0
+PLACE["U3"] = (48.0, U3_ROW, 180, "F")
+PLACE["D1"] = (36.5, 26.0, 270, "F")     # K front (VIN_BB, along y 26 under U3 to its VIN), A rear (VBAT lane)
+PLACE["D8"] = (39.55, 44.12, 90, "F")     # K rear (VSYS lane), A front (U3's OUT)
+# left LED column supply: D9 (1N4148) on the bottom cross bar, between R7 and R1 (A front = VSYS, K rear = VLED_L)
+PLACE["D9"] = (28.8, 18.12, 90, "F")
 
 # IR LED switch, front left (turned 180 deg: base on the left, straight in front of R7)
 PLACE["Q1"] = (30.66, 3.2, 180, "F")
@@ -76,9 +90,9 @@ for _ref, _y in zip(("D2", "D3", "D4"), LED_Y):
 for _ref, _y in zip(("D5", "D6", "D7"), LED_Y[::-1]):
     PLACE[_ref] = (LED_R, _y, 270, "F")
 
-# test pads (SMD, top) for a multimeter: GND/3V3 in the middle, the sensors on their bus lines, VSYS beside D1,
-# IR (= IR LED cathodes) at Q1.  (VBAT: D1's anode pad, labelled - there is no room for one more pad there.)
-TEST_PADS = {"TP1": (50.0, 22.6), "TP2": (50.0, R_REAR), "TP3": (81.0, 41.5),
+# test pads (SMD, top) for a multimeter: GND beside the button, 3V3 in the middle, the sensors on their bus lines,
+# VSYS beside the XIAO's 5V pin, IR (= IR LED cathodes) at Q1.  (VBAT: D1's anode pad, labelled.)
+TEST_PADS = {"TP1": (22.0, 45.6), "TP2": (50.0, R_REAR), "TP3": (81.0, 41.5),
              "TP4": (47.2, 16.6), "TP5": (59.0, 15.3), "TP6": (71.0, 14.0), "TP7": (28.79, 7.8)}
 for _ref, (_x, _y) in TEST_PADS.items():
     PLACE[_ref] = (_x, _y, 0, "F")
@@ -175,12 +189,14 @@ route("D4-DO", "F", W_SIG, P("D4", "2"), Y(1.0), X(LED_R + 0.9), P("D5", "4"))
 route("D5-DO", "F", W_SIG, P("D5", "2"), Y(7.895), DX(LED_R + 0.9), P("D6", "4"))
 route("D6-DO", "F", W_SIG, P("D6", "2"), Y(14.895), DX(LED_R + 0.9), P("D7", "4"))
 # supply (VSYS, up to 0.36 A) on the bottom: from the XIAO's 5V pin past its right end to a bar inside the right
-# column, across the front half at y 14.5 (behind the caster pin) to a bar inside the left column; short stubs
+# column, across the front half at y 14.5 (behind the caster pin) to D9 between R7 and R1; from D9's cathode
+# (VLED_L, 0.7 V lower: the first LED then reads the XIAO's 3.3 V data) to a bar inside the left column; short stubs
 LB, RB = LED_L + 2.1, LED_R - 2.1                     # the two bars (0.3 mm off the VDD / DO pads)
 route("VSYS", "B", W_LEDV, P("U1", "14"), X(81.6), Y(22.0), X(RB), Y(LED_Y[2] - 0.635), P("D5", "3"), c=0.5)
-route("VSYS", "B", W_LEDV, (RB, 14.5), X(LB), Y(LED_Y[0] + 0.635), P("D2", "3"), c=0)      # (LB, 14.5) is a T
-route("VSYS", "B", W_LEDV, (LB, 14.5), Y(LED_Y[2] + 0.635), P("D4", "3"))
-route("VSYS", "B", W_LEDV, (LB, LED_Y[1] + 0.635), P("D3", "3"))
+route("VSYS", "B", W_LEDV, (RB, 14.5), X(32.8), DX(28.8, -1), P("D9", "2"))
+route("VLED_L", "B", W_LEDV, P("D9", "1"), DX(25.4, -1), X(LB), Y(LED_Y[0] + 0.635), P("D2", "3"), c=0)  # (LB, ..) T
+route("VLED_L", "B", W_LEDV, (LB, 14.72), Y(LED_Y[2] + 0.635), P("D4", "3"))
+route("VLED_L", "B", W_LEDV, (LB, LED_Y[1] + 0.635), P("D3", "3"))
 route("VSYS", "B", W_LEDV, (RB, LED_Y[1] - 0.635), P("D6", "3"))
 route("VSYS", "B", W_LEDV, (RB, LED_Y[0] - 0.635), P("D7", "3"))
 # test pads on short stubs
@@ -202,12 +218,18 @@ route("MOT_OUT1", "F", W_PWR, P("U2", "12"), DX(45.58), P("M1", "1"))
 route("MOT_OUT3", "F", W_PWR, P("U2", "13"), DX(54.42), P("M2", "2"))
 route("MOT_OUT4", "F", W_PWR, P("U2", "14"), DX(59.5), P("M2", "1"))
 
-# power: VBAT straight from VM to D1's anode, C1 and J1 on short stubs; VSYS: C2+ -> D1's K, 5V pin onto it
-route("VBAT", "F", W_PWR, P("U2", "15"), X(80.6), P("D1", "2"))
+# power: VBAT straight from VM to J1, C1 on a short stub
+route("VBAT", "F", W_PWR, P("U2", "15"), X(72.8), P("J1", "1"))
 route("VBAT", "F", W_PWR, (64.8, U2_R), P("C1", "1"))
-route("VBAT", "F", W_PWR, (72.8, U2_R), P("J1", "1"))
-route("VSYS", "F", W_VSYS, P("C2", "1"), P("D1", "1"))
-route("VSYS", "F", W_VSYS, P("U1", "14"), Y(U2_R - 10.16))
+# rev.L4 5 V supply.  Two lanes under the driver module, between its pin rows (y 48.7 .. 54.5):
+#   rear lane  VBAT (U3's input, up to 1 A at low battery) from the VM pin, out at the left end, up past D8 to D1's A
+#   front lane VSYS (up to 0.5 A) from D8's K, out at the right end, round C1's - pad and up to the XIAO's 5V pin
+W_BB = 0.6
+route("VBAT", "F", W_BB, P("U2", "15"), Y(53.0), X(37.85), Y(34.97), DY(33.62, -1), P("D1", "2"))
+route("VIN_BB", "F", W_VSYS, P("D1", "1"), X(51.81), P("U3", "1"))                # under U3 to its VIN
+route("VIN_BB", "F", W_SIG + 0.05, P("U3", "4"), Y(39.55), X(51.81), P("U3", "1"))   # EN = VIN (always on)
+route("VOUT_BB", "F", W_BB, P("U3", "3"), Y(36.1), X(39.55), P("D8", "2"))
+route("VSYS", "F", W_BB, P("D8", "1"), DX(38.75, 1), Y(48.5), DX(39.55, 1), X(78.67), P("U1", "14"))
 
 # IR LED cathodes: a bus on the bottom right behind the sensors, to Q1's collector
 route("LED_K", "B", W_3V3, P("Q1", "2"), Y(6.6), X(59.95), P("PS3", "2"))
