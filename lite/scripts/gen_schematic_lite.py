@@ -9,7 +9,7 @@ Differences from the standard board (gen_schematic.py):
   * 3 x LBR-127HLD sensors straight into the XIAO's three ADC pins (no 4051 multiplexer)
   * no battery measurement (the XIAO has only 3 ADC pins; all of them are used by the sensors)
   * 1 button, a passive piezo buzzer sharing the button's pin (D4), 6 full-colour LEDs (PL9823, one data line
-    on D6), test pads for a multimeter, no power LED, no expansion header
+    on D6 through R11 1k), test pads for a multimeter, no power LED, no expansion header
 """
 import os
 import sys
@@ -201,15 +201,21 @@ s.text("short press = start / stop, long press = speed level", 271.78, 128.27, 1
 # 6 full-colour LEDs in one chain, 3 down each side of the board: D6 -> D2 DIN (left rear), D2 -> D3 -> D4 (left front)
 # -> D5 (right front) -> D6 -> D7 (right rear), D7 DO open.  Powered from VSYS (battery - 0.3 V, or USB 5 V): the
 # PL9823 asks for 4.5-6 V, on fresh AA cells VSYS is about 4.2 V (works, a little out of spec; blue / green get
-# dimmer as the cells run down).  C2 (470 uF on VSYS) is the only bulk capacitor.
+# dimmer as the cells run down).  C2 (470 uF on VSYS) is the only bulk capacitor (no 0.1 uF at the LEDs).
+# R11 1k in the data line: no current flows into DIN in normal use (CMOS input), but a solder bridge from DIN to
+# VDD (5 V on USB) or GND, or D2 put in backwards, would load D6 far beyond the ESP32-C6's 28 mA (sink) / 40 mA
+# (source).  With 1k it is 5 mA at most; the edges slow down by about 1k x 15 pF = 15 ns (a bit lasts 1.7 us).
 leds = []
 for i in range(6):
-    d = s.place("Linetracer2:PL9823", "D%d" % (i + 2), "PL9823", 284.48 + 20.32 * i, 149.86, 0, footprint=RGB_FP,
+    d = s.place("Linetracer2:PL9823", "D%d" % (i + 2), "PL9823", 292.1 + 20.32 * i, 149.86, 0, footprint=RGB_FP,
                 ref_off=(-5.08, -7.62), val_off=(2.54, 7.62))
     s.lab(d, "3", "VSYS")
     s.pwr(d, "1", "GND")
     leds.append(d)
-s.lab(leds[0], "4", "RGB_DIN")
+r11 = s.place("Device:R", "R11", "1k", 279.4, 149.86, 90, footprint=R_FP,
+              ref_off=(-2.54, -2.54), val_off=(-1.27, 2.54))
+s.lab(r11, "1", "RGB_DIN")
+s.connect(r11, "2", leds[0], "4")
 for a, b in zip(leds, leds[1:]):
     s.connect(a, "2", b, "4")
 s.nc(leds[-1], "2")
@@ -217,6 +223,8 @@ s.text("D2..D7 = PL9823 (NeoPixel type, 800 kHz, 24 bit per LED): D2-D4 left sid
        271.78, 163.83, 1.27)
 s.text("(front -> rear).  Data from D6 (TX: the boot log may flash them once).  6 x white = 0.36 A: the library limits it.",
        271.78, 167.64, 1.27)
+s.text("R11 1k: protects D6 and the 1st LED if DIN touches", 325.12, 172.72, 1.27)
+s.text("VDD or GND, or D2 is in backwards (5 mA at most).", 325.12, 176.53, 1.27)
 r9 = s.place("Device:R", "R9", "100", 287.02, 172.72, 90, footprint=R_FP,
              ref_off=(-2.54, -2.54), val_off=(-1.27, 2.54))
 bz = s.place("Device:Buzzer", "BZ1", "piezo 13mm", 304.8, 175.26, 0,
