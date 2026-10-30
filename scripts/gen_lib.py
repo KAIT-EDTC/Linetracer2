@@ -184,15 +184,16 @@ def sym_pico():
 
 def sym_pl9823():
     """PL9823 (5 mm NeoPixel-type full-colour LED, Akizuki 108411).  1 = GND, 2 = DO, 3 = VDD, 4 = DIN.
-    Drawn like KiCad's WS2812: data in left, data out right, VDD on top, GND at the bottom."""
-    pins = [pin("power_in", 0, -7.62, 90, "GND", "1"), pin("output", 7.62, 0, 180, "DO", "2"),
-            pin("power_in", 0, 7.62, 270, "VDD", "3"), pin("input", -7.62, 0, 0, "DIN", "4")]
+    Drawn like KiCad's WS2812: data in left, data out right, VDD on top, GND at the bottom.
+    Body 12.7 mm: the four pin names sit inside it, so the LED drawing stays in the middle and "RGB" in a corner."""
+    pins = [pin("power_in", 0, -8.89, 90, "GND", "1"), pin("output", 8.89, 0, 180, "DO", "2"),
+            pin("power_in", 0, 8.89, 270, "VDD", "3"), pin("input", -8.89, 0, 0, "DIN", "4")]
     g = """
-    (rectangle (start -5.08 5.08) (end 5.08 -5.08) (stroke (width 0.254) (type default)) (fill (type background)))
-    (circle (center 1.27 0) (radius 2.286) (stroke (width 0.254) (type default)) (fill (type none)))
-    (polyline (pts (xy 0.508 0.762) (xy 2.032 0.762) (xy 1.27 -0.762) (xy 0.508 0.762)) (stroke (width 0.2) (type default)) (fill (type outline)))
-    (polyline (pts (xy 0.508 -0.762) (xy 2.032 -0.762)) (stroke (width 0.2) (type default)) (fill (type none)))
-    (text "RGB" (at -2.286 0 0) (effects (font (size 1 1))))
+    (rectangle (start -6.35 6.35) (end 6.35 -6.35) (stroke (width 0.254) (type default)) (fill (type background)))
+    (circle (center 0 0) (radius 2.032) (stroke (width 0.254) (type default)) (fill (type none)))
+    (polyline (pts (xy -0.762 0.762) (xy 0.762 0.762) (xy 0 -0.762) (xy -0.762 0.762)) (stroke (width 0.2) (type default)) (fill (type outline)))
+    (polyline (pts (xy -0.762 -0.762) (xy 0.762 -0.762)) (stroke (width 0.2) (type default)) (fill (type none)))
+    (text "RGB" (at -3.81 3.81 0) (effects (font (size 1 1))))
 """
     return """(symbol "PL9823"
   (pin_names (offset 0.254))
@@ -208,8 +209,8 @@ def sym_pl9823():
   )
   (embedded_fonts no)
 )""" % (
-        prop("Reference", "D", -5.08, 6.35, justify="left"),
-        prop("Value", "PL9823", 1.27, -6.35, justify="left"),
+        prop("Reference", "D", -6.35, 7.62, justify="left"),
+        prop("Value", "PL9823", 1.27, -7.62, justify="left"),
         prop("Footprint", "Linetracer2:LED_PL9823_5mm", 0, -10.16, hide=True),
         prop("Datasheet", "https://akizukidenshi.com/goodsaffix/pl9823.pdf", 0, -12.7, hide=True),
         prop("Description", "5 mm full-colour LED with controller (NeoPixel type, 800 kHz), supply 4.5-6 V", 0, -15.24, hide=True),

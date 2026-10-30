@@ -1,9 +1,9 @@
 (export
 	(version "E")
 	(design
-		(source "/home/aonuma/Desktop/EDTC/Linetracer2/.claude/worktrees/esp32c6-photoreflector-spec-95e549/lite/hardware/kicad/Linetracer2-Lite.kicad_sch")
-		(date "2026-10-09T02:42:08")
-		(tool "Eeschema 10.0.6")
+		(source "/home/aonuma/Desktop/EDTC/Linetracer2/.claude/worktrees/lite-schematic/lite/hardware/kicad/Linetracer2-Lite.kicad_sch")
+		(date "2026-10-30T17:29:34")
+		(tool "Eeschema 10.0.7")
 		(sheet
 			(number "1")
 			(name "/")
