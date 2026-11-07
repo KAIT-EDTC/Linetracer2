@@ -200,8 +200,10 @@ class LineFollower {
   float left = 0, right = 0;  // the last motor command (%)
   int pos = 0;                // the last position (or lt2::LINE_LOST)
   uint32_t lostTimeoutMs = 800;
+  float maxPct = 100;          // no wheel goes faster than this (%), steering included
 
  private:
+  void drive(float l, float r);
   Robot& robot_;
   float base_ = 0, kp_ = 0, kd_ = 0;
   int lastErr_ = 0;

@@ -399,9 +399,7 @@ bool LineFollower::update() {
       return false;
     }
     float turn = s.lastPos > 0 ? 60 : -60;
-    left = base_ * 0.3f + turn;
-    right = base_ * 0.3f - turn;
-    robot_.motors.run(left, right);
+    drive(base_ * 0.3f + turn, base_ * 0.3f - turn);
     return true;
   }
   lost_ = false;
@@ -410,10 +408,20 @@ bool LineFollower::update() {
   dF_ += (d - dF_) * 0.3f;               // smooth it: with 3 sensors the position moves in steps
   lastErr_ = err;
   float steer = kp_ * err + kd_ * dF_;
-  left = base_ + steer;
-  right = base_ - steer;
-  robot_.motors.run(left, right);
+  drive(base_ + steer, base_ - steer);
   return true;
+}
+
+void LineFollower::drive(float l, float r) {
+  // the faster wheel over maxPct: move both down by the same amount, so that the steering (the difference) stays
+  float over = max(l, r) - maxPct;
+  if (over > 0) {
+    l -= over;
+    r -= over;
+  }
+  left = constrain(l, -maxPct, maxPct);
+  right = constrain(r, -maxPct, maxPct);
+  robot_.motors.run(left, right);
 }
 
 void LineFollower::stop() {

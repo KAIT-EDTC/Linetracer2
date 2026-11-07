@@ -42,7 +42,7 @@ arduino-cli upload --fqbn esp32:esp32:XIAO_ESP32C6:CDCOnBoot=cdc -p /dev/ttyACM0
 
 ### 3.1 `01_LineTrace`（ふつうのライントレース）
 
-操作は MicroPython の `main.py` と同じ（`lite/README.md` §8.2 の表）。START 短く: 1 回目 = 自動キャリブレーション、2 回目から = 走る／止まる。START 長押し: 速さレベル 1→2→3。START を押したまま電源 ON: しずかモード。速さと Kp / Kd はスケッチの `LEVELS` で変える。
+操作は MicroPython の `main.py` と同じ（`lite/README.md` §8.2 の表）。START 短く: 1 回目 = 自動キャリブレーション、2 回目から = 走る／止まる。START 長押し: 速さレベル 1→2→3（電源 ON のときはレベル 3 = 基本の速さ 60 %）。曲がるときも、どの車輪も `MAX_PCT`（80 %）より速くしない（速い方の車輪が 80 % をこえるときは、左右の差を保ったまま両方を下げる）。START を押したまま電源 ON: しずかモード。速さと Kp / Kd はスケッチの `LEVELS` で変える。
 
 ### 3.2 `02_SelfTest`（動作チェック、先生用）
 

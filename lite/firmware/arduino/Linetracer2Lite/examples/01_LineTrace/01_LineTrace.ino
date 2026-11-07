@@ -4,6 +4,7 @@
 //   START みじかく : 1 回目 = 自動キャリブレーション（線の上で その場で 左右に まわる）
 //                    2 回目から = 走る。もう一度 START で 止まる。
 //   START ながおし : 速さレベル 1〜3 を かえる（LED が 消えたら はなす。ピッと鳴って 黄色の LED が 1〜3 こ つく）
+//                    電源 ON の ときは レベル 3 = 基本の速さ 60 %。曲がるときも どの 車輪も 80 % まで
 //   LED（左右 3 こずつ）: みどり = じゅんび OK、あお = キャリブレーション中、あか = キャリブレーション しっぱい、
 //                    走っている間: 車輪の 速さで 前から 後ろへ 光が 流れる（線を 見うしなうと あか）
 //   ブザー         : 電源 ON で あいさつ、走る前に 「ピ・ピ・ピ・ピー」、しっぱいすると ひくい音
@@ -27,7 +28,8 @@ const Level LEVELS[] = {
     {60, 0.040, 0.65},  // 3: はやい
 };
 const int N_LEVELS = sizeof(LEVELS) / sizeof(LEVELS[0]);
-int level = 1;
+int level = 3;          // 電源を 入れたときの レベル（3 = 基本の速さ 60 %）
+const float MAX_PCT = 80;  // 曲がるときも 車輪は これより 速くしない（%）
 
 void setup() {
   Serial.begin(115200);
@@ -86,6 +88,7 @@ void runCourse() {
   const Level& lv = LEVELS[level - 1];
   robot.led.value(false);
   robot.waitRelease();
+  follower.maxPct = MAX_PCT;
   follower.start(lv.base, lv.kp, lv.kd);
   while (!robot.startPressed()) {
     if (!follower.update()) break;  // 線を 見うしなって あきらめた
