@@ -10,6 +10,7 @@ MicroPython 版（`../micropython/`）と同じことを Arduino IDE（C++）で
 | `Linetracer2Lite/examples/01_LineTrace/` | ふつうのライントレース（`main.py` と同じ操作） |
 | `Linetracer2Lite/examples/02_SelfTest/` | 先生用: 組み立てたロボットの動作チェック（LED・ブザー・ボタン・センサー・モーター・Wi-Fi） |
 | `Linetracer2Lite/examples/03_WiFiControl/` | ロボットが Wi-Fi の電波を出して、スマホのブラウザでラジコンのように動かす |
+| `Linetracer2Lite/examples/04_Rainbow/` | フルカラー LED に、にじ色を上（前）から下（後ろ）へ流す。START 短く = 速さ、長押し = 向き（USB だけで光る） |
 
 ## 1. 準備（1 回だけ）
 
@@ -18,7 +19,7 @@ MicroPython 版（`../micropython/`）と同じことを Arduino IDE（C++）で
    `https://espressif.github.io/arduino-esp32/package_esp32_index.json`
 3. 「ツール → ボード → ボードマネージャ」で **esp32（Espressif Systems）3.x** を入れる（3.3.11 で確認）。
 4. ライブラリを入れる: `Linetracer2Lite` フォルダを丸ごと **スケッチブックの `libraries/`** にコピーする（Linux / Mac: `~/Arduino/libraries/`、Windows: `ドキュメント\Arduino\libraries\`）。ZIP にして「スケッチ → ライブラリをインクルード → .ZIP 形式のライブラリをインストール」でもよい。ほかのライブラリはいらない（Wi-Fi・Web サーバーは esp32 に入っている）。
-5. Arduino IDE を開き直すと「ファイル → スケッチ例 → Linetracer2Lite」に 3 つのスケッチが出る。
+5. Arduino IDE を開き直すと「ファイル → スケッチ例 → Linetracer2Lite」に 4 つのスケッチが出る。
 
 ## 2. 書き込み
 
