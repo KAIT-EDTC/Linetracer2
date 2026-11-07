@@ -373,21 +373,24 @@ void LineFollower::start(float base, float kp, float kd) {
   lastErr_ = 0;
   dF_ = 0;
   lost_ = false;
+  fresh_ = true;
   n_ = 0;
   left = right = base;
-  tPrev_ = micros();
+  pTerm = dTerm = 0;
+  tPrev_ = micros() - periodUs;  // the first step at once
   running_ = true;
 }
 
 bool LineFollower::update() {
   if (!running_) return false;
+  uint32_t now = micros();
+  if (now - tPrev_ < periodUs) return true;  // not yet: one control step every periodUs
+  float dt = (now - tPrev_) / 1000.0f;       // ms
+  tPrev_ = now;
   LineSensors& s = robot_.sensors;
   pos = s.position();
-  if (++n_ % 10 == 0)  // running lights (not every time: a frame takes ~0.2 ms)
+  if (++n_ % 10 == 0)  // running lights (not every step: a frame takes ~0.2 ms)
     robot_.led.flow(left, right, pos != LINE_LOST ? Colors::CYAN : Colors::RED);
-  uint32_t now = micros();
-  float dt = max<uint32_t>(1, now - tPrev_) / 1000.0f;  // ms
-  tPrev_ = now;
   if (pos == LINE_LOST) {
     // line lost: turn hard to the side where it was last seen
     if (!lost_) {
@@ -402,12 +405,18 @@ bool LineFollower::update() {
     drive(base_ * 0.3f + turn, base_ * 0.3f - turn);
     return true;
   }
-  lost_ = false;
-  int err = pos;                         // -1000 .. +1000  (+ = line is right)
-  float d = (err - lastErr_) / dt;       // change per millisecond
-  dF_ += (d - dF_) * 0.3f;               // smooth it: with 3 sensors the position moves in steps
+  int err = pos;  // -1000 .. +1000  (+ = line is right)
+  if (lost_ || fresh_) {  // at the start and when the line comes back: no jump of the D term
+    lastErr_ = err;
+    dF_ = 0;
+  }
+  lost_ = fresh_ = false;
+  float d = (err - lastErr_) / dt;   // change per millisecond
+  dF_ += (d - dF_) * dt / (dTauMs + dt);
   lastErr_ = err;
-  float steer = kp_ * err + kd_ * dF_;
+  pTerm = kp_ * err;
+  dTerm = kd_ * dF_;
+  float steer = pTerm + dTerm;
   drive(base_ + steer, base_ - steer);
   return true;
 }
@@ -421,7 +430,7 @@ void LineFollower::drive(float l, float r) {
   }
   left = constrain(l, -maxPct, maxPct);
   right = constrain(r, -maxPct, maxPct);
-  robot_.motors.run(left, right);
+  robot_.motors.run(left, right, ramp);
 }
 
 void LineFollower::stop() {

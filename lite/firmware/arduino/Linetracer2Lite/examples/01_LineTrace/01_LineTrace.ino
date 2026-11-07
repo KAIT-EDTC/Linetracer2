@@ -27,15 +27,18 @@ struct Level {
   float base, kp, kd;
 };
 const Level LEVELS[] = {
-    {30, 0.025, 0.35},  // 1: ゆっくり
+    {20, 0.018, 0.00},  // 1: ゆっくり
     {45, 0.032, 0.50},  // 2: ふつう
     {60, 0.040, 0.65},  // 3: はやい
 };
 const int N_LEVELS = sizeof(LEVELS) / sizeof(LEVELS[0]);
-int level = 3;          // 電源を 入れたときの レベル（3 = 基本の速さ 60 %）
+int level = 0;          // 電源を 入れたときの レベル（3 = 基本の速さ 60 %）
 const float MAX_PCT = 80;  // 曲がるときも 車輪は これより 速くしない（%）
+// true = 走っている間 0.05 びょうごとに 線の 位置・P・D・左右の 速さを シリアルに 出す（調整用。USB を つないで
+// シリアルモニタか シリアルプロッタを ひらいて おく。ひらかずに つなぐだけだと 出力が つまって 走りが おかしくなる）
+const bool DEBUG_PRINT = false;
 const bool MANUAL_CAL = true;  // true = 手で キャリブレーション（黒 → 白）、false = 自動（その場で 左右に まわる）
-const bool REVERSE = true;  // 前に 走るはずが 後ろに 走るとき true（前と 後ろを 入れかえる。回る 向きは そのまま）
+const bool REVERSE = false;  // 前に 走るはずが 後ろに 走るとき true（前と 後ろを 入れかえる。回る 向きは そのまま）
 
 void setup() {
   Serial.begin(115200);
@@ -156,8 +159,15 @@ void runCourse() {
   robot.waitRelease();
   follower.maxPct = MAX_PCT;
   follower.start(lv.base, lv.kp, lv.kd);
+  uint32_t tLog = 0;
   while (!robot.startPressed()) {
     if (!follower.update()) break;  // 線を 見うしなって あきらめた
+    if (DEBUG_PRINT && millis() - tLog >= 50) {
+      tLog = millis();
+      bool lost = follower.pos == lt2::LINE_LOST;  // 見うしなったら pos/10 = 0、lost = 100
+      Serial.printf("pos/10:%d,P:%.1f,D:%.1f,L:%.1f,R:%.1f,lost:%d\n", lost ? 0 : follower.pos / 10, follower.pTerm,
+                    follower.dTerm, follower.left, follower.right, lost ? 100 : 0);
+    }
   }
   if (follower.running()) follower.stop();
   robot.led.value(true);

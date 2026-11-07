@@ -201,6 +201,10 @@ class LineFollower {
   int pos = 0;                // the last position (or lt2::LINE_LOST)
   uint32_t lostTimeoutMs = 800;
   float maxPct = 100;          // no wheel goes faster than this (%), steering included
+  uint32_t periodUs = 3000;    // fixed control step: the D term must not depend on how fast loop() runs
+  float dTauMs = 15;           // smoothing of the D term (time constant, ms): sensor noise and the steps of 3 sensors
+  float ramp = 0.05f;          // max change of motor duty per control step
+  float pTerm = 0, dTerm = 0;  // the last P and D parts of the steering (%), for tuning
 
  private:
   void drive(float l, float r);
@@ -209,5 +213,5 @@ class LineFollower {
   int lastErr_ = 0;
   float dF_ = 0;
   uint32_t tPrev_ = 0, lostSince_ = 0, n_ = 0;
-  bool lost_ = false, running_ = false;
+  bool lost_ = false, running_ = false, fresh_ = true;
 };
