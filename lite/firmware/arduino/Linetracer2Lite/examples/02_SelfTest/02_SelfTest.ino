@@ -14,6 +14,7 @@
 #include <WiFi.h>
 
 Robot robot;
+const bool REVERSE = true;  // 前に 走るはずが 後ろに 走るとき true（前と 後ろを 入れかえる。回る 向きは そのまま）
 
 enum class Result { NotRun, Ok, Ng, Look };
 const char* RESULT_TEXT[] = {"-", "OK", "NG", "見て確認"};
@@ -242,6 +243,7 @@ void runAll() {
 void setup() {
   Serial.begin(115200);
   robot.begin();
+  robot.motors.reverse = REVERSE;
   delay(1500);  // USB の シリアルが つながるのを 少し 待つ
   Serial.printf("\nchip %s rev %d, %lu MHz, flash %lu KB, MAC %s\n", ESP.getChipModel(), ESP.getChipRevision(),
                 ESP.getCpuFreqMHz(), ESP.getFlashChipSize() / 1024, WiFi.macAddress().c_str());

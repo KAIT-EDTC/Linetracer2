@@ -35,10 +35,12 @@ const int N_LEVELS = sizeof(LEVELS) / sizeof(LEVELS[0]);
 int level = 3;          // 電源を 入れたときの レベル（3 = 基本の速さ 60 %）
 const float MAX_PCT = 80;  // 曲がるときも 車輪は これより 速くしない（%）
 const bool MANUAL_CAL = true;  // true = 手で キャリブレーション（黒 → 白）、false = 自動（その場で 左右に まわる）
+const bool REVERSE = true;  // 前に 走るはずが 後ろに 走るとき true（前と 後ろを 入れかえる。回る 向きは そのまま）
 
 void setup() {
   Serial.begin(115200);
   robot.begin();
+  robot.motors.reverse = REVERSE;
   if (robot.startPressed()) {  // START を おしたまま 電源 ON -> しずかモード
     robot.volume = 0;
     robot.blink(2, 100);
