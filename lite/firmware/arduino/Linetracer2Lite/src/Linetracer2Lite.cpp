@@ -166,10 +166,9 @@ int LineSensors::position(int threshold) {
   read(v);
   long total = 0, acc = 0;
   for (int i = 0; i < N_SENS; i++) {
-    if (v[i] > threshold) {
-      total += v[i];
-      acc += (long)v[i] * (i - 1) * 1000;
-    }
+    int w = max(0, v[i] - threshold);  // (a hard cut here made the position jump)
+    total += w;
+    acc += (long)w * (i - 1) * 1000;
   }
   if (total < 300) {  // line lost: remember which side it went
     lastPos = lastPos > 0 ? 1000 : -1000;
@@ -177,6 +176,26 @@ int LineSensors::position(int threshold) {
   }
   lastPos = acc / total;
   return lastPos;
+}
+
+int LineSensors::edgePosition() {
+  int v[N_SENS];
+  read(v);
+  int a = v[0], b = v[1], c = v[2];
+  if (a + b + c < 300) {  // line lost
+    lastPos = lastPos > 0 ? 1000 : -1000;
+    return LINE_LOST;
+  }
+  int e;
+  if (b < 300) {  // S2 is off the line: far out, steer hard to the side that still sees it
+    e = c > a ? 1000 : -1000;
+  } else {
+    // S3 half black = 0.  Beyond that the line also leaves S2 (+) or reaches S1 (-), so it keeps growing
+    int s = c > a ? 1 : -1;
+    e = constrain((c - 500) - a / 2 + s * (1000 - b) / 2, -1000, 1000);
+  }
+  lastPos = e;
+  return e;
 }
 
 // ================================================================ Lights
@@ -388,7 +407,7 @@ bool LineFollower::update() {
   float dt = (now - tPrev_) / 1000.0f;       // ms
   tPrev_ = now;
   LineSensors& s = robot_.sensors;
-  pos = s.position();
+  pos = edge ? s.edgePosition() : s.position();
   if (++n_ % 10 == 0)  // running lights (not every step: a frame takes ~0.2 ms)
     robot_.led.flow(left, right, pos != LINE_LOST ? Colors::CYAN : Colors::RED);
   if (pos == LINE_LOST) {

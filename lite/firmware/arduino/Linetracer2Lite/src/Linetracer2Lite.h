@@ -113,6 +113,9 @@ class Motors {
 //   calibrate()  -> learn white/black for each sensor (move the sensors over the line!)
 //   read(v)      -> 0 (white) .. 1000 (black) for each sensor
 //   position()   -> -1000 (line under S1, left) .. 0 (centre, S2) .. +1000 (S3, right), or lt2::LINE_LOST
+//   edgePosition() -> 0 when S2 is on the line and S3 half on its RIGHT edge; -1000 .. +1000 (+ = line is right).
+//                  On a 19 mm line with the sensors 12 mm apart, S1 and S3 do not reach the edges when S2 is in the
+//                  middle, so position() sees nothing for the first ~1 mm and then jumps; S3 on the edge does not.
 class LineSensors {
  public:
   void begin();
@@ -123,7 +126,8 @@ class LineSensors {
   void calibrate(int samples = 1);
   bool calibrated() const;
   void read(int out[lt2::N_SENS]);
-  int position(int threshold = 150);
+  int position(int threshold = 50);  // values under threshold fade in (no jump when a side sensor starts to see)
+  int edgePosition();
   bool ambientCancel = true;
   uint32_t settleUs = 300;
   int lo[lt2::N_SENS], hi[lt2::N_SENS];
@@ -200,6 +204,7 @@ class LineFollower {
   float left = 0, right = 0;  // the last motor command (%)
   int pos = 0;                // the last position (or lt2::LINE_LOST)
   uint32_t lostTimeoutMs = 800;
+  bool edge = false;           // true = steer with LineSensors::edgePosition() (S3 on the right edge of the line)
   float maxPct = 100;          // no wheel goes faster than this (%), steering included
   uint32_t periodUs = 3000;    // fixed control step: the D term must not depend on how fast loop() runs
   float dTauMs = 15;           // smoothing of the D term (time constant, ms): sensor noise and the steps of 3 sensors

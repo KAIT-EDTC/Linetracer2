@@ -27,7 +27,7 @@ struct Level {
   float base, kp, kd;
 };
 const Level LEVELS[] = {
-    {20, 0.018, 0.00},  // 1: ゆっくり
+    {10, 0.001, 0.00},  // 1: ゆっくり
     {45, 0.032, 0.50},  // 2: ふつう
     {60, 0.040, 0.65},  // 3: はやい
 };
@@ -37,6 +37,10 @@ const float MAX_PCT = 80;  // 曲がるときも 車輪は これより 速く�
 // true = 走っている間 0.05 びょうごとに 線の 位置・P・D・左右の 速さを シリアルに 出す（調整用。USB を つないで
 // シリアルモニタか シリアルプロッタを ひらいて おく。ひらかずに つなぐだけだと 出力が つまって 走りが おかしくなる）
 const bool DEBUG_PRINT = false;
+// true = S2 を 線の 上、S3 を 線の 右の 境目に のせて 走る（ロボットは 線の 少し 左を 走る）。19 mm の 線で
+// センサーが 12 mm おきだと、まん中では S1 / S3 が 線の 境目に とどかず、ずれ始めを 見のがして ぐらつく。
+// 境目の S3 は 少しの ずれでも 値が かわる（Kp は 半分くらいから 合わせる）。false = 3 つの 重心で 線の まん中を 走る
+const bool EDGE = true;
 const bool MANUAL_CAL = true;  // true = 手で キャリブレーション（黒 → 白）、false = 自動（その場で 左右に まわる）
 const bool REVERSE = false;  // 前に 走るはずが 後ろに 走るとき true（前と 後ろを 入れかえる。回る 向きは そのまま）
 
@@ -158,6 +162,7 @@ void runCourse() {
   robot.led.value(false);
   robot.waitRelease();
   follower.maxPct = MAX_PCT;
+  follower.edge = EDGE;
   follower.start(lv.base, lv.kp, lv.kd);
   uint32_t tLog = 0;
   while (!robot.startPressed()) {
@@ -165,8 +170,10 @@ void runCourse() {
     if (DEBUG_PRINT && millis() - tLog >= 50) {
       tLog = millis();
       bool lost = follower.pos == lt2::LINE_LOST;  // 見うしなったら pos/10 = 0、lost = 100
-      Serial.printf("pos/10:%d,P:%.1f,D:%.1f,L:%.1f,R:%.1f,lost:%d\n", lost ? 0 : follower.pos / 10, follower.pTerm,
-                    follower.dTerm, follower.left, follower.right, lost ? 100 : 0);
+      const int* v = robot.sensors.values;  // 0（白）〜 1000（黒）
+      Serial.printf("S1/10:%d,S2/10:%d,S3/10:%d,pos/10:%d,P:%.1f,D:%.1f,L:%.1f,R:%.1f,lost:%d\n", v[0] / 10,
+                    v[1] / 10, v[2] / 10, lost ? 0 : follower.pos / 10, follower.pTerm, follower.dTerm, follower.left,
+                    follower.right, lost ? 100 : 0);
     }
   }
   if (follower.running()) follower.stop();
