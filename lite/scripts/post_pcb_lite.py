@@ -4,7 +4,7 @@
 Only SYMBOLS on the board (lower elementary school): build-order numbers, +/- and polarity pictures, the 3rd colour
 band of each resistor, short part names.  What they mean and the steps are in the assembly manual
 (lite/docs/assembly.md).  Build order (one kind of part per step, lowest parts first):
-   1 ちゃ resistors (100) x4   2 だいだい resistors (10k) x3   3 あか resistors (1k) x2   4 diode   5 0.1uF caps x2
+   1 ちゃ resistors (100) x4   2 だいだい resistors (10k) x3   3 あか resistors (1k) x3   4 diode   5 0.1uF caps x2
    6 transistor   7 button   8 buzzer   9 battery connector   10 motor driver   11 XIAO
    12 full-colour LEDs x6 (8.7 mm tall, down both sides)   13 470uF caps (the tallest: last, so they do not get in the way of the
    XIAO's joints)   14 sensors (bottom)   15 motors (after the frames are on)
@@ -232,7 +232,7 @@ def silk(b):
         text(b, "S%d" % (i + 1), x, 6.7, 0.8)
 
     # ---- resistors: colour of the 3rd band on the body; the key in the front-right corner -----------------------
-    for ref in ("R1", "R2", "R3", "R4", "R5", "R6", "R7", "R9", "R10"):
+    for ref in ("R1", "R2", "R3", "R4", "R5", "R6", "R7", "R9", "R10", "R11"):
         fp = FPS[ref]
         (x1, y1), (x2, y2) = pad_xy(fp, "1"), pad_xy(fp, "2")
         w = BAND3[fp.GetValue()]
@@ -282,8 +282,9 @@ def silk(b):
     # full-colour LEDs (both sides): the footprint brings the outline and the dot beside the GND hole (longest leg)
     num(b, 12, LL.LED_L - 0.1, 23.7)
     num(b, 12, 74.4, 4.2)
-    text(b, "Linetracer2", 51.0, 30.2, 1.3, bold=True)
-    text(b, "Lite rev.L3", 51.0, 32.6, 1.0)
+    # (below the resistor key: on the key's lines it would read like a 4th colour, and R11 is to the right)
+    text(b, "Linetracer2", 48.0, 37.4, 1.3, bold=True)
+    text(b, "Lite rev.L3", 48.0, 39.3, 1.0)
 
     # ---- test pads (for the teacher's multimeter; meaning and voltages in the manual) ---------------------
     for ref, label, dx, dy in (("TP1", "GND", 3.3, 0), ("TP2", "3V3", -3.0, 0), ("TP3", "VSYS", -0.6, 1.9),

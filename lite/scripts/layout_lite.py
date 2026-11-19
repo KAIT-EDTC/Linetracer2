@@ -10,7 +10,8 @@ Routing style ("beautiful" by rule, not by an autorouter):
   * signals that travel together run as a bus at a fixed pitch (sensor lines 1.3 mm, motor inputs 1.27 mm,
     the three button/LED lines 1.0 mm) and keep their order, so nothing on the top side crosses
   * the top side (F.Cu) carries almost everything; the bottom side only the IR LED cathode bus right behind the
-    sensors (they are on the bottom too) and the driver's STBY line, plus a GND pour on both sides
+    sensors (they are on the bottom too), the driver's STBY line and the RGB LEDs' supply and data inlet (R11 -> D2),
+    plus a GND pour on both sides
   * symmetric where the parts allow it: the driver sits on the centre line and fans out to both motors alike
 """
 
@@ -65,6 +66,8 @@ PLACE["R10"] = (25.58, UI_R, 270, "F")   # 1k: D4 -> button (right behind R7, sa
 PLACE["SW1"] = (19.08, 37.4, 0, "F")     # pin 1 (front) on R10, pin 2 (rear) GND
 PLACE["R9"] = (32.5, UI_R, 270, "F")     # 100: D4 -> buzzer +
 PLACE["BZ1"] = (32.5, 47.5, 270, "F")    # + front, - rear (body centre 32.5 / 50.0; 1 mm from the frame pillar)
+# 1k in the RGB data line, same row, right beside the XIAO's antenna keep-out (x 56.65 ..): pad 1 (D6) at the front
+PLACE["R11"] = (55.5, UI_R, 270, "F")
 
 # 6 full-colour LEDs (PL9823), 3 down each side edge of the front half (the board is free there in front of the
 # XIAO).  One data chain: left rear -> left front (turned 90: DIN rear, DO front), along the front edge,
@@ -166,9 +169,11 @@ route("BTN", "F", W_SIG, P("SW1", "1"), X(25.58))      # the button's two pin-1 
 route("Q1-B", "F", W_SIG, P("R7", "2"), P("Q1", "3"))
 route("BZ1+", "F", W_SIG, P("R9", "2"), P("BZ1", "1"))
 
-# RGB LEDs.  Data: D6 on the bottom just in front of the XIAO's pins to the left rear LED, then on the top along
-# each column (a step and a 45 deg jog between neighbours) and along the front edge from the left to the right
-route("RGB_DIN", "B", W_SIG, P("U1", "7"), Y(21.8), X(LED_L - 0.9), P("D2", "4"))
+# RGB LEDs.  Data: D6 as the 3rd line of the bus (in front of the antenna keep-out) to R11, from R11's rear pad on
+# the bottom (a 45 deg step past its front pad) to the left rear LED, then on the top along each column (a step and
+# a 45 deg jog between neighbours) and along the front edge from the left to the right
+route("RGB_DIN", "F", W_SIG, P("U1", "7"), Y(21.6), X(55.5), P("R11", "1"))
+route("D2-DIN", "B", W_SIG, P("R11", "2"), DX(53.5, -1), Y(21.8), X(LED_L - 0.9), P("D2", "4"))
 route("D2-DO", "F", W_SIG, P("D2", "2"), Y(15.305), DX(LED_L - 0.9, -1), P("D3", "4"))
 route("D3-DO", "F", W_SIG, P("D3", "2"), Y(8.305), DX(LED_L - 0.9, -1), P("D4", "4"))
 route("D4-DO", "F", W_SIG, P("D4", "2"), Y(1.0), X(LED_R + 0.9), P("D5", "4"))
@@ -294,7 +299,7 @@ def vias(padpos):
 def routed_nets():
     """Board net names that are fully hand-routed (the preview hides their ratsnest)."""
     names = {"A1": "Net-(PS1-A)", "A2": "Net-(PS2-A)", "A3": "Net-(PS3-A)", "Q1-B": "Net-(Q1-B)",
-             "BZ1+": "Net-(BZ1-+)", "+3V3": "+3V3",
+             "BZ1+": "Net-(BZ1-+)", "+3V3": "+3V3", "D2-DIN": "Net-(D2-DIN)",
              "D2-DO": "Net-(D2-DO)", "D3-DO": "Net-(D3-DO)", "D4-DO": "Net-(D4-DO)", "D5-DO": "Net-(D5-DO)",
              "D6-DO": "Net-(D6-DO)"}
     return {names.get(r["net"], "/" + r["net"]) for r in ROUTES}
