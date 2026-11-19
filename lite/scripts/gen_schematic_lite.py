@@ -89,35 +89,56 @@ d1 = s.place("Device:D_Schottky", "D1", "1N5819", 73.66, 45.72, 180,
              fields={"Note": "reverse battery: protects U3 and the XIAO"},
              ref_off=(-2.54, -3.81), val_off=(-3.81, 3.81))
 s.lab(d1, "2", "VBAT")      # A
-s.lab(d1, "1", "VIN_BB")    # K
-s.power("PWR_FLAG", 83.82, 43.18, "up")
-s.wire(83.82, 43.18, 83.82, 45.72)
-s.label("VIN_BB", 83.82, 45.72, "down")
-
+# D1 K -> U3 VIN with EN tied to it (EN must not float: always on); one VIN_BB label names the net for the PCB
 u3 = s.place("Linetracer2:AE-TPS63802", "U3", "AE-TPS63802", 104.14, 48.26, 0,
              footprint="Linetracer2:AE-TPS63802",
              fields={"Akizuki": "115557 (AE-TPS63802 kit) + 470k 125474 for VR1",
                      "Note": "VR1 = 470k resistor (5.13 V), lying flat; header 4P from the kit"},
-             ref_off=(0, -8.89), val_off=(0, 11.43))
-s.lab(u3, "1", "VIN_BB")
-s.lab(u3, "4", "VIN_BB")    # EN must not float: always on
-s.lab(u3, "3", "VOUT_BB")
+             ref_off=(0, -10.16), val_off=(0, -7.62))
+xk, yk, _ = d1.pin("1")
+xv, yv, _ = u3.pin("1")
+xe, ye, _ = u3.pin("4")
+s.wire(xk, yk, xv, yv)
+s.path((xe, ye), (xe - 5.08, ye), (xe - 5.08, yv))
+s.junction(xe - 5.08, yv)
+s.label("VIN_BB", xk + 2.54, yk, "right")
+s.power("PWR_FLAG", 83.82, 43.18, "up")
+s.wire(83.82, 43.18, 83.82, yk)
+s.junction(83.82, yk)
 s.pwr(u3, "2", "GND")
 
+# U3 VOUT -> D8 A (one VOUT_BB label), D8 K -> VSYS
 d8 = s.place("Device:D_Schottky", "D8", "1N5819", 132.08, 45.72, 180,
              footprint="Diode_THT:D_DO-41_SOD81_P7.62mm_Horizontal",
              fields={"Note": "OR diode: U3 can not feed the PC's USB port, USB 5 V can not feed U3"},
              ref_off=(-2.54, -3.81), val_off=(-3.81, 3.81))
-s.lab(d8, "2", "VOUT_BB")   # A
+xo, yo, _ = u3.pin("3")
+xa, ya, _ = d8.pin("2")
+s.wire(xo, yo, xa, ya)
+s.label("VOUT_BB", xo + 2.54, yo, "right")
 s.lab(d8, "1", "VSYS")      # K
 s.power("PWR_FLAG", 142.24, 43.18, "up")
 s.wire(142.24, 43.18, 142.24, 45.72)
 s.label("VSYS", 142.24, 45.72, "down")
 
+# D9: supply of the left LED column (D2..D4), 0.7 V below VSYS: the first LED then reads the XIAO's 3.3 V data
+d9 = s.place("Device:D", "D9", "1N4148", 182.88, 45.72, 180,
+             footprint="Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal",
+             fields={"Akizuki": "1N4148 (check the code)", "Note": "level shift: the first LED runs 0.7 V lower"},
+             ref_off=(-2.54, -3.81), val_off=(-3.81, 3.81))
+s.lab(d9, "2", "VSYS")      # A
+s.lab(d9, "1", "VLED_L")    # K
+s.power("PWR_FLAG", 198.12, 43.18, "up")
+s.wire(198.12, 43.18, 198.12, 45.72)
+s.label("VLED_L", 198.12, 45.72, "down")
+s.text("D9: VLED_L = VSYS - 0.7 V = about 4.1 V for the left LEDs D2-D4.", 167.64, 55.88, 1.27)
+s.text("A PL9823 reads '1' above 0.7 x VDD: 2.9 V there, so the XIAO's 3.3 V", 167.64, 59.69, 1.27)
+s.text("data is enough.  D2-D4 pass the data on at 4.1 V, enough for D5-D7.", 167.64, 63.5, 1.27)
+
 # GND: nothing on this board is a power output for GND (the XIAO's GND pin is a power input)
-s.power("PWR_FLAG", 160.02, 43.18, "up")
-s.wire(160.02, 43.18, 160.02, 45.72)
-s.power("GND", 160.02, 45.72, "down")
+s.power("PWR_FLAG", 228.6, 43.18, "up")
+s.wire(228.6, 43.18, 228.6, 45.72)
+s.power("GND", 228.6, 45.72, "down")
 
 s.text("Why rev.L4: 2 motors starting / stalled pull 2-4 A and the AA cells sag to 2.5-3.3 V; the XIAO needs about 4 V on its "
        "5V pin and reset.", 20.32, 73.66, 1.27)
@@ -128,7 +149,7 @@ s.text("U3 kit: solder a 470k resistor (flat) in place of VR1 BEFORE power-up.  
 
 # ---- mechanical (mounting holes, kept in the schematic for PCB parity)
 s.text("MECHANICAL: H1-H4 = gearbox frame M3 (x30/x70, y62/y96), H5 = front ball caster / skid, snap-in (x50, y11: behind the centre sensor)",
-       20.32, 83.82, 1.27)
+       20.32, 85.09, 1.27)
 for i in range(5):
     s.place("Mechanical:MountingHole", "H%d" % (i + 1), "M3" if i < 4 else "SKID M3", 27.94 + i * 22.86, 91.44, 0,
             footprint="MountingHole:MountingHole_3.2mm_M3", in_bom=False,
@@ -252,20 +273,12 @@ s.connect(r11, "2", leds[0], "4")
 for a, b in zip(leds, leds[1:]):
     s.connect(a, "2", b, "4")
 s.nc(leds[-1], "2")
-d9 = s.place("Device:D", "D9", "1N4148", 299.72, 135.89, 180,
-             footprint="Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal",
-             fields={"Akizuki": "1N4148 (check the code)", "Note": "level shift: the first LED runs 0.7 V lower"},
-             ref_off=(-2.54, -3.81), val_off=(-3.81, 3.81))
-s.lab(d9, "2", "VSYS")      # A
-s.lab(d9, "1", "VLED_L")    # K
-s.power("PWR_FLAG", 312.42, 133.35, "up")
-s.wire(312.42, 133.35, 312.42, 135.89)
-s.label("VLED_L", 312.42, 135.89, "down")
-s.text("D2..D7 = PL9823 (NeoPixel type, 800 kHz, 24 bit per LED): D2-D4 left side (rear -> front), D5-D7 right side",
+s.text("D2..D7 = PL9823 (NeoPixel type, 800 kHz, 24 bit per LED): D2-D4 left side (rear -> front, VDD = VLED_L),",
        271.78, 165.1, 1.27)
-s.text("(front -> rear).  Data from D6 (TX: the boot log may flash them once).  6 x white = 0.36 A: the library limits it.",
+s.text("D5-D7 right side (front -> rear, VDD = VSYS).  Data from D6 (TX: the boot log may flash them once) through R11 1k:",
        271.78, 168.91, 1.27)
-s.text("R11 1k in the data line: 5 mA at most if DIN touches VDD or GND, or D2 is in backwards.", 271.78, 172.72, 1.27)
+s.text("5 mA at most if DIN touches VDD or GND, or D2 is in backwards.  6 x white = 0.36 A: the library limits it.",
+       292.1, 172.72, 1.27)
 r9 = s.place("Device:R", "R9", "100", 287.02, 175.26, 90, footprint=R_FP,
              ref_off=(-2.54, -2.54), val_off=(-1.27, 2.54))
 bz = s.place("Device:Buzzer", "BZ1", "piezo 13mm", 304.8, 177.8, 0,

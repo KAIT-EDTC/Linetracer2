@@ -23,7 +23,7 @@ import asm3d  # noqa: E402
 import layout_lite as LL  # noqa: E402
 
 # build order (= the circled numbers on the board, lite/docs/assembly.md)
-STEPS = {1: ["R1", "R2", "R3", "R9"], 2: ["R4", "R5", "R6"], 3: ["R7", "R10"], 4: ["D1", "D8"], 5: ["D9"],
+STEPS = {1: ["R1", "R2", "R3", "R9"], 2: ["R4", "R5", "R6"], 3: ["R7", "R10", "R11"], 4: ["D1", "D8"], 5: ["D9"],
          6: ["C3", "C4"], 7: ["Q1"], 8: ["SW1"], 9: ["BZ1"], 10: ["J1"], 11: ["U2"], 12: ["U1"], 13: ["U3"],
          14: ["D2", "D3", "D4", "D5", "D6", "D7"], 15: ["C1"], 16: ["PS1", "PS2", "PS3"]}
 SENSOR_STEP = 16
