@@ -25,7 +25,7 @@ Raspberry Pi Pico ＋ TC78H653FTG ＋ 130 モーター ×2 の、**全部足付�
 
 標準版から部品を減らした版も用意した（詳しくは [lite/README.md](lite/README.md)）。**Lite のファイルはすべて `lite/` フォルダにまとめてあり、標準版のファイルとは混ざらない**。**枠・デッキ・平歯車・車輪の 3D プリント部品、ねじ、モーター、電池ボックスは標準版と共通**で、基板・ソフト・前の支え（Lite 用ボールキャスター）が違う。
 rev.L2（2026-10-05）でマイコンを **Seeed Studio XIAO ESP32C6**、センサーを **LBR-127HLD** に変え、rev.L3（2026-10-07）で **XIAO をピンヘッダ付けに、ブザーとフルカラー LED 6 こ・テストパッドを追加、配線を全部手で引き直し（交差なし・ビア 0）、Lite 用ボールキャスター**を作った。ロボット全体の 3D モデル（STL / GLB）もある。
-**rev.L4（2026-10-30）**: モーターに力がかかる（車輪を止める・100 % で走り出す）と電池が 2.5〜3.3 V まで下がって XIAO がリセットしていたので、**XIAO の電源を昇降圧モジュール（秋月 AE-TPS63802、5 V）で作る**ようにし、ほかの回路の問題（USB の VBUS に 470 µF、フルカラー LED の信号の電圧、ニッケル水素で動かない など）も直した（[lite/README.md](lite/README.md) §0）。**KiCad のファイル・Gerber はまだ rev.L3 のまま**（生成スクリプトは rev.L4。KiCad 10 で作り直してから発注）。
+**rev.L4（2026-10-30）**: モーターに力がかかる（車輪を止める・100 % で走り出す）と電池が 2.5〜3.3 V まで下がって XIAO がリセットしていたので、**XIAO の電源を昇降圧モジュール（秋月 AE-TPS63802、5 V）で作る**ようにし、ほかの回路の問題（USB の VBUS に 470 µF、フルカラー LED の信号の電圧、ニッケル水素で動かない など）も直した（[lite/README.md](lite/README.md) §0）。フルカラー LED の信号線には保護の R11 1 kΩ を入れた。KiCad のファイル・Gerber・PDF・絵も rev.L4（ERC 0・DRC 0）。ロボット全体の 3D と干渉チェックだけ rev.L3 のまま。
 
 | | 標準版 rev.A1 | Lite rev.L4 |
 |---|---|---|
@@ -86,7 +86,7 @@ Linetracer2/
 └── lite/                     ★ Lite 一式（rev.L4: XIAO ESP32C6 版。標準版とは別フォルダ）
     ├── README.md             Lite の設計書（変更点・コスト比較・組み立て・ソフト）
     ├── docs/                 回路図/組立図 PDF、3D 画像
-    ├── hardware/             KiCad プロジェクト、Gerber（Linetracer2-Lite_rev.L3_gerber.zip）、ロボット全体の 3D（STL / GLB）
+    ├── hardware/             KiCad プロジェクト、Gerber（Linetracer2-Lite_rev.L4_gerber.zip）、ロボット全体の 3D（STL / GLB）
     ├── firmware/micropython/ Lite 用ソフト（XIAO ESP32C6 用 MicroPython。センサー 3 個・ボタン 1 個・フルカラー LED 6 個・ブザー）
     └── scripts/              Lite 専用の生成スクリプト（回路図・配置と手で引いた配線・シルク・配置の確認用の絵）
 ```
@@ -105,5 +105,6 @@ Linetracer2/
 - [x] Lite rev.L2（XIAO ESP32C6 ＋ LBR-127HLD）の回路図・基板・部品表・ソフト・スキッド 7.5 mm（2026-10-05）
 - [x] Lite rev.L3（XIAO をピンヘッダで、ブザー、手で引いた配線、Lite 用ボールキャスター、ロボット全体の 3D と干渉チェック）（2026-10-07）
 - [x] Lite rev.L4 の回路・配置と配線（生成スクリプト）: XIAO 用 5 V 昇降圧、USB と電源の分け方、フルカラー LED の信号の電圧（2026-10-30）
-- [ ] Lite rev.L4 を KiCad 10 で作り直す（回路図・基板・DRC・Gerber・絵・3D、`lite/README.md` §0.6・§9）
+- [x] Lite rev.L4 を KiCad 10 で作り直す（回路図・基板・DRC・Gerber・絵、`lite/README.md` §0.6・§9）（2026-11-19）
+- [ ] Lite rev.L4 のロボット全体の 3D と干渉チェック（`export_assembly.sh`）
 - [ ] Lite の試作（LBR-127HLD の高さ、キャスターの転がり、3 センサーでの走り、`lite/README.md` §10）

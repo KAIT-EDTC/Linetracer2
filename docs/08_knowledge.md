@@ -185,6 +185,8 @@ flatpak install --user flathub org.kicad.KiCad org.kicad.KiCad.Library.Footprint
 - `kicad-cli` は `flatpak run --command=kicad-cli org.kicad.KiCad`、pcbnew 入り Python は `flatpak run --command=python3 org.kicad.KiCad`（`scripts/kc`, `scripts/kpy` に用意）。
 - **flatpak の中の `/tmp` は外と別物**。kicad-cli の出力先はホームの下にする。
 - GUI を一度も起動していないとグローバルのライブラリ表が無く、ERC が「ライブラリが構成にない」警告を大量に出す → `/app/extensions/Library/template/{sym,fp}-lib-table` を `~/.var/app/org.kicad.KiCad/config/kicad/10.0/` にコピーすれば消える（GUI 初回起動時のウィザードと同じこと）。
+- **シルクの日本語のフォント（Noto Sans CJK JP）が無いと、代わりのフォント（Inter）になり、DRC に `text_thickness`（と `silk_over_copper`）の警告が出る**（2026-11-19。Lite の回路図の直し #9 で「KiCad 10.0.7 で `text_thickness` が 25 件」と見えたのはこれ）。flatpak にはフォントが入っている。それ以外の環境では `fonts-noto-cjk` などを入れてから `build_pcb.py` を回す。
+- flatpak が使えない Linux（クラウドの作業環境など）では、公式の Docker イメージ `kicad/kicad:10.0.x` のレイヤーを取り出して、その中の `ld-linux` で `kicad-cli` / `python3`（pcbnew）を動かせた（2026-11-19、10.0.7）。ふつうのイメージには 3D モデルが無い（`-full` にだけある）。3D のプラグインは `/usr/lib/x86_64-linux-gnu/kicad/plugins/3d` だけを探すので、そこに無いと VRML・3D の絵に部品が出ない（エラーにならない）。
 
 ### C2. スクリプトで回路図・基板を作るときの注意
 - 回路図は S 式（テキスト）。古い版（KiCad 9 形式）で書いて `kicad-cli sch upgrade` で 10 形式に変換するのが楽。

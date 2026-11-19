@@ -553,7 +553,7 @@ def fp_tps63802():
     for i, nm in enumerate(("VIN", "GND", "OUT", "EN")):
         x = round(-3.81 + 2.54 * i, 3)
         f.pad(str(i + 1), x, 0, "rect" if i == 0 else "circle", 1.7, 1.7, 1.0)
-        f.text(nm, x, -2.6, size=0.7, thick=0.12)
+        f.text(nm, x, -2.6, size=0.8, thick=0.15)        # 0.8 mm: the board's minimum silk text height
     f.rect(-6.5, -1.8, 6.5, 18.2)                                  # the module (silkscreen: where it lies)
     f.rect(-6.5, -1.8, 6.5, 18.2, layer="F.Fab", w=0.1)
     f.text("AE-TPS63802", 0, 9.0, layer="F.Fab", size=1.0, thick=0.15)

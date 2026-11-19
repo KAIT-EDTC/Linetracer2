@@ -1,18 +1,18 @@
 (export
 	(version "E")
 	(design
-		(source "/home/aonuma/Desktop/EDTC/Linetracer2/.claude/worktrees/lite-schematic/lite/hardware/kicad/Linetracer2-Lite.kicad_sch")
-		(date "2026-10-30T17:29:34")
+		(source "/home/user/Linetracer2/lite/hardware/kicad/Linetracer2-Lite.kicad_sch")
+		(date "2026-11-19T09:28:22")
 		(tool "Eeschema 10.0.7")
 		(sheet
 			(number "1")
 			(name "/")
 			(tstamps "/")
 			(title_block
-				(title "Linetracer2 Lite rev.L3 - XIAO ESP32C6 kids line tracer")
+				(title "Linetracer2 Lite rev.L4 - XIAO ESP32C6 kids line tracer")
 				(company "EDTC")
-				(rev "L3")
-				(date "2026-10-07")
+				(rev "L4")
+				(date "2026-10-30")
 				(source "Linetracer2-Lite.kicad_sch")
 				(comment
 					(number "1")
@@ -20,7 +20,7 @@
 				)
 				(comment
 					(number "2")
-					(value "XIAO ESP32C6 + Akizuki AE-TC78H653FTG module + 3 x LBR-127HLD")
+					(value "XIAO ESP32C6 + AE-TC78H653FTG + AE-TPS63802 (5 V) + 3 x LBR-127HLD")
 				)
 				(comment
 					(number "3")
@@ -187,72 +187,6 @@
 			)
 		)
 		(comp
-			(ref "C2")
-			(value "470uF 16V")
-			(footprint "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm")
-			(description "Polarized capacitor")
-			(fields
-				(field
-					(name "Note") "hold-up for the XIAO when motors pull the battery down")
-				(field
-					(name "Akizuki") "108426 (Rubycon 16WXA470MEFC 8x9)")
-				(field
-					(name "Footprint") "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm")
-				(field
-					(name "Datasheet")
-				)
-				(field
-					(name "Description") "Polarized capacitor")
-			)
-			(libsource
-				(lib "Device")
-				(part "C_Polarized")
-				(description "Polarized capacitor")
-			)
-			(property
-				(name "Note")
-				(value "hold-up for the XIAO when motors pull the battery down")
-			)
-			(property
-				(name "Akizuki")
-				(value "108426 (Rubycon 16WXA470MEFC 8x9)")
-			)
-			(property
-				(name "Sheetname")
-				(value "Linetracer2-Lite")
-			)
-			(property
-				(name "Sheetfile")
-				(value "Linetracer2-Lite.kicad_sch")
-			)
-			(property
-				(name "ki_keywords")
-				(value "cap capacitor")
-			)
-			(property
-				(name "ki_fp_filters")
-				(value "CP_*")
-			)
-			(sheetpath
-				(names "/")
-				(tstamps "/")
-			)
-			(tstamps "b14b34e0-1eb5-5620-9668-de3dc70877a5")
-			(units
-				(unit
-					(name "A")
-					(pins
-						(pin
-							(num "1")
-						)
-						(pin
-							(num "2")
-						)
-					)
-				)
-			)
-		)
-		(comp
 			(ref "C3")
 			(value "0.1uF (at motor)")
 			(footprint "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm")
@@ -375,15 +309,15 @@
 		(comp
 			(ref "D1")
 			(value "1N5819")
-			(footprint "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal")
+			(footprint "Diode_THT:D_DO-41_SOD81_P7.62mm_Horizontal")
 			(description "Schottky diode")
 			(fields
 				(field
-					(name "Akizuki") "117244")
+					(name "Note") "reverse battery: protects U3 and the XIAO")
 				(field
-					(name "Note") "blocks USB 5V back-feed into batteries")
+					(name "Akizuki") "117244 (10pcs)")
 				(field
-					(name "Footprint") "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal")
+					(name "Footprint") "Diode_THT:D_DO-41_SOD81_P7.62mm_Horizontal")
 				(field
 					(name "Datasheet")
 				)
@@ -396,12 +330,12 @@
 				(description "Schottky diode")
 			)
 			(property
-				(name "Akizuki")
-				(value "117244")
+				(name "Note")
+				(value "reverse battery: protects U3 and the XIAO")
 			)
 			(property
-				(name "Note")
-				(value "blocks USB 5V back-feed into batteries")
+				(name "Akizuki")
+				(value "117244 (10pcs)")
 			)
 			(property
 				(name "Sheetname")
@@ -776,6 +710,138 @@
 						(pin
 							(num "3")
 						)
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "D8")
+			(value "1N5819")
+			(footprint "Diode_THT:D_DO-41_SOD81_P7.62mm_Horizontal")
+			(description "Schottky diode")
+			(fields
+				(field
+					(name "Note") "OR diode: U3 can not feed the PC's USB port, USB 5 V can not feed U3")
+				(field
+					(name "Akizuki") "117244 (10pcs)")
+				(field
+					(name "Footprint") "Diode_THT:D_DO-41_SOD81_P7.62mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Schottky diode")
+			)
+			(libsource
+				(lib "Device")
+				(part "D_Schottky")
+				(description "Schottky diode")
+			)
+			(property
+				(name "Note")
+				(value "OR diode: U3 can not feed the PC's USB port, USB 5 V can not feed U3")
+			)
+			(property
+				(name "Akizuki")
+				(value "117244 (10pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "diode Schottky")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "TO-???* *_Diode_* *SingleDiode* D_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "45322834-4001-57a1-a45b-1ca049c17d07")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
+			(ref "D9")
+			(value "1N4148")
+			(footprint "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal")
+			(description "Diode")
+			(fields
+				(field
+					(name "Akizuki") "1N4148 (check the code)")
+				(field
+					(name "Note") "level shift: the first LED runs 0.7 V lower")
+				(field
+					(name "Footprint") "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Diode")
+			)
+			(libsource
+				(lib "Device")
+				(part "D")
+				(description "Diode")
+			)
+			(property
+				(name "Akizuki")
+				(value "1N4148 (check the code)")
+			)
+			(property
+				(name "Note")
+				(value "level shift: the first LED runs 0.7 V lower")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "diode")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "TO-???* *_Diode_* *SingleDiode* D_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "05ff0342-9ece-59bc-b785-54da6ad9cd74")
+			(units
+				(unit
+					(name "A")
+					(pins
 						(pin
 							(num "1")
 						)
@@ -2000,6 +2066,66 @@
 			)
 		)
 		(comp
+			(ref "R11")
+			(value "1k")
+			(footprint "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+			(description "Resistor")
+			(fields
+				(field
+					(name "Akizuki") "125102 (100pcs)")
+				(field
+					(name "Footprint") "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Resistor")
+			)
+			(libsource
+				(lib "Device")
+				(part "R")
+				(description "Resistor")
+			)
+			(property
+				(name "Akizuki")
+				(value "125102 (100pcs)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "R res resistor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "R_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "e4d30f41-fe86-5936-87aa-f05e5dbf06ff")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
 			(ref "SW1")
 			(value "START")
 			(footprint "Button_Switch_THT:SW_PUSH_6mm")
@@ -2635,6 +2761,70 @@
 				)
 			)
 		)
+		(comp
+			(ref "U3")
+			(value "AE-TPS63802")
+			(footprint "Linetracer2:AE-TPS63802")
+			(datasheet "https://akizukidenshi.com/goodsaffix/AE-TPS63802.pdf")
+			(description "Akizuki AE-TPS63802 buck-boost module (TI TPS63802, VIN 1.8-5.5 V, keeps running down to 1.3 V), output set by VR1 (470k = 5.13 V). EN must not float")
+			(fields
+				(field
+					(name "Akizuki") "115557 (AE-TPS63802 kit) + 470k 125474 for VR1")
+				(field
+					(name "Note") "VR1 = 470k resistor (5.13 V), lying flat; header 4P from the kit")
+				(field
+					(name "Footprint") "Linetracer2:AE-TPS63802")
+				(field
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/AE-TPS63802.pdf")
+				(field
+					(name "Description") "Akizuki AE-TPS63802 buck-boost module (TI TPS63802, VIN 1.8-5.5 V, keeps running down to 1.3 V), output set by VR1 (470k = 5.13 V). EN must not float")
+			)
+			(libsource
+				(lib "Linetracer2")
+				(part "AE-TPS63802")
+				(description "Akizuki AE-TPS63802 buck-boost module (TI TPS63802, VIN 1.8-5.5 V, keeps running down to 1.3 V), output set by VR1 (470k = 5.13 V). EN must not float")
+			)
+			(property
+				(name "Akizuki")
+				(value "115557 (AE-TPS63802 kit) + 470k 125474 for VR1")
+			)
+			(property
+				(name "Note")
+				(value "VR1 = 470k resistor (5.13 V), lying flat; header 4P from the kit")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "c4ac2cb0-64e9-55e1-b9f3-c8456b5679e5")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "4")
+						)
+						(pin
+							(num "2")
+						)
+						(pin
+							(num "3")
+						)
+					)
+				)
+			)
+		)
 	)
 	(groups)
 	(variants)
@@ -2807,6 +2997,47 @@
 		)
 		(libpart
 			(lib "Device")
+			(part "D")
+			(description "Diode")
+			(footprints
+				(fp "TO-???*")
+				(fp "*_Diode_*")
+				(fp "*SingleDiode*")
+				(fp "D_*")
+			)
+			(fields
+				(field
+					(name "Reference") "D")
+				(field
+					(name "Value") "D")
+				(field
+					(name "Footprint")
+				)
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Diode")
+				(field
+					(name "Sim.Device") "D")
+				(field
+					(name "Sim.Pins") "1=K 2=A")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "K")
+					(type "passive")
+				)
+				(pin
+					(num "2")
+					(name "A")
+					(type "passive")
+				)
+			)
+		)
+		(libpart
+			(lib "Device")
 			(part "D_Schottky")
 			(description "Schottky diode")
 			(footprints
@@ -2973,6 +3204,46 @@
 					(num "16")
 					(name "VM")
 					(type "power_in")
+				)
+			)
+		)
+		(libpart
+			(lib "Linetracer2")
+			(part "AE-TPS63802")
+			(description "Akizuki AE-TPS63802 buck-boost module (TI TPS63802, VIN 1.8-5.5 V, keeps running down to 1.3 V), output set by VR1 (470k = 5.13 V). EN must not float")
+			(docs "https://akizukidenshi.com/goodsaffix/AE-TPS63802.pdf")
+			(fields
+				(field
+					(name "Reference") "U")
+				(field
+					(name "Value") "AE-TPS63802")
+				(field
+					(name "Footprint") "Linetracer2:AE-TPS63802")
+				(field
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/AE-TPS63802.pdf")
+				(field
+					(name "Description") "Akizuki AE-TPS63802 buck-boost module (TI TPS63802, VIN 1.8-5.5 V, keeps running down to 1.3 V), output set by VR1 (470k = 5.13 V). EN must not float")
+			)
+			(pins
+				(pin
+					(num "1")
+					(name "VIN")
+					(type "power_in")
+				)
+				(pin
+					(num "2")
+					(name "GND")
+					(type "power_in")
+				)
+				(pin
+					(num "3")
+					(name "VOUT")
+					(type "power_out")
+				)
+				(pin
+					(num "4")
+					(name "EN")
+					(type "input")
 				)
 			)
 		)
@@ -3588,10 +3859,9 @@
 			(name "/RGB_DIN")
 			(class "Default")
 			(node
-				(ref "D2")
-				(pin "4")
-				(pinfunction "DIN_4")
-				(pintype "input")
+				(ref "R11")
+				(pin "1")
+				(pintype "passive")
 			)
 			(node
 				(ref "U1")
@@ -3757,19 +4027,31 @@
 		)
 		(net
 			(code "20")
-			(name "/VSYS")
-			(class "Power")
-			(node
-				(ref "C2")
-				(pin "1")
-				(pintype "passive")
-			)
+			(name "/VIN_BB")
+			(class "Default")
 			(node
 				(ref "D1")
 				(pin "1")
 				(pinfunction "K_1")
 				(pintype "passive")
 			)
+			(node
+				(ref "U3")
+				(pin "1")
+				(pinfunction "VIN_1")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U3")
+				(pin "4")
+				(pinfunction "EN_4")
+				(pintype "input")
+			)
+		)
+		(net
+			(code "21")
+			(name "/VLED_L")
+			(class "Default")
 			(node
 				(ref "D2")
 				(pin "3")
@@ -3789,6 +4071,34 @@
 				(pintype "power_in")
 			)
 			(node
+				(ref "D9")
+				(pin "1")
+				(pinfunction "K_1")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "22")
+			(name "/VOUT_BB")
+			(class "Default")
+			(node
+				(ref "D8")
+				(pin "2")
+				(pinfunction "A_2")
+				(pintype "passive")
+			)
+			(node
+				(ref "U3")
+				(pin "3")
+				(pinfunction "VOUT_3")
+				(pintype "power_out")
+			)
+		)
+		(net
+			(code "23")
+			(name "/VSYS")
+			(class "Power")
+			(node
 				(ref "D5")
 				(pin "3")
 				(pinfunction "VDD_3")
@@ -3807,6 +4117,18 @@
 				(pintype "power_in")
 			)
 			(node
+				(ref "D8")
+				(pin "1")
+				(pinfunction "K_1")
+				(pintype "passive")
+			)
+			(node
+				(ref "D9")
+				(pin "2")
+				(pinfunction "A_2")
+				(pintype "passive")
+			)
+			(node
 				(ref "TP3")
 				(pin "1")
 				(pinfunction "1_1")
@@ -3820,7 +4142,7 @@
 			)
 		)
 		(net
-			(code "21")
+			(code "24")
 			(name "GND")
 			(class "Ground")
 			(node
@@ -3831,11 +4153,6 @@
 			)
 			(node
 				(ref "C1")
-				(pin "2")
-				(pintype "passive")
-			)
-			(node
-				(ref "C2")
 				(pin "2")
 				(pintype "passive")
 			)
@@ -3953,9 +4270,15 @@
 				(pinfunction "GND_9")
 				(pintype "power_in")
 			)
+			(node
+				(ref "U3")
+				(pin "2")
+				(pinfunction "GND_2")
+				(pintype "power_in")
+			)
 		)
 		(net
-			(code "22")
+			(code "25")
 			(name "Net-(BZ1-+)")
 			(class "Default")
 			(node
@@ -3971,7 +4294,23 @@
 			)
 		)
 		(net
-			(code "23")
+			(code "26")
+			(name "Net-(D2-DIN)")
+			(class "Default")
+			(node
+				(ref "D2")
+				(pin "4")
+				(pinfunction "DIN_4")
+				(pintype "input")
+			)
+			(node
+				(ref "R11")
+				(pin "2")
+				(pintype "passive")
+			)
+		)
+		(net
+			(code "27")
 			(name "Net-(D2-DO)")
 			(class "Default")
 			(node
@@ -3988,7 +4327,7 @@
 			)
 		)
 		(net
-			(code "24")
+			(code "28")
 			(name "Net-(D3-DO)")
 			(class "Default")
 			(node
@@ -4005,7 +4344,7 @@
 			)
 		)
 		(net
-			(code "25")
+			(code "29")
 			(name "Net-(D4-DO)")
 			(class "Default")
 			(node
@@ -4022,7 +4361,7 @@
 			)
 		)
 		(net
-			(code "26")
+			(code "30")
 			(name "Net-(D5-DO)")
 			(class "Default")
 			(node
@@ -4039,7 +4378,7 @@
 			)
 		)
 		(net
-			(code "27")
+			(code "31")
 			(name "Net-(D6-DO)")
 			(class "Default")
 			(node
@@ -4056,7 +4395,7 @@
 			)
 		)
 		(net
-			(code "28")
+			(code "32")
 			(name "Net-(PS1-A)")
 			(class "Default")
 			(node
@@ -4072,7 +4411,7 @@
 			)
 		)
 		(net
-			(code "29")
+			(code "33")
 			(name "Net-(PS2-A)")
 			(class "Default")
 			(node
@@ -4088,7 +4427,7 @@
 			)
 		)
 		(net
-			(code "30")
+			(code "34")
 			(name "Net-(PS3-A)")
 			(class "Default")
 			(node
@@ -4104,7 +4443,7 @@
 			)
 		)
 		(net
-			(code "31")
+			(code "35")
 			(name "Net-(Q1-B)")
 			(class "Default")
 			(node
@@ -4120,7 +4459,7 @@
 			)
 		)
 		(net
-			(code "32")
+			(code "36")
 			(name "unconnected-(D7-DO-Pad2)")
 			(class "Default")
 			(node

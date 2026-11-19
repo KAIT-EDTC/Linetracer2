@@ -96,7 +96,7 @@ for _ref, _y in zip(("D5", "D6", "D7"), LED_Y[::-1]):
 
 # test pads (SMD, top) for a multimeter: GND beside the button, 3V3 in the middle, the sensors on their bus lines,
 # VSYS beside the XIAO's 5V pin, IR (= IR LED cathodes) at Q1.  (VBAT: D1's anode pad, labelled.)
-TEST_PADS = {"TP1": (22.0, 45.6), "TP2": (50.0, R_REAR), "TP3": (81.0, 41.5),
+TEST_PADS = {"TP1": (20.6, 48.6), "TP2": (50.0, R_REAR), "TP3": (81.0, 41.5),
              "TP4": (47.2, 16.6), "TP5": (59.0, 15.3), "TP6": (71.0, 14.0), "TP7": (28.79, 7.8)}
 for _ref, (_x, _y) in TEST_PADS.items():
     PLACE[_ref] = (_x, _y, 0, "F")

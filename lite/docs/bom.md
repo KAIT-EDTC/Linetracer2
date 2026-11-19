@@ -30,7 +30,7 @@
 | | | | | **小計** | **≒¥2,696** |
 
 - （やり方 B）XIAO を抜き差しして使い回すなら、**ピンソケット(メス) 1×7(7P) FH-1x7SG/RH** [104285](https://akizukidenshi.com/catalog/g/g104285/)（1 個 ¥20）を 2 個（1 台 ¥40）。高さ 8.5 mm の分 XIAO が上がる（USB の上の端が基板から約 15 mm）が、枠・デッキ・電池ボックス・モーター・ねじには当たらない（2026-10-09 に 3D モデルで確認）。
-- 基板そのものは特注（JLCPCB など、30 枚で 1 枚 ≒¥80）。**rev.L4 の Gerber はまだない**（KiCad で作り直すと `../hardware/Linetracer2-Lite_rev.L4_gerber.zip`。今ある [`rev.L3`](../hardware/Linetracer2-Lite_rev.L3_gerber.zip) は XIAO が落ちる問題があるので発注しない）。
+- 基板そのものは特注（JLCPCB など、30 枚で 1 枚 ≒¥80）。Gerber: [`../hardware/Linetracer2-Lite_rev.L4_gerber.zip`](../hardware/Linetracer2-Lite_rev.L4_gerber.zip)（rev.L3 のものは XIAO が落ちる問題があるので消した）。
 
 ## 2. 機械部品（1 台分）
 

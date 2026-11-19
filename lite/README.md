@@ -1,12 +1,12 @@
 # Linetracer2 Lite（rev.L4：XIAO ESP32C6（ピンヘッダ）＋ LBR-127HLD ＋ ブザー ＋ フルカラー LED ＋ 5 V 昇降圧）
 
 > 最終更新: 2026-10-30（**rev.L4**: モーターに力がかかると XIAO が落ちる問題を、マイコンの電源を作り直して直した（§0）。フルカラー LED の信号線に R11 1 kΩ（§3.6）。**未製造・未試作**）
-> **注意: KiCad のファイル（回路図・基板・Gerber・PDF・絵・3D）はまだ rev.L3 のまま**。rev.L4 は生成スクリプトに入っている。§9 のコマンドで作り直し、DRC を通してから発注する。**今の Gerber（rev.L3）は発注しない**（§0.6）。
+> **KiCad のファイル（回路図・基板・Gerber・PDF・絵・手順の絵）は rev.L4 で作り直した**（KiCad 10.0.7、ERC 0・DRC 0・未接続 0、2026-11-19）。**ロボット全体の 3D（`hardware/Linetracer2-Lite_assembly.*`）と干渉チェックだけはまだ rev.L3**（`export_assembly.sh` に要る OpenSCAD 2021 が無い環境で作業した）（§0.6）。**未試作なので、U3 の外形を確かめてから発注する**（§10）。
 > 標準版（rev.A1）から部品を減らした版。マイコンは **Seeed Studio XIAO ESP32C6**、センサーは **LBR-127HLD**。rev.L3 で **XIAO をピンヘッダで付ける**ようにし、**ブザー**と**フルカラー LED 6 こ**、**テストパッド**を足し、**配線を全部手で引き直して**（自動配線をやめた）、**Lite 用のボールキャスター**を作った（§1）。
 > **枠・デッキ・平歯車・車輪の 3D プリント部品、ねじ、モーター、電池ボックス、枠のねじ穴は標準版と共通**。違うのは基板（外形と中身）・ソフト・**前の支え（高さ 7.5 mm のボールキャスターかスキッド）**。
 > **Lite のファイルはすべてこの `lite/` フォルダの中**（下のパスは `lite/` からの相対パス）。標準版のファイル（リポジトリ直下の `hardware/` `docs/` `firmware/`）とは混ざらない。
 > 回路図: `hardware/kicad/Linetracer2-Lite.kicad_sch`（PDF: `docs/Linetracer2-Lite_schematic.pdf`）
-> 製造データ: `hardware/Linetracer2-Lite_rev.L3_gerber.zip`（**rev.L3、XIAO が落ちる問題あり**。rev.L4 は KiCad で作り直すと `Linetracer2-Lite_rev.L4_gerber.zip`）　ソフト: `firmware/micropython/`（Arduino C++ 版: [`firmware/arduino/`](firmware/arduino/README.md)）　組み立て手順書: [`docs/assembly.md`](docs/assembly.md)
+> 製造データ: `hardware/Linetracer2-Lite_rev.L4_gerber.zip`（rev.L3 の Gerber は XIAO が落ちる問題があるので消した。git の履歴に残っている）　ソフト: `firmware/micropython/`（Arduino C++ 版: [`firmware/arduino/`](firmware/arduino/README.md)）　組み立て手順書: [`docs/assembly.md`](docs/assembly.md)
 > **ロボット全体の 3D モデル**: `hardware/Linetracer2-Lite_assembly.stl`（GitHub 上でそのまま回して見られる）、色つき `hardware/Linetracer2-Lite_assembly.glb`。部品付き基板だけの STEP: `hardware/kicad/Linetracer2-Lite_pcb.step`
 > 前の版 rev.L2（XIAO じか付け、自動配線）は git の履歴とプルリクエスト #3 に、rev.L1（Pico ＋ LBR-123F）はコミット `1db5a53` に残っている。
 
@@ -120,9 +120,10 @@ rev.L3 は `単3×3 ─ D1 ─ XIAO の 5V ピン` だった。XIAO の中は `5
 | 配置と配線 `scripts/layout_lite.py`、シルク `scripts/post_pcb_lite.py`、手順の絵 `scripts/step_images.py` | **rev.L4** |
 | ソフト（MicroPython / Arduino） | コメントと目安だけ（ピンは同じ） |
 | この README、手順書 `docs/assembly.md`、部品表 `docs/bom.md` | **rev.L4** |
-| `hardware/kicad/*.kicad_sch` / `*.kicad_pcb` / ライブラリ、Gerber、BOM の csv、PDF、`docs/*.png`、STEP、ロボット全体の 3D、手順の絵 `docs/steps/` | **まだ rev.L3**。このセッションでは KiCad 10 を入れられなかった（配布元につながらず、ソースからのビルドは止められた）。§9 のコマンドを順に実行すれば全部 rev.L4 になる |
+| `hardware/kicad/*.kicad_sch` / `*.kicad_pcb` / ライブラリ、Gerber、BOM の csv、PDF、`docs/*.png`、STEP、手順の絵 `docs/steps/` | **rev.L4**（2026-11-19、#9・#10・#11 をまとめたあと KiCad 10.0.7 で §9 の手順を通した。ERC 0、DRC 0（警告も 0）、未接続 0、回路図との不一致 0） |
+| ロボット全体の 3D（`hardware/Linetracer2-Lite_assembly.stl` / `.glb`）と干渉チェック | **まだ rev.L3**（`export_assembly.sh` に要る OpenSCAD 2021 がこの環境に無かった）。U3（高さ約 6 mm）がデッキなどに当たらないかは、OpenSCAD のある PC で `./export_assembly.sh` を回して確かめる |
 
-KiCad で作り直したら確かめること: ERC / DRC がエラー 0・警告 0・未接続 0・回路図との不一致 0、シルクが U3 の四角・抵抗の絵・番号で重なっていないか、`export_assembly.sh` の干渉チェックで U3 が何にも当たらないか（U3 は高さ約 6 mm、上には何もない）。
+KiCad で作り直したときに直したこと: シルクの重なり（TP1 の場所をスタートの字の下から (20.6, 48.6) へ、IR の字を D9 の足から TP7 の右へ、左の LED の ⑭ を R11 の左へ、U3 のピンの字を 0.8 mm に）。まだのこと: `export_assembly.sh` の干渉チェックで U3 が何にも当たらないか（U3 は高さ約 6 mm、上には何もない）。
 
 ---
 
@@ -332,13 +333,13 @@ VSYS ─ D2〜D7 の VDD（裏の線）      GND ─ D2〜D7 の GND（ベタ）
 | 項目 | Lite rev.L2 | **Lite rev.L3** |
 |------|-------------|-----------------|
 | 外形・層・板厚 | 65 × 100 mm、2 層、1.6 mm | 同じ |
-| フットプリント | 29（取付穴 5 を含む） | **44**（BZ1・R9・R10・R11・フルカラー LED 6・テストパッド 7 が増え、赤 LED・R8 が減った） |
-| パッド / 配線 / ビア | 96 / 131 本 / 0 | **125 / 135 本 / 0**（rev.L3、R11 を足す前） |
-| 配線の総延長 | 737 mm（表 97 / 裏 640） | **838 mm（表 624 / 裏 214）**（rev.L3、R11 を足す前） |
+| フットプリント | 29（取付穴 5 を含む） | **43**（BZ1・R9・R10・フルカラー LED 6・テストパッド 7 が増え、赤 LED・R8 が減った）。rev.L4 は **46**（U3・D8・D9・R11 が増え、C2 が減った） |
+| パッド / 配線 / ビア | 96 / 131 本 / 0 | **125 / 135 本 / 0**。rev.L4 は **133 / 164 本 / 0** |
+| 配線の総延長 | 737 mm（表 97 / 裏 640） | **838 mm（表 624 / 裏 214）**。rev.L4 は **977 mm（表 761 / 裏 216）** |
 | 配線のしかた | Freerouting（6 回やっていちばん短いもの） | **手で引いた配線（毎回同じ）** |
 | ERC / DRC | エラー 0、警告 0、未接続 0 | **エラー 0、警告 0、未接続 0、回路図との不一致 0** |
 
-> **rev.L2 の基板とは別物**。rev.L3 の Gerber（`hardware/Linetracer2-Lite_rev.L3_gerber.zip`）で発注する。発注の設定は標準版と同じ（`../docs/04_pcb.md` §5）。
+> **rev.L2 の基板とは別物**。rev.L4 の Gerber（`hardware/Linetracer2-Lite_rev.L4_gerber.zip`）で発注する。発注の設定は標準版と同じ（`../docs/04_pcb.md` §5）。
 
 ### 4.2 XIAO のフットプリント `Linetracer2:XIAO_ESP32C6_Header`
 
@@ -612,7 +613,8 @@ robot.motors.battery_volt = 3.7 # 電池の電圧（決め打ち）。ニッケ�
 
 ## 9. 作り直し方（スクリプト）
 
-> **rev.L4 はまだこの手順を通していない**（§0.6）。KiCad 10 の入った PC で、下のコマンドを上から順に実行する（`gen_lib.py` で `AE-TPS63802` のフットプリント・シンボル・3D ができ、`gen_schematic_lite.py` から `export_assembly.sh` までで回路図・基板・Gerber（`Linetracer2-Lite_rev.L4_gerber.zip`）・絵・3D が rev.L4 になる。手順の絵は `step_images.py`）。
+> rev.L4 は 2026-11-19 にこの手順を `export_outputs.sh` まで通した（KiCad 10.0.7）。`export_assembly.sh`（ロボット全体の 3D と干渉チェック、手順の絵 `docs/steps/` も作る）は OpenSCAD 2021 が要る。手順の絵だけなら、VRML を書き出して `python3 ../lite/scripts/step_images.py ../.tmp/asm/board.wrl`（`step_images.py` の先頭のコメント）。
+> シルクの日本語は **Noto Sans CJK JP** を使う。このフォントが入っていない PC で `build_pcb.py` を回すと、代わりのフォントになって DRC に `text_thickness` などの警告が出る（Linux なら `fonts-noto-cjk`）。
 
 共通のスクリプト（リポジトリ直下の `scripts/`）に環境変数 `LT2_VARIANT=lite` を付けると、出力先が `lite/hardware/` になる。Lite 専用のスクリプトは `lite/scripts/` にある。コマンドはリポジトリ直下の `scripts/` で実行する。
 
@@ -658,7 +660,8 @@ python3 ../lite/scripts/preview_layout.py ../.tmp/preview.png
 
 **rev.L4 で増えたこと**
 
-- [ ] **KiCad 10 で全部作り直す**（§9）。ERC / DRC 0、シルクの重なり、干渉チェック、手順の絵 `docs/steps/`（§0.6）
+- [x] **KiCad 10 で作り直す**（§9）。ERC / DRC 0、シルクの重なり、手順の絵 `docs/steps/`（2026-11-19）
+- [ ] ロボット全体の 3D と干渉チェック（`export_assembly.sh`、OpenSCAD 2021 が要る。§0.6）
 - [ ] **AE-TPS63802 の外形とピンの位置**を実物か秋月の外形図で確かめ、`../scripts/gen_lib.py` の `fp_tps63802()` を合わせる（発注の前に。§0.4）
 - [ ] U3 の出力（470 kΩ で 5.13 V）、VSYS（4.7〜4.9 V）、USB をつないだまま電池を入れたり切ったりしても XIAO が止まらないか
 - [ ] **車輪を手で止めて 100 %、2 つとも 100 % で走り出す、で XIAO がリセットしないか**（rev.L4 の目的）。電池がいくつまで下がると止まるか（計算では VBAT 約 1.6 V）

@@ -116,10 +116,12 @@ xo, yo, _ = u3.pin("3")
 xa, ya, _ = d8.pin("2")
 s.wire(xo, yo, xa, ya)
 s.label("VOUT_BB", xo + 2.54, yo, "right")
-s.lab(d8, "1", "VSYS")      # K
+xk8, yk8, _ = d8.pin("1")    # K -> VSYS, with its PWR_FLAG on the same wire
+s.wire(xk8, yk8, 147.32, yk8)
+s.label("VSYS", 147.32, yk8, "right")
 s.power("PWR_FLAG", 142.24, 43.18, "up")
-s.wire(142.24, 43.18, 142.24, 45.72)
-s.label("VSYS", 142.24, 45.72, "down")
+s.wire(142.24, 43.18, 142.24, yk8)
+s.junction(142.24, yk8)
 
 # D9: supply of the left LED column (D2..D4), 0.7 V below VSYS: the first LED then reads the XIAO's 3.3 V data
 d9 = s.place("Device:D", "D9", "1N4148", 182.88, 45.72, 180,
@@ -289,10 +291,10 @@ s.lab(r9, "1", "SW1")
 s.connect(r9, "2", bz, "1")
 s.pwr(bz, "2", "GND", length=2.54)
 # beside the buzzer (below it the frame ends)
-s.text("The buzzer shares D4 with the START button (no free XIAO pin).", 327.66, 175.26, 1.27)
-s.text("A piezo passes no DC, so reading the button (input + pull-up)", 327.66, 179.07, 1.27)
-s.text("works; to beep, D4 becomes a PWM output - it also sounds while", 327.66, 182.88, 1.27)
-s.text("START is held.", 327.66, 186.69, 1.27)
+s.text("The buzzer shares D4 with the START button (no free XIAO pin).", 327.66, 176.53, 1.27)
+s.text("A piezo passes no DC, so reading the button (input + pull-up)", 327.66, 180.34, 1.27)
+s.text("works; to beep, D4 becomes a PWM output - it also sounds while", 327.66, 184.15, 1.27)
+s.text("START is held.", 327.66, 187.96, 1.27)
 
 # ================================================================= SENSOR block
 s.rect(17.78, 195.58, 297.18, 281.94)

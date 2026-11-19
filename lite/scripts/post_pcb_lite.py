@@ -285,7 +285,7 @@ def silk(b):
     text(b, "XIAO ESP32C6", ux - 0.6, uy + 0.4, 1.0)
     text(b, "USB", ux + 7.6, uy + 4.0, 1.0)
     # full-colour LEDs (both sides): the footprint brings the outline and the dot beside the GND hole (longest leg)
-    num(b, 14, LL.LED_L - 0.1, 23.7)
+    num(b, 14, 19.1, 27.6)                                  # beside R11 (left of its body)
     num(b, 14, 74.4, 4.2)
     # 5 V module (rev.L4): the footprint draws where it lies and VIN / GND / OUT / EN behind the pins
     num(b, 13, 43.0, 35.6)
@@ -296,7 +296,7 @@ def silk(b):
     # ---- test pads (for the teacher's multimeter; meaning and voltages in the manual) ---------------------
     for ref, label, dx, dy in (("TP1", "GND", 3.3, 0), ("TP2", "3V3", -3.0, 0), ("TP3", "VSYS", -0.6, 1.9),
                                ("TP4", "S1", 0, -1.7), ("TP5", "S2", 0, -1.7), ("TP6", "S3", 0, -1.7),
-                               ("TP7", "IR", 0, 2.0)):
+                               ("TP7", "IR", 1.6, 0)):
         tx, ty = LL.TEST_PADS[ref]
         text(b, label, tx + dx, ty + dy, 0.9)
 
