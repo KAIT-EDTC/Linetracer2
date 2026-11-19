@@ -1,4 +1,4 @@
-"""Shared paths/helpers for the Linetracer2 KiCad generator scripts (Lite board rev.L3 -> hardware/kicad/).
+"""Shared paths/helpers for the Linetracer2 KiCad generator scripts (Lite board rev.L4 -> hardware/kicad/).
 
 (The former standard board rev.A1 was removed; it is still in the git history.)
 """

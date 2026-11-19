@@ -14,6 +14,8 @@
 #
 # The board can not measure the battery: when the cells run down the robot gets slower, and when they are
 # nearly empty the XIAO restarts as the motors start (the LEDs go out) -> put in new cells.
+# (rev.L4: the XIAO has its own 5 V from a buck-boost module, so this happens only with almost empty cells.
+#  On a rev.L3 board it happened already when a wheel was held or both motors started at full speed.)
 #
 # Put the robot on the line before pressing START.
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 # Export everything needed for fabrication and documentation from the KiCad project.
-#   ./export_outputs.sh      (Lite board rev.L3)
+#   ./export_outputs.sh      (Lite board rev.L4)
 #
 #   Gerber + drill   hardware/gerber/  (+ zip in hardware/)
 #   BOM csv          hardware/kicad/bom/
@@ -12,7 +12,7 @@ set -e
 cd "$(dirname "$0")/.."
 ROOT=$(pwd)
 KC="$ROOT/scripts/kc"
-NAME=Linetracer2-Lite; REV=rev.L3
+NAME=Linetracer2-Lite; REV=rev.L4
 HW="$ROOT/hardware"; DOCS="$ROOT/docs"; IMG="$ROOT/docs"
 K="$HW/kicad"
 PCB="$K/$NAME.kicad_pcb"
