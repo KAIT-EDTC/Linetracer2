@@ -25,15 +25,15 @@
 //   2 x M3x8  flat : battery box floor -> deck (nuts in the deck)
 //   1 x M3x8  flat : skid (from the floor side) -> NYLON nut on the PCB top (next to sensor solder joints)
 //
-// LITE = true : Lite board (rev.L3: 65 x 100 mm board, 3 x LBR-127HLD, front support in the hole (50,11): ball caster
-//   caster_lite_print by default, or the 7.5 mm skid; printed TPU tyres instead of O-rings).
-//   openscad -D 'LITE=true' -D 'part="check_skid_sensor"' ...   Frames, deck, gears and wheels are the same for
-//   both boards; the Lite needs a TALLER skid (7.5 mm) because the LBR-127HLD is 5.6 mm tall: the front of the
-//   robot is lifted and the board leans back about 3 deg (the wheels set the height at the rear).
-//   openscad -D 'LITE=true' -o x.echo ...  prints the tilt, the sensor-to-floor gap and the clearances.
+// LITE = true (default): Lite board rev.L3 (65 x 100 mm board, 3 x LBR-127HLD, front support in the hole (50,11):
+//   ball caster caster_lite_print by default, or the 7.5 mm skid; printed TPU tyres).  The LBR-127HLD is 5.6 mm tall,
+//   so the front is lifted 7.5 mm and the board leans back about 3 deg (the wheels set the height at the rear).
+//   openscad -o x.echo ...  prints the tilt, the sensor-to-floor gap and the clearances.
+// LITE = false: the former standard board rev.A1 (100 x 100 mm, removed from the repository, still in the git
+//   history).  Its skid / caster parts are kept here only so the old checks still run.
 
 part = "assembly";
-LITE = false;
+LITE = true;
 $fn = 64;
 
 // ---------------------------------------------------------------- parameters

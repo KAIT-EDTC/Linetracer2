@@ -1,26 +1,19 @@
 #!/bin/sh
 # Export everything needed for fabrication and documentation from the KiCad project.
-#   ./export_outputs.sh                      standard board (rev.A1)
-#   LT2_VARIANT=lite ./export_outputs.sh     Lite board (rev.L4)
+#   ./export_outputs.sh      (Lite board rev.L4)
 #
-#                    standard                                   Lite
-#   Gerber + drill   hardware/gerber/  (+ zip in hardware/)     lite/hardware/gerber/  (+ zip in lite/hardware/)
-#   BOM csv          hardware/kicad/bom/                        lite/hardware/kicad/bom/
-#   ERC / DRC        hardware/kicad/reports/                    lite/hardware/kicad/reports/
-#   PDFs             docs/                                      lite/docs/
-#   3D renders       docs/images/                               lite/docs/
-#   3D STEP          hardware/kicad/Linetracer2_pcb.step        lite/hardware/kicad/Linetracer2-Lite_pcb.step
+#   Gerber + drill   hardware/gerber/  (+ zip in hardware/)
+#   BOM csv          hardware/kicad/bom/
+#   ERC / DRC        hardware/kicad/reports/
+#   PDFs             docs/
+#   3D renders       docs/
+#   3D STEP          hardware/kicad/Linetracer2-Lite_pcb.step
 set -e
 cd "$(dirname "$0")/.."
 ROOT=$(pwd)
 KC="$ROOT/scripts/kc"
-if [ "${LT2_VARIANT:-std}" = "lite" ]; then
-  NAME=Linetracer2-Lite; REV=rev.L4
-  HW="$ROOT/lite/hardware"; DOCS="$ROOT/lite/docs"; IMG="$ROOT/lite/docs"
-else
-  NAME=Linetracer2; REV=rev.A1
-  HW="$ROOT/hardware"; DOCS="$ROOT/docs"; IMG="$ROOT/docs/images"
-fi
+NAME=Linetracer2-Lite; REV=rev.L4
+HW="$ROOT/hardware"; DOCS="$ROOT/docs"; IMG="$ROOT/docs"
 K="$HW/kicad"
 PCB="$K/$NAME.kicad_pcb"
 SCH="$K/$NAME.kicad_sch"
@@ -54,7 +47,7 @@ $KC pcb export pdf -o "$DOCS/${NAME}_assembly_top.pdf" --mode-single --black-and
 $KC pcb export pdf -o "$DOCS/${NAME}_assembly_bottom.pdf" --mode-single --black-and-white --mirror \
     --sketch-pads-on-fab-layers --layers "B.Fab,Edge.Cuts" --include-border-title "$PCB" | tail -1
 
-if [ "${LT2_VARIANT:-std}" = "lite" ] && command -v pdftoppm >/dev/null; then
+if command -v pdftoppm >/dev/null; then
   echo "== silkscreen pictures (what the kids read: top, and the back seen from below)"
   T=$(mktemp -d "$HOME/.cache/lt2silk.XXXXXX")
   $KC pcb export pdf -o "$T/top.pdf" --mode-single --black-and-white \

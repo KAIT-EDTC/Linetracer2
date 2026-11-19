@@ -1,11 +1,11 @@
 #!/bin/sh
 # Lite のロボット 1 台分の 3D プリント部品を、プレート（印刷設定）ごとのフォルダに分けて 1 つの zip にする。
-#   ./make_print_set.sh      ->  lite/hardware/Linetracer2-Lite_print_set.zip
+#   ./make_print_set.sh      ->  hardware/Linetracer2-Lite_print_set.zip
 # STL は hardware/mechanical/ のもの（linetracer2_mech.scad から書き出したもの）をそのままコピーする。
 set -e
 cd "$(dirname "$0")/.."
 M=hardware/mechanical
-OUT=lite/hardware/Linetracer2-Lite_print_set
+OUT=hardware/Linetracer2-Lite_print_set
 T=$(mktemp -d)
 D="$T/Linetracer2-Lite_print_set"
 mkdir -p "$D/1_PLA_0.20mm" "$D/2_PLA_0.08mm_gear" "$D/3_PLA_0.16mm_wheel" "$D/4_PETG_0.12mm_caster" "$D/5_TPU_tire"
@@ -33,7 +33,7 @@ STL は書き出したままの向きで、サポートは要りません。数�
 ・平歯車の歯は GEAR_BACKLASH 0.15、軸間は 12.1 mm（GEAR_CD_ADD 0.10）の版です。
 ・印刷のあと: キャスターは玉を指で押して回し、受けから離しておく。車輪と平歯車は
   手で回して引っかかりがないか見る。
-・くわしい設定とチェック: hardware/mechanical/README.md、組み立て: lite/docs/assembly.md
+・くわしい設定とチェック: hardware/mechanical/README.md、組み立て: docs/assembly.md
 TXT
 rm -f "$OUT.zip"
 (cd "$T" && zip -qr -X - Linetracer2-Lite_print_set) > "$OUT.zip"

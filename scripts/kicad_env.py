@@ -1,29 +1,17 @@
-"""Shared paths/helpers for the Linetracer2 KiCad generator scripts.
+"""Shared paths/helpers for the Linetracer2 KiCad generator scripts (Lite board rev.L4 -> hardware/kicad/).
 
-Two boards are generated from the same scripts; pick one with the environment variable LT2_VARIANT:
-  (unset) / std : standard rev.A1  -> hardware/kicad/        Linetracer2.*
-  lite          : Lite (rev.L4)    -> lite/hardware/kicad/   Linetracer2-Lite.*
-                  (everything of the Lite board lives under lite/; its generators are in lite/scripts/)
+(The former standard board rev.A1 was removed; it is still in the git history.)
 """
 import glob
 import os
 import uuid
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VARIANT = os.environ.get("LT2_VARIANT", "std") or "std"
-if VARIANT not in ("std", "lite"):
-    raise SystemExit("LT2_VARIANT must be 'std' or 'lite' (got %r)" % VARIANT)
-if VARIANT == "lite":
-    HWDIR = os.path.join(ROOT, "lite", "hardware")
-    KDIR = os.path.join(HWDIR, "kicad")
-    PROJ = "Linetracer2-Lite"
-else:
-    HWDIR = os.path.join(ROOT, "hardware")
-    KDIR = os.path.join(HWDIR, "kicad")
-    PROJ = "Linetracer2"
+HWDIR = os.path.join(ROOT, "hardware")
+KDIR = os.path.join(HWDIR, "kicad")
+PROJ = "Linetracer2-Lite"
 LIBDIR = os.path.join(KDIR, "lib")
-LIBNICK = "Linetracer2"          # nickname of the project library (same for both boards)
-LITE_SCRIPTS = os.path.join(ROOT, "lite", "scripts")   # gen_schematic_lite.py, gen_pcb_lite.py, post_pcb_lite.py
+LIBNICK = "Linetracer2"          # nickname of the project library
 
 _NS = uuid.UUID("6c1d7a52-2f0e-4c0b-9d1c-4c2e5b1a7e10")
 
