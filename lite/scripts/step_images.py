@@ -23,9 +23,10 @@ import asm3d  # noqa: E402
 import layout_lite as LL  # noqa: E402
 
 # build order (= the circled numbers on the board, lite/docs/assembly.md)
-STEPS = {1: ["R1", "R2", "R3", "R9"], 2: ["R4", "R5", "R6"], 3: ["R7", "R10"], 4: ["D1"], 5: ["C3", "C4"],
-         6: ["Q1"], 7: ["SW1"], 8: ["BZ1"], 9: ["J1"], 10: ["U2"], 11: ["U1"], 12: ["D2", "D3", "D4", "D5", "D6", "D7"],
-         13: ["C1", "C2"], 14: ["PS1", "PS2", "PS3"]}
+STEPS = {1: ["R1", "R2", "R3", "R9"], 2: ["R4", "R5", "R6"], 3: ["R7", "R10"], 4: ["D1", "D8"], 5: ["D9"],
+         6: ["C3", "C4"], 7: ["Q1"], 8: ["SW1"], 9: ["BZ1"], 10: ["J1"], 11: ["U2"], 12: ["U1"], 13: ["U3"],
+         14: ["D2", "D3", "D4", "D5", "D6", "D7"], 15: ["C1"], 16: ["PS1", "PS2", "PS3"]}
+SENSOR_STEP = 16
 S = 11.0                       # px per mm
 X0, X1, Y0, Y1 = 17.5, 82.5, 0.0, 68.0          # board area shown (the rear is under the gearbox)
 LIGHT = (-0.35, 0.45, 1.0)
@@ -85,7 +86,7 @@ def shade(rgb, n, pale=False):
 
 
 def render(comps, refs, step, out):
-    bottom = step == 14
+    bottom = step == SENSOR_STEP
     W, H = int((X1 - X0) * S), int((Y1 - Y0) * S)
     im = Image.new("RGB", (W, H), (250, 250, 248))
     now = {refs[r] for r in STEPS[step] if r in refs}

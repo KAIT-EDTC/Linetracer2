@@ -1,6 +1,6 @@
 // Linetracer2Lite.h  -  Linetracer2 Lite library for Arduino (Seeed Studio XIAO ESP32C6)
 //
-// For the Lite board rev.L3: XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button + a buzzer on the same pin,
+// For the Lite board rev.L3 / rev.L4 (same pins): XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button + a buzzer on the same pin,
 // 6 full-colour LEDs (PL9823, NeoPixel type, 3 down each side of the board) on one data pin.
 // C++ port of lite/firmware/micropython/linetracer.py (same pins, same behaviour, same settings).
 //
@@ -23,7 +23,7 @@
 
 namespace lt2 {
 
-// ----------------------------------------------------------------- pins (PCB rev.L3)
+// ----------------------------------------------------------------- pins (PCB rev.L3 and rev.L4: the same)
 // GPIO numbers of the ESP32-C6 (XIAO pin names in the comments).
 constexpr uint8_t PIN_SENS_LED = 21;           // D3   HIGH = IR LEDs on (through Q1)
 constexpr uint8_t PIN_STBY = 17;               // D7 (RX)  TC78H653 STBY
@@ -39,6 +39,8 @@ constexpr uint8_t ADC_SENS[3] = {2, 1, 0};     // S1 (left), S2 (centre), S3 (ri
 constexpr float MAX_MOTOR_VOLT = 3.0f;    // FA-130RA-2270 is rated 1.5-3.0 V. 100 % = this voltage (with BATTERY_VOLT)
 constexpr float BATTERY_VOLT = 4.2f;      // the board can NOT measure the battery: AA alkaline x3 while driving ~4.2 V
                                           // (NiMH x3: 3.7).  The robot gets slower as the cells run down.
+                                          // (rev.L4: the XIAO has its own 5 V buck-boost and keeps running
+                                          // while the motors pull the cells down; rev.L3 restarted.)
 constexpr uint32_t PWM_FREQ = 20000;      // 20 kHz (not audible)
 constexpr uint8_t PWM_BITS = 10;          // 0 .. 1023
 constexpr float RAMP_PER_CALL = 0.04f;    // max change of duty per run() call (soft start, avoids ISD trip)
