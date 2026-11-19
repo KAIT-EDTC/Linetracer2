@@ -184,15 +184,16 @@ def sym_pico():
 
 def sym_pl9823():
     """PL9823 (5 mm NeoPixel-type full-colour LED, Akizuki 108411).  1 = GND, 2 = DO, 3 = VDD, 4 = DIN.
-    Drawn like KiCad's WS2812: data in left, data out right, VDD on top, GND at the bottom."""
-    pins = [pin("power_in", 0, -7.62, 90, "GND", "1"), pin("output", 7.62, 0, 180, "DO", "2"),
-            pin("power_in", 0, 7.62, 270, "VDD", "3"), pin("input", -7.62, 0, 0, "DIN", "4")]
+    Drawn like KiCad's WS2812: data in left, data out right, VDD on top, GND at the bottom.
+    Body 12.7 mm: the four pin names sit inside it, so the LED drawing stays in the middle and "RGB" in a corner."""
+    pins = [pin("power_in", 0, -8.89, 90, "GND", "1"), pin("output", 8.89, 0, 180, "DO", "2"),
+            pin("power_in", 0, 8.89, 270, "VDD", "3"), pin("input", -8.89, 0, 0, "DIN", "4")]
     g = """
-    (rectangle (start -5.08 5.08) (end 5.08 -5.08) (stroke (width 0.254) (type default)) (fill (type background)))
-    (circle (center 1.27 0) (radius 2.286) (stroke (width 0.254) (type default)) (fill (type none)))
-    (polyline (pts (xy 0.508 0.762) (xy 2.032 0.762) (xy 1.27 -0.762) (xy 0.508 0.762)) (stroke (width 0.2) (type default)) (fill (type outline)))
-    (polyline (pts (xy 0.508 -0.762) (xy 2.032 -0.762)) (stroke (width 0.2) (type default)) (fill (type none)))
-    (text "RGB" (at -2.286 0 0) (effects (font (size 1 1))))
+    (rectangle (start -6.35 6.35) (end 6.35 -6.35) (stroke (width 0.254) (type default)) (fill (type background)))
+    (circle (center 0 0) (radius 2.032) (stroke (width 0.254) (type default)) (fill (type none)))
+    (polyline (pts (xy -0.762 0.762) (xy 0.762 0.762) (xy 0 -0.762) (xy -0.762 0.762)) (stroke (width 0.2) (type default)) (fill (type outline)))
+    (polyline (pts (xy -0.762 -0.762) (xy 0.762 -0.762)) (stroke (width 0.2) (type default)) (fill (type none)))
+    (text "RGB" (at -3.81 3.81 0) (effects (font (size 1 1))))
 """
     return """(symbol "PL9823"
   (pin_names (offset 0.254))
@@ -208,19 +209,49 @@ def sym_pl9823():
   )
   (embedded_fonts no)
 )""" % (
-        prop("Reference", "D", -5.08, 6.35, justify="left"),
-        prop("Value", "PL9823", 1.27, -6.35, justify="left"),
+        prop("Reference", "D", -6.35, 7.62, justify="left"),
+        prop("Value", "PL9823", 1.27, -7.62, justify="left"),
         prop("Footprint", "Linetracer2:LED_PL9823_5mm", 0, -10.16, hide=True),
         prop("Datasheet", "https://akizukidenshi.com/goodsaffix/pl9823.pdf", 0, -12.7, hide=True),
         prop("Description", "5 mm full-colour LED with controller (NeoPixel type, 800 kHz), supply 4.5-6 V", 0, -15.24, hide=True),
         g, "\n    ".join(pins))
 
 
+def sym_tps63802():
+    """Akizuki AE-TPS63802 buck-boost module (TI TPS63802): 4-pin header 1 = VIN, 2 = GND, 3 = VOUT, 4 = EN.
+    Lite rev.L4 uses it to make a steady 5 V for the XIAO out of the AA cells (the motors pull the cells down)."""
+    pins = [pin("power_in", -10.16, 2.54, 0, "VIN", "1"), pin("input", -10.16, -2.54, 0, "EN", "4"),
+            pin("power_out", 10.16, 2.54, 180, "VOUT", "3"), pin("power_in", 0, -7.62, 90, "GND", "2")]
+    return """(symbol "AE-TPS63802"
+  (pin_names (offset 1.016))
+  (exclude_from_sim no) (in_bom yes) (on_board yes)
+  %s
+  %s
+  %s
+  %s
+  %s
+  (symbol "AE-TPS63802_0_1"
+    (rectangle (start -7.62 5.08) (end 7.62 -5.08) (stroke (width 0.254) (type default)) (fill (type background)))
+  )
+  (symbol "AE-TPS63802_1_1"
+    %s
+  )
+  (embedded_fonts no)
+)""" % (
+        prop("Reference", "U", 0, 7.62),
+        prop("Value", "AE-TPS63802", 0, -10.16),
+        prop("Footprint", "Linetracer2:AE-TPS63802", 0, -12.7, hide=True),
+        prop("Datasheet", "https://akizukidenshi.com/goodsaffix/AE-TPS63802.pdf", 0, -15.24, hide=True),
+        prop("Description", "Akizuki AE-TPS63802 buck-boost module (TI TPS63802, VIN 1.8-5.5 V, keeps running down to "
+             "1.3 V), output set by VR1 (470k = 5.13 V). EN must not float", 0, -17.78, hide=True),
+        "\n    ".join(pins))
+
+
 def write_symbols():
     txt = "(kicad_symbol_lib\n\t(version 20241209)\n\t(generator \"linetracer2_gen\")\n\t(generator_version \"9.0\")\n"
     lbr127 = sym_reflector("LBR-127HLD", "https://akizukidenshi.com/goodsaffix/lbr127hld.pdf",
                            "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
-    for s in (sym_module(), sym_reflector(), lbr127, sym_xiao(), sym_pl9823()):
+    for s in (sym_module(), sym_reflector(), lbr127, sym_xiao(), sym_pl9823(), sym_tps63802()):
         node = sexpr.parse(s)
         txt += sexpr.dump(node, 1) + "\n"
     txt += sym_pico() + "\n)\n"
@@ -509,7 +540,29 @@ def fp_pl9823():
     f.circle(0, 0, 3.2, layer="F.CrtYd", w=0.05)
     f.write((0, -4.3), (0, 4.3))
 
+def fp_tps63802():
+    """Akizuki AE-TPS63802 buck-boost module (20 x 13 mm) on its own 4-pin header, lying flat 2.5 mm above the board
+    (Lite rev.L4).  Origin = centre of the pin row, pin 1 (VIN) at -x.  The body is drawn on the +y side: the pins
+    are assumed to sit on one 13 mm end, 1.8 mm in from the edge (Akizuki's drawing gives 20 / 13 / 1.8 / 2.7 /
+    2.54 mm; 2.7 = (13 - 3 x 2.54) / 2).  CHECK THE REAL MODULE before ordering boards.  Turning the module over
+    (parts down) keeps every pin in its hole and puts the body on the other side of the row, so it fits either way
+    round as long as the parts on it stay under 2.5 mm (VR1 = a 470k resistor lying flat, not the 25-turn trimmer)."""
+    f = FP("AE-TPS63802",
+           "Akizuki AE-TPS63802 buck-boost module 20x13 mm, 1x4 pin header VIN GND VOUT EN (2.54 mm), lying flat",
+           "TPS63802 buck boost DC-DC module Akizuki")
+    for i, nm in enumerate(("VIN", "GND", "OUT", "EN")):
+        x = round(-3.81 + 2.54 * i, 3)
+        f.pad(str(i + 1), x, 0, "rect" if i == 0 else "circle", 1.7, 1.7, 1.0)
+        f.text(nm, x, -2.6, size=0.8, thick=0.15)        # 0.8 mm: the board's minimum silk text height
+    f.rect(-6.5, -1.8, 6.5, 18.2)                                  # the module (silkscreen: where it lies)
+    f.rect(-6.5, -1.8, 6.5, 18.2, layer="F.Fab", w=0.1)
+    f.text("AE-TPS63802", 0, 9.0, layer="F.Fab", size=1.0, thick=0.15)
+    f.rect(-6.75, -3.3, 6.75, 18.45, layer="F.CrtYd", w=0.05)
+    f.write((0, 19.4), (0, 20.8))
+
+
 def write_footprints():
+    fp_tps63802()
     fp_pl9823()
     fp_xiao_header()
     fp_buzzer_pkm13()
