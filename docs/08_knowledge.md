@@ -189,6 +189,12 @@ flatpak install --user flathub org.kicad.KiCad org.kicad.KiCad.Library.Footprint
 - 回路図は S 式（テキスト）。古い版（KiCad 9 形式）で書いて `kicad-cli sch upgrade` で 10 形式に変換するのが楽。
 - 90°/180° 回転したシンボルのフィールド文字は、KiCad が向きをトグル・寄せを反転して表示する → 90° 回転のときは角度 90・寄せ反転で保存すると横書きの左寄せになる。
 - ローカルラベルのネット名は **`/VBAT` のように `/` が付く** → ネットクラスのパターンも `/VBAT`、`/MOT_OUT*` と書く（`VBAT` では当たらない）。
+- 回路図の文字の重なりは ERC では見つからない（2026-10-30、Lite rev.L3 で直した）→ `pdftoppm -r 150` で PDF を絵にして、区切りごとに切り出して目で見る。気をつけるところ:
+  - A3 の図枠の内側は x 12〜408、y 12〜285 mm。**右下の表題欄は x 300 以上・y 253 以上**（110 × 34 mm）→ 枠や文字をそこに入れない
+  - 縦に並んだピンに GND 記号を 2 つ続けると、2 つ目の「GND」の字が下のピンのラベルに重なる → 2 本のピンを線でつないで GND 記号は 1 つにする
+  - 文字の中の **`~` は上線（反転）の記号**なので、`~3 V` は「-3 V」のように見える → 「about 3 V」と書く
+  - 文字の幅は 1.27 mm の字で 1 文字およそ 1 mm。長い説明は枠の幅に合わせて行を分ける
+- Lite の自作シンボル（`lite/hardware/kicad/lib/Linetracer2.kicad_sym`）は `gen_lib.py` の出力のまま入れてある（`sym upgrade` をかけるとファイル全体が書き換わる）。フットプリント（`.pretty`）は `fp upgrade` 後のものが入っている → シンボルだけ変えるときは `gen_lib.py` の後に `git checkout -- lite/hardware/kicad/lib/Linetracer2.pretty` で元に戻す。
 - pcbnew Python（10.0.6）のクセ:
   - `board.GetDrawings()` が TypeError（使わない）
   - トラックを `Remove()`/`Add()` した後、`FindFootprintByReference()` が壊れたオブジェクトを返すことがある → `GetFootprints()` から辞書を作る

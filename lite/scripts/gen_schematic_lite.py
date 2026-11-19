@@ -54,7 +54,7 @@ s.text("Power: AA x3 (alkaline 4.5V recommended / NiMH 3.6V) -> VBAT (motors) ; 
        "USB 5V can not back-feed the batteries. Never use 4 cells (the XIAO's 5V input clamps above about 6 V).", 20.32, 24.13, 1.5)
 
 # ================================================================= POWER block
-s.rect(17.78, 30.48, 172.72, 99.06)
+s.rect(17.78, 30.48, 264.16, 99.06)
 s.text("1. POWER", 20.32, 35.56, 2, True)
 
 j1 = s.place("Connector_Generic:Conn_01x02", "J1", "BATTERY (AA x3, XH 2P)", 30.48, 48.26, 90,
@@ -67,9 +67,9 @@ s.path((xj, yj), (xj, yj + 10.16), (xj + 7.62, yj + 10.16))
 s.label("VBAT", xj + 7.62, yj + 10.16, "right")
 s.text("Insert the plug first and solder the header so that the RED wire is on '+'", 20.32, 69.85, 1.27)
 
-s.power("PWR_FLAG", 45.72, 43.18, "up")
-s.wire(45.72, 43.18, 45.72, 45.72)
-s.label("VBAT", 45.72, 45.72, "down")
+s.power("PWR_FLAG", 50.8, 43.18, "up")     # right of J1's value text
+s.wire(50.8, 43.18, 50.8, 45.72)
+s.label("VBAT", 50.8, 45.72, "down")
 
 c1 = s.place("Device:C_Polarized", "C1", "470uF 16V", 63.5, 55.88, 0, footprint=CP_FP,
              fields={"Note": "motor bulk capacitor, place near U2 VM"})
@@ -123,7 +123,7 @@ u1 = s.place("Linetracer2:XIAO_ESP32C6", "U1", "XIAO ESP32C6", 190.5, 144.78, 0,
 # TX / RX carry the boot log and the UART REPL: only outputs there (RGB LED data, STBY), never the button.
 # The XIAO's rear row (D7..D10) feeds only the motor driver behind it; everything else leaves from the front row.
 # rev.L3: D3/D4 and D8/D10 swapped against rev.L2 so that no two tracks cross on the top side (see layout_lite.py).
-# D4 (SW1) also drives the buzzer (through R9; the button hangs on R10).  D6 = data of the 5 RGB LEDs.
+# D4 (SW1) also drives the buzzer (through R9; the button hangs on R10).  D6 = data of the 6 RGB LEDs.
 pins = {"1": "SENS3", "2": "SENS2", "3": "SENS1", "4": "SENS_LED_EN", "5": "SW1", "6": "MOT_IN2",
         "7": "RGB_DIN", "8": "MOT_STBY", "9": "MOT_IN1", "10": "MOT_IN3", "11": "MOT_IN4"}
 for num, net in pins.items():
@@ -142,13 +142,18 @@ s.text("Never solder a Li-ion cell to the XIAO's BAT pads on this robot (AA cell
        121.92, 186.69, 1.27)
 
 # ================================================================= MOTOR block
-s.rect(269.24, 30.48, 408.94, 99.06)
+s.rect(269.24, 30.48, 406.4, 99.06)
 s.text("3. MOTOR DRIVER  (Akizuki AE-TC78H653FTG module, DIP16)", 271.78, 35.56, 2, True)
 u2 = s.place("Linetracer2:AE-TC78H653FTG", "U2", "AE-TC78H653FTG", 304.8, 60.96, 0,
              fields={"Akizuki": "114746", "Note": "uses the two 1x8 pin headers that come with the module"},
              ref_off=(-5.08, -13.97), val_off=(-7.62, 13.97))
-s.pwr(u2, "1", "GND")   # LARGE = L : small mode (2 motors, 2A/ch)
-s.pwr(u2, "2", "GND")   # MODE  = L : IN/IN control
+# LARGE = L : small mode (2 motors, 2A/ch), MODE = L : IN/IN control.  One GND symbol for both pins: a second one
+# on pin 2 would put its "GND" on top of the MOT_STBY label below it.
+x1, y1, d = s.stub_end(u2, "1")
+x2, y2, _ = s.stub_end(u2, "2")
+s.wire(x1, y1, x2, y2)
+s.junction(x1, y1)
+s.power("GND", x1, y1, d)
 s.lab(u2, "3", "MOT_STBY")
 s.lab(u2, "4", "MOT_IN4")
 s.lab(u2, "5", "MOT_IN3")
@@ -184,15 +189,15 @@ s.text("H/L fwd, L/H rev, H/H brake, L/L coast.  Over-current (ISD) latches OFF:
 s.text("toggle STBY L->H to recover (done by the library).", 271.78, 96.52, 1.27)
 
 # ================================================================= UI block
-s.rect(269.24, 101.6, 408.94, 190.5)
+s.rect(269.24, 101.6, 406.4, 190.5)
 s.text("4. BUTTON / BUZZER / RGB LEDs", 271.78, 106.68, 2, True)
-sw1 = s.place("Switch:SW_Push", "SW1", "START", 294.64, 116.84, 0, footprint="Button_Switch_THT:SW_PUSH_6mm",
+sw1 = s.place("Switch:SW_Push", "SW1", "START", 302.26, 116.84, 0, footprint="Button_Switch_THT:SW_PUSH_6mm",
               fields={"Akizuki": "108075"}, ref_off=(-2.54, -3.81), val_off=(-2.54, 3.81))
-r10 = s.place("Device:R", "R10", "1k", 279.4, 116.84, 90, footprint=R_FP,
+r10 = s.place("Device:R", "R10", "1k", 284.48, 116.84, 90, footprint=R_FP,
               ref_off=(-2.54, -2.54), val_off=(-1.27, 2.54))
 s.lab(r10, "1", "SW1")
-s.lab(r10, "2", "BTN")
-s.lab(sw1, "1", "BTN")
+s.connect(r10, "2", sw1, "1")       # one wire with one BTN label (the PCB routes this net by name)
+s.label("BTN", r10.pin("2")[0] + 1.27, r10.pin("2")[1], "right")
 s.pwr(sw1, "2", "GND")
 s.text("internal pull-up, pressed = 0.  R10: if START is pressed while D4 beeps, only 3.3 mA flows",
        271.78, 124.46, 1.27)
@@ -204,8 +209,8 @@ s.text("short press = start / stop, long press = speed level", 271.78, 128.27, 1
 # dimmer as the cells run down).  C2 (470 uF on VSYS) is the only bulk capacitor.
 leds = []
 for i in range(6):
-    d = s.place("Linetracer2:PL9823", "D%d" % (i + 2), "PL9823", 284.48 + 20.32 * i, 149.86, 0, footprint=RGB_FP,
-                ref_off=(-5.08, -7.62), val_off=(2.54, 7.62))
+    d = s.place("Linetracer2:PL9823", "D%d" % (i + 2), "PL9823", 289.56 + 20.32 * i, 146.05, 0, footprint=RGB_FP,
+                ref_off=(-5.08, -8.89), val_off=(2.54, 8.89))
     s.lab(d, "3", "VSYS")
     s.pwr(d, "1", "GND")
     leds.append(d)
@@ -214,25 +219,26 @@ for a, b in zip(leds, leds[1:]):
     s.connect(a, "2", b, "4")
 s.nc(leds[-1], "2")
 s.text("D2..D7 = PL9823 (NeoPixel type, 800 kHz, 24 bit per LED): D2-D4 left side (rear -> front), D5-D7 right side",
-       271.78, 163.83, 1.27)
+       271.78, 165.1, 1.27)
 s.text("(front -> rear).  Data from D6 (TX: the boot log may flash them once).  6 x white = 0.36 A: the library limits it.",
-       271.78, 167.64, 1.27)
-r9 = s.place("Device:R", "R9", "100", 287.02, 172.72, 90, footprint=R_FP,
+       271.78, 168.91, 1.27)
+r9 = s.place("Device:R", "R9", "100", 287.02, 175.26, 90, footprint=R_FP,
              ref_off=(-2.54, -2.54), val_off=(-1.27, 2.54))
-bz = s.place("Device:Buzzer", "BZ1", "piezo 13mm", 304.8, 175.26, 0,
+bz = s.place("Device:Buzzer", "BZ1", "piezo 13mm", 304.8, 177.8, 0,
              footprint="Linetracer2:Buzzer_PKM13_P5.0",
              fields={"Akizuki": "104118 (Murata PKM13EPYH4000-A0)", "Note": "passive piezo, + on the square pad"},
              ref_off=(3.81, -2.54), val_off=(3.81, 2.54))
 s.lab(r9, "1", "SW1")
 s.connect(r9, "2", bz, "1")
 s.pwr(bz, "2", "GND", length=2.54)
-s.text("The buzzer shares D4 with the START button (no free XIAO pin).  A piezo passes no DC, so reading the",
-       271.78, 182.88, 1.27)
-s.text("button (input + pull-up) works; to beep, D4 becomes a PWM output - it also sounds while START is held.",
-       271.78, 186.69, 1.27)
+# beside the buzzer (below it the frame ends)
+s.text("The buzzer shares D4 with the START button (no free XIAO pin).", 327.66, 175.26, 1.27)
+s.text("A piezo passes no DC, so reading the button (input + pull-up)", 327.66, 179.07, 1.27)
+s.text("works; to beep, D4 becomes a PWM output - it also sounds while", 327.66, 182.88, 1.27)
+s.text("START is held.", 327.66, 186.69, 1.27)
 
 # ================================================================= SENSOR block
-s.rect(17.78, 195.58, 299.72, 281.94)
+s.rect(17.78, 195.58, 297.18, 281.94)
 s.text("5. LINE SENSORS  3 x LBR-127HLD (mount on the BOTTOM side, lens to the floor), 12 mm apart",
        20.32, 200.66, 2, True)
 s.text("IR LED: (3.3V - 1.2V - 0.1V) / 100 ohm = about 20 mA each.  Q1 switches all LEDs (ambient light cancel).  "
@@ -243,7 +249,7 @@ by = 238.76
 for i in range(3):
     bx = 38.1 + i * 60.96
     ps = s.place("Linetracer2:LBR-127HLD", "PS%d" % (i + 1), "LBR-127HLD", bx, by, 0,
-                 fields={"Akizuki": "104500"}, ref_off=(-3.81, -6.35), val_off=(-3.81, 7.62))
+                 fields={"Akizuki": "104500"}, ref_off=(-3.81, -6.35), val_off=(-8.89, 7.62))   # value clear of E's GND
     rl = s.place("Device:R", "R%d" % (i + 1), "100", bx - 12.7, by - 12.7, 0, footprint=R_FP,
                  ref_off=(-6.35, -1.27), val_off=(-6.35, 1.27))
     rp = s.place("Device:R", "R%d" % (i + 4), "10k", bx + 12.7, by - 12.7, 0, footprint=R_FP,
@@ -272,10 +278,10 @@ s.text("PS1 = LEFT -> D2 (GPIO2/ADC),  PS2 = CENTRE -> D1 (GPIO1/ADC),  PS3 = RI
        "(seen from above, robot moving up the page)", 20.32, 276.86, 1.27)
 
 # LED switch
-q1 = s.place("Transistor_BJT:2SC1815", "Q1", "2SC1815-GR", 279.4, 251.46, 0,
+q1 = s.place("Transistor_BJT:2SC1815", "Q1", "2SC1815-GR", 274.32, 251.46, 0,
              footprint="Package_TO_SOT_THT:TO-92_Inline_Wide", fields={"Akizuki": "117089"},
              ref_off=(5.08, -1.27), val_off=(5.08, 1.27))
-r7 = s.place("Device:R", "R7", "1k", 266.7, 251.46, 90, footprint=R_FP,
+r7 = s.place("Device:R", "R7", "1k", 261.62, 251.46, 90, footprint=R_FP,
              ref_off=(-2.54, -2.54), val_off=(-1.27, 2.54))
 qb = [n for n, v in q1._pins.items() if v[0][3] == "B"][0]
 qc = [n for n, v in q1._pins.items() if v[0][3] == "C"][0]
@@ -287,22 +293,23 @@ s.pwr(q1, qe, "GND")
 s.text("Q1: all IR LEDs on when SENS_LED_EN = 1 (about 60 mA)", 200.66, 270.51, 1.27)
 
 # ================================================================= TEST PADS
-s.rect(300.99, 195.58, 408.94, 281.94)
-s.text("6. TEST PADS  (multimeter, black probe on GND)", 303.53, 200.66, 2, True)
+# above the title block (it starts at y = 253 on A3), so one row of pads and the notes under it
+s.rect(299.72, 195.58, 406.4, 248.92)
+s.text("6. TEST PADS  (multimeter, black probe on GND)", 302.26, 200.66, 2, True)
 TPS = (("TP1", "GND"), ("TP2", "+3V3"), ("TP3", "VSYS"), ("TP4", "SENS1"), ("TP5", "SENS2"), ("TP6", "SENS3"),
        ("TP7", "LED_K"))
 for i, (ref, net) in enumerate(TPS):
-    x, y = 317.5 + 22.86 * (i % 4), 223.52 + 25.4 * (i // 4)
+    x, y = 309.88 + 13.97 * i, 212.09
     t = s.place("Connector:TestPoint", ref, net if net[0] != "+" else net[1:], x, y, 0,
                 footprint="TestPoint:TestPoint_Pad_D1.5mm", in_bom=False, ref_off=(2.54, -2.54), val_off=(2.54, 0))
     if net in ("GND", "+3V3"):
         s.pwr(t, "1", net)
     else:
         s.lab(t, "1", net)
-s.text("VBAT (D1 anode / J1 +) 3.6-4.8 V, VSYS = VBAT - 0.3 V (USB: 5 V), 3V3 = 3.3 V.  S1-S3: white low, black ~3 V.",
-       303.53, 271.78, 1.27)
-s.text("IR (LED_K): about 0.1 V while the IR LEDs are on (robot.sensors.leds(True)), about 2 V when off.",
-       303.53, 275.59, 1.27)
+s.text("VBAT (D1 anode / J1 +) 3.6-4.8 V,  VSYS = VBAT - 0.3 V (USB: 5 V),  3V3 = 3.3 V.", 302.26, 228.6, 1.27)
+s.text("S1-S3: white low, black about 3 V.", 302.26, 232.41, 1.27)     # not '~3 V': it prints like '-3 V'
+s.text("IR (LED_K): about 0.1 V while the IR LEDs are on (robot.sensors.leds(True)),", 302.26, 236.22, 1.27)
+s.text("about 2 V when off.", 302.26, 240.03, 1.27)
 
 out = os.path.join(KDIR, PROJ + ".kicad_sch")
 s.save(out, date="2026-10-07", rev="L3",
