@@ -1,8 +1,19 @@
-# main.py  -  Linetracer2 standard program (PD line following)
+# main.py  -  Linetracer2 Lite standard program (PD line following, 3 sensors)
 #
-#   SELECT (SW2) : change speed level 1..3  (LED1 = 1, LED2 = 2, both = 3, + beeps)
-#   START  (SW1) : 1st press = auto calibration (robot spins on the line)
-#                  2nd press = run.  Press START again to stop.
+#   START short press : 1st time = auto calibration (robot spins on the line)
+#                       after that = run.  Press START again to stop.
+#   START long press  : change speed level 1..3 (hold until the LEDs go out, then let go;
+#                       the buzzer beeps and 1..3 LEDs light yellow)
+#   LEDs (6, full colour, 3 down each side): green = ready, blue = calibrating, red = calibration failed,
+#                       while running: lights run front -> rear on each side as fast as that wheel turns
+#                       (red when the line is lost)
+#   buzzer            : a short tune at power-on, "pi-pi-pi-PI" before it starts, a low tone when something failed
+#                       (the buzzer is on the START button's pin: it can not see a press while it sounds)
+#                       (hold START while switching on = quiet mode: no sound, the LED blinks instead)
+#   On USB alone the motors have NO power (they run from the batteries only): switch the battery box ON.
+#
+# The board can not measure the battery: when the cells run down the robot gets slower, and when they are
+# nearly empty the XIAO restarts as the motors start (the LEDs go out) -> put in new cells.
 #
 # Put the robot on the line before pressing START.
 
@@ -13,28 +24,31 @@ robot = Robot()
 m, s = robot.motors, robot.sensors
 
 # speed level -> (base speed %, Kp, Kd)   100 % = 3.0 V on the motors
+# Position is -1000 .. +1000 (3 sensors, 12 mm apart), so Kp is larger than on the 6-sensor board.
 # (starting values - tune them on your course: Kp first, then Kd)
 LEVELS = {
-    1: (30, 0.012, 0.35),     # slow
-    2: (45, 0.016, 0.50),     # medium
-    3: (60, 0.020, 0.65),     # fast
+    1: (30, 0.025, 0.35),     # slow
+    2: (45, 0.032, 0.50),     # medium
+    3: (60, 0.040, 0.65),     # fast
 }
 level = 1
-
-
-def show_level(lv):
-    robot.led1.value(lv & 1)
-    robot.led2.value((lv >> 1) & 1)
 
 
 def run_course(base, kp, kd):
     s.ambient_cancel = True
     last_err = 0
+    d_f = 0.0
     lost_since = None
     t_prev = time.ticks_us()
+    robot.led.value(0)
     robot.wait_release()
+    n = 0
+    left = right = base
     while not robot.start_pressed():
         pos = s.position()
+        n += 1
+        if n % 10 == 0:                     # running lights (about 0.3 ms, so not every time)
+            robot.led.flow(left, right, "cyan" if pos is not None else "red")
         now = time.ticks_us()
         dt = max(1, time.ticks_diff(now, t_prev)) / 1000.0   # ms
         t_prev = now
@@ -45,43 +59,66 @@ def run_course(base, kp, kd):
             if time.ticks_diff(time.ticks_ms(), lost_since) > 800:
                 break                       # gave up (off the course)
             turn = 60 if s.last_pos > 0 else -60
-            m.run(base * 0.3 + turn, base * 0.3 - turn)
+            left, right = base * 0.3 + turn, base * 0.3 - turn
+            m.run(left, right)
             continue
         lost_since = None
-        err = pos                           # -2500 .. +2500  (+ = line is right)
+        err = pos                           # -1000 .. +1000  (+ = line is right)
         d = (err - last_err) / dt           # change per millisecond
+        d_f += (d - d_f) * 0.3              # smooth it: with 3 sensors the position moves in steps
         last_err = err
-        steer = kp * err + kd * d
-        m.run(base + steer, base - steer)
+        steer = kp * err + kd * d_f
+        left, right = base + steer, base - steer
+        m.run(left, right)
     m.brake()
     time.sleep_ms(300)
     m.stop()
+    robot.led.value(1)
 
 
-robot.buzzer.beep(1, 1500)
-ok, v = robot.battery_ok()
-print("battery %.2f V" % v)
-if not ok:
-    robot.buzzer.beep(5, 800, 120)          # low battery (or USB only)
+if robot.start_pressed():                   # START held at power-on -> quiet mode
+    robot.volume = 0
+    robot.blink(2, 100)
+    robot.wait_release()
+robot.melody([(1047, 120), (1319, 120), (1568, 200)])     # hello
+print("Linetracer2 Lite (XIAO ESP32C6). Motors run only with the battery switch ON.")
+robot.led.value(1)                          # ready
 
-show_level(level)
-while True:
-    if robot.select_pressed():
-        level = level % len(LEVELS) + 1
-        show_level(level)
-        robot.buzzer.beep(level, 2500, 40)
-        robot.wait_release()
-    if robot.start_pressed():
-        robot.wait_release()
+try:
+    while True:
+        kind = robot.wait_press()
+        if kind == "long":
+            level = level % len(LEVELS) + 1
+            print("level", level)
+            time.sleep_ms(300)
+            robot.led.value(0)
+            time.sleep_ms(300)
+            robot.led.count(level)          # 1..3 yellow LEDs on each side
+            for _ in range(level):
+                robot.beep(2000, 120)
+                time.sleep_ms(150)
+            time.sleep_ms(600)
+            robot.led.value(1)
+            continue
         if not s.calibrated():
-            robot.buzzer.beep(2, 1200)
+            robot.led.fill("blue")              # calibrating
+            robot.beep(2000, 60)                # take your hand off the robot ...
+            time.sleep_ms(1000)                 # ... it starts to turn in 1 second
             ok = robot.auto_calibrate()
             print("calibrated" if ok else "calibration failed", s.lo, s.hi)
-            robot.buzzer.beep(1 if ok else 4, 2000 if ok else 600)
+            if not ok:
+                robot.led.fill("red")
+                robot.beep(400, 600)            # low tone = failed
+                time.sleep_ms(1000)
+            else:
+                robot.melody([(1568, 100), (2093, 200)])
+            robot.led.value(1)
             continue
-        robot.buzzer.beep(3, 3000, 50)       # ready...
+        for f in (2000, 2000, 2000, 4000):      # pi-pi-pi-PI ... go!
+            robot.beep(f, 80 if f < 4000 else 250)
+            time.sleep_ms(250)
         base, kp, kd = LEVELS[level]
         run_course(base, kp, kd)
-        robot.buzzer.beep(1, 1000, 200)
         robot.wait_release()
-    time.sleep_ms(20)
+finally:
+    m.off()                                 # Ctrl-C in Thonny: motors off, driver in standby

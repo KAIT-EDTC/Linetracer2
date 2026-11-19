@@ -2,10 +2,10 @@
 # Whole Lite robot as one 3D model: the KiCad board with all its parts + frames, motors, gears, wheels, tyres, deck,
 # battery box, caster, screws (OpenSCAD).  Run from scripts/:   ./export_assembly.sh
 #
-#   lite/hardware/Linetracer2-Lite_assembly.stl   one mesh (GitHub shows it in a 3D viewer; slicers / CAD import it)
-#   lite/hardware/Linetracer2-Lite_assembly.glb   the same with colours (Windows 3D Viewer, Blender, online glTF viewers)
-#   lite/docs/assembly_*.png                     pictures (OpenSCAD renders of the same pieces)
-#   lite/docs/steps/step_NN.png                  one picture per soldering step (for lite/docs/assembly.md)
+#   hardware/Linetracer2-Lite_assembly.stl        one mesh (GitHub shows it in a 3D viewer; slicers / CAD import it)
+#   hardware/Linetracer2-Lite_assembly.glb        the same with colours (Windows 3D Viewer, Blender, online glTF viewers)
+#   docs/assembly_*.png                     pictures (OpenSCAD renders of the same pieces)
+#   docs/steps/step_NN.png                  one picture per soldering step (for docs/assembly.md)
 #
 # Coordinates: KiCad's 3D frame (x right, y to the FRONT, z up, PCB top at z = 0, origin = the board's (0, 0)).
 set -e
@@ -14,17 +14,17 @@ ROOT=$(cd .. && pwd)
 SCAD="$HOME/.local/opt/openscad-2021/AppRun"
 MECH="$ROOT/hardware/mechanical"
 T="$ROOT/.tmp/asm"                      # inside the repo: the KiCad flatpak can not write to /tmp
-OUT="$ROOT/lite/hardware/Linetracer2-Lite_assembly"
-IMG="$ROOT/lite/docs"
+OUT="$ROOT/hardware/Linetracer2-Lite_assembly"
+IMG="$ROOT/docs"
 SUPPORT=${LITE_SUPPORT:-caster_print}
 mkdir -p "$T"
 
 echo "== board (KiCad VRML, all parts)"
 ./kc pcb export vrml --units mm --user-origin 100x50mm -f -o "$T/board.wrl" \
-    "$ROOT/lite/hardware/kicad/Linetracer2-Lite.kicad_pcb" | tail -1
+    "$ROOT/hardware/kicad/Linetracer2-Lite.kicad_pcb" | tail -1
 
-echo "== one picture per soldering step (lite/docs/steps/)"
-python3 "$ROOT/lite/scripts/step_images.py" "$T/board.wrl" | tail -1
+echo "== one picture per soldering step (docs/steps/)"
+python3 "$ROOT/scripts/step_images.py" "$T/board.wrl" | tail -1
 
 echo "== mechanical pieces (OpenSCAD, LITE_SUPPORT=$SUPPORT)"
 # piece:colour (sRGB hex)
