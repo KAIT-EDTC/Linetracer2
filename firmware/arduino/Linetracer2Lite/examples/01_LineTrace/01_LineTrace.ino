@@ -16,15 +16,15 @@
 Robot robot;
 LineFollower follower(robot);
 
-// 速さレベル -> (基本の速さ %, Kp, Kd)   100 % = モーターに 3.0 V
+// 速さレベル -> (基本の速さ %, Kp, Kd)   100 % = モーターに 1.6 V（rev.L5。前は 3.0 V。Kp・Kd は 1.875 ばい）
 // （コースに あわせて 調整する: まず Kp、つぎに Kd）
 struct Level {
   float base, kp, kd;
 };
 const Level LEVELS[] = {
-    {30, 0.025, 0.35},  // 1: ゆっくり
-    {45, 0.032, 0.50},  // 2: ふつう
-    {60, 0.040, 0.65},  // 3: はやい
+    {55, 0.047, 0.66},  // 1: ゆっくり（0.9 V）
+    {70, 0.060, 0.94},  // 2: ふつう（1.1 V）
+    {85, 0.075, 1.22},  // 3: はやい（1.4 V）
 };
 const int N_LEVELS = sizeof(LEVELS) / sizeof(LEVELS[0]);
 int level = 1;

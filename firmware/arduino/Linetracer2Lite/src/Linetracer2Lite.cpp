@@ -188,7 +188,7 @@ void Lights::begin() {
 
 void Lights::set(int i, Color c, float k) {
   if (i < 0 || i >= N_RGB) return;
-  k = k * brightness / 255.0f;
+  k = k * (brightness < lt2::RGB_LIMIT ? brightness : lt2::RGB_LIMIT) / 255.0f;
   px_[i][0] = c.r * k;  // PL9823 takes red, green, blue
   px_[i][1] = c.g * k;
   px_[i][2] = c.b * k;
@@ -393,7 +393,7 @@ bool LineFollower::update() {
       stop();
       return false;
     }
-    float turn = s.lastPos > 0 ? 60 : -60;
+    float turn = s.lastPos > 0 ? 75 : -75;  // (rev.L5: % of 1.6 V; the outer wheel ends at the limit)
     left = base_ * 0.3f + turn;
     right = base_ * 0.3f - turn;
     robot_.motors.run(left, right);

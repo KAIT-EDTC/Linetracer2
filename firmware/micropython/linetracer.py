@@ -1,6 +1,6 @@
 # linetracer.py  -  Linetracer2 Lite library for MicroPython (Seeed Studio XIAO ESP32C6)
 #
-# For the Lite board rev.L3 / rev.L4 (same pins): XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button + a buzzer on the same pin,
+# For the Lite board rev.L3 / rev.L4 / rev.L5 (same pins): XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button + a buzzer on the same pin,
 # 6 full-colour LEDs (PL9823, NeoPixel type, 3 down each side of the board) on one data pin.
 # MicroPython: the official "ESP32_GENERIC_C6" firmware (micropython.org).
 # (The standard rev.A1 board has its own library in firmware/micropython/ at the top of the repo.)
@@ -9,7 +9,7 @@
 #
 #     from linetracer import Robot
 #     robot = Robot()
-#     robot.motors.run(30, 30)     # left %, right %  (100 % = MAX_MOTOR_VOLT)
+#     robot.motors.run(55, 55)     # left %, right %  (100 % = MAX_MOTOR_VOLT = 1.6 V)
 #
 # Hardware: see README.md  (pin numbers below must match the PCB)
 
@@ -17,7 +17,7 @@ from machine import Pin, PWM, ADC
 from neopixel import NeoPixel
 import time
 
-# ----------------------------------------------------------------- pins (PCB rev.L3 and rev.L4: the same)
+# ----------------------------------------------------------------- pins (PCB rev.L3, rev.L4 and rev.L5: the same)
 # GPIO numbers of the ESP32-C6 (XIAO pin names in the comments).
 # rev.L3 swapped D3/D4 and D8/D10 against rev.L2 (so that no tracks cross on the board).
 PIN_SENS_LED = 21          # D3   1 = IR LEDs on (through Q1)
@@ -35,14 +35,17 @@ ADC_SENS = (2, 1, 0)       # S1 (left), S2 (centre), S3 (right)  -> D2, D1, D0 (
 SENSOR_PITCH_MM = 12
 
 # ----------------------------------------------------------------- settings
-MAX_MOTOR_VOLT = 3.0      # FA-130RA-2270 is rated 1.5-3.0 V. 100 % = this voltage (with BATTERY_VOLT)
+MAX_MOTOR_VOLT = 1.6      # 100 % = this average voltage on a motor (with BATTERY_VOLT).  Not 3.0 V (the motor's
+                          # rating): a wheel held by hand (stalled) draws voltage / about 0.9 ohm, and the driver
+                          # TC78H653FTG (small mode) must stay under 2.0 A.  1.6 V -> about 1.8 A at most, and the
+                          # cells sag half as much (rev.L5 circuit review).  Still about 2 m/s with no load.
 BATTERY_VOLT = 4.2        # the board can NOT measure the battery (no ADC pin left): AA alkaline x3 while
                           # driving is about 4.2 V.  NiMH x3: set 3.7.  The robot gets slower as the cells run down.
-                          # (rev.L4 feeds the XIAO from its own 5 V buck-boost: it keeps running while the motors
+                          # (rev.L4/L5 feed the XIAO from its own 5 V buck-boost: it keeps running while the motors
                           # pull the cells down, also on NiMH.  rev.L3 restarted when a motor stalled or started hard.)
 PWM_FREQ = 20000          # 20 kHz (not audible)
 RAMP_PER_CALL = 0.04      # max change of duty per run() call (soft start, avoids ISD trip)
-LEFT_INVERT = False       # set True if the left wheel turns backwards on run(30, 30)
+LEFT_INVERT = False       # set True if the left wheel turns backwards on run(55, 55)
 RIGHT_INVERT = False      # the motors face opposite directions, but M2's + pad is on OUT4 (wired reversed)
 LONG_PRESS_MS = 1500      # button held this long = "long press" (children often hold a normal press ~0.8 s)
 BEEP_FREQ = 4000          # the piezo (PKM13EPYH4000) is loudest around 4 kHz
@@ -54,7 +57,9 @@ CAL_MIN_SPAN = 4000       # calibration is good if white and black differ by thi
 N_RGB = 6
 RGB_TIMING = (350, 1360, 1360, 350)   # PL9823 bit timing in ns: 0 = 0.35 us high + 1.36 low, 1 = 1.36 + 0.35
 RGB_ORDER = (0, 1, 2)     # PL9823 takes red, green, blue.  If red and green come out swapped, use (1, 0, 2)
-RGB_MAX = 60              # brightness limit 0..255: 6 x white at 255 = 0.36 A and they get warm
+RGB_MAX = 60              # default brightness 0..255: 6 x white at 255 = 0.36 A and they get warm
+RGB_LIMIT = 100           # brightness is never set above this (6 x white = 0.14 A): the LEDs are the biggest
+                          # load on the 5 V module after the XIAO's Wi-Fi (rev.L5 circuit review)
 LEFT_SIDE = (2, 1, 0)     # the left LEDs, front -> rear
 RIGHT_SIDE = (3, 4, 5)    # the right LEDs, front -> rear
 FLOW_SPEED = 6.0          # running lights: steps per second at 100 % motor speed
@@ -255,7 +260,7 @@ class Lights:
         robot.led.value(1)            # like a plain LED: all on in robot.led.color, value(0) = all off
         robot.led.flow(30, 30)        # running lights (call it again and again): each side flows front -> rear
                                       # at the speed of its wheel (negative = rear -> front)
-        robot.led.brightness = 30     # 0..255 (limit, default RGB_MAX)
+        robot.led.brightness = 30     # 0..RGB_LIMIT (100; default RGB_MAX = 60)
     """
 
     def __init__(self, pin=PIN_RGB, n=N_RGB):
@@ -271,7 +276,7 @@ class Lights:
 
     def _rgb(self, c, k=1.0):
         c = COLORS[c] if isinstance(c, str) else c
-        k = k * _clamp(self.brightness, 0, 255) / 255
+        k = k * _clamp(self.brightness, 0, RGB_LIMIT) / 255
         return (int(c[0] * k), int(c[1] * k), int(c[2] * k))
 
     def __setitem__(self, i, c):
@@ -409,7 +414,7 @@ class Robot:
             time.sleep_ms(gap_ms)
 
     # helpers ---------------------------------------------------------------
-    def auto_calibrate(self, ms=2400, speed=25):
+    def auto_calibrate(self, ms=2400, speed=45):
         """Spin left and right over the line while learning white/black."""
         n = LineSensors.N
         self.sensors.lo = [65535] * n

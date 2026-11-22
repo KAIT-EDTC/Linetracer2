@@ -3,11 +3,11 @@
 
 Only SYMBOLS on the board (lower elementary school): build-order numbers, +/- and polarity pictures, the 3rd colour
 band of each resistor, short part names.  What they mean and the steps are in the assembly manual
-(docs/assembly.md).  Build order (one kind of part per step, lowest parts first; rev.L4):
+(docs/assembly.md).  Build order (one kind of part per step, lowest parts first; rev.L5):
    1 ちゃ resistors (100) x4   2 だいだい resistors (10k) x3   3 あか resistors (1k) x3   4 diodes 1N5819 x2 (black)
    5 diode 1N4148 (glass)   6 0.1uF caps x2   7 transistor   8 button   9 buzzer   10 battery connector
-   11 motor driver   12 XIAO   13 5 V module (でんげん, prepared by the teacher)   14 full-colour LEDs x6 (8.7 mm tall,
-   down both sides)   15 470uF cap (the tallest: last, so it does not get in the way of the XIAO's joints)
+   11 motor driver   12 XIAO   13 5 V module (でんげん, headers put on by the teacher)   14 full-colour LEDs x6
+   (8.7 mm tall, down both sides)   15 470uF caps x2 (the tallest: last, so they do not get in the way)
    16 sensors (bottom)   17 motors (after the frames are on)
 Japanese text is 1.3 mm or bigger (smaller kana fail the stroke-width check); symbols use the stroke font.
 NOTE: run only once on a freshly routed board (build_pcb.py does this).
@@ -193,9 +193,10 @@ def led_picture(b, px, py):
     text(b, "+", px - 1.7, py + 4.8, 1.2)
 
 
-def resistor_key(b, x0, y0):
-    """Front-right corner: a resistor with its four bands, the 3rd band drawn solid, and the key
-    1 = ちゃ, 2 = だいだい, 3 = あか (the step number and the colour of the 3rd band)."""
+def resistor_key(b, x0, y0, first=4.3, pitch=2.9, r=None, nsize=None, nx=1.4, tx=3.0):
+    """A resistor with its four bands, the 3rd band drawn solid, and the key 1 = ちゃ, 2 = だいだい, 3 = あか
+    (the step number and the colour of the 3rd band).  rev.L5 draws it a little tighter (rows 2.4 mm apart, r 1.0
+    circles) in front of the 5 V module."""
     line(b, x0, y0, x0 + 1.2, y0)                         # leads
     line(b, x0 + 8.2, y0, x0 + 9.4, y0)
     rect(b, x0 + 1.2, y0 - 1.0, x0 + 8.2, y0 + 1.0)
@@ -205,9 +206,9 @@ def resistor_key(b, x0, y0):
     line(b, x0 + 7.0, y0 - 1.0, x0 + 7.0, y0 + 1.0, w=0.3)                       # gold band
     poly(b, [(x0 + 4.3, y0 + 1.35), (x0 + 3.8, y0 + 2.15), (x0 + 4.8, y0 + 2.15)])   # arrow to the 3rd band
     for i, (n, w) in enumerate(((1, "ちゃ"), (2, "だいだい"), (3, "あか"))):
-        y = y0 + 4.3 + 2.9 * i
-        num(b, n, x0 + 1.4, y)
-        text(b, w, x0 + 3.0, y, 1.3, jp=True, just="left")
+        y = y0 + first + pitch * i
+        num(b, n, x0 + nx, y, r=r, size=nsize)
+        text(b, w, x0 + tx, y, 1.3, jp=True, just="left")
 
 
 def silk(b):
@@ -239,8 +240,9 @@ def silk(b):
         w = BAND3[fp.GetValue()]
         text(b, w, (x1 + x2) / 2, (y1 + y2) / 2, 1.1 if len(w) > 2 else 1.5,
              angle=90 if abs(x1 - x2) < 0.1 else 0, jp=True)
-    # under the 5 V module's outline: the resistors (1-3) go in long before the module (13) covers it
-    resistor_key(b, 42.6, 22.9)
+    # in front of the 5 V module, right of C2, up to the XIAO's antenna end (rev.L5; it was under the big rev.L4
+    # module).  The resistors (1-3) go in long before C2 (15) and the XIAO (12) are near it.
+    resistor_key(b, 50.3, 20.3, first=3.3, pitch=2.4, r=1.0, nsize=1.1, nx=1.3, tx=2.6)
 
     # ---- small parts ---------------------------------------------------------------------------------------
     num(b, 4, 36.5, 30.6)                                   # 1N5819 x2 (inside their outlines)
@@ -268,10 +270,12 @@ def silk(b):
     text(b, "でんち", jx + 1.25, jy + 2.3, 1.3, jp=True)
     num(b, 10, jx - 3.8, jy + 4.6)
     text(b, "VBAT", 35.9, 35.9, 0.9)                        # D1's anode pad = the battery (test point)
-    # the 470 uF can is the tallest part: soldered LAST (15), after the driver (11), the XIAO (12), the 5 V module (13)
-    # and the LEDs (14)
+    # the 470 uF cans are the tallest parts: soldered LAST (15), after the driver (11), the XIAO (12), the 5 V module
+    # (13) and the LEDs (14).  C1 = motors (VBAT), C2 = hold-up for the 5 V module (behind D1, rev.L5)
     electrolytic(b, FPS["C1"], plus_outside=True)
     num(b, 15, 62.0, 47.0)
+    electrolytic(b, FPS["C2"], plus_outside=True)
+    num(b, 15, 40.0, 21.6)
 
     # ---- modules --------------------------------------------------------------------------------------------
     num(b, 11, 41.6, LL.U2_Y)
@@ -286,11 +290,15 @@ def silk(b):
     # full-colour LEDs (both sides): the footprint brings the outline and the dot beside the GND hole (longest leg)
     num(b, 14, 19.1, 27.6)                                  # beside R11 (left of its body)
     num(b, 14, 74.4, 4.2)
-    # 5 V module (rev.L4): the footprint draws where it lies and VIN / GND / OUT / EN behind the pins
-    num(b, 13, 43.0, 35.6)
-    text(b, "でんげん", 48.5, 35.6, 1.3, jp=True)
+    # 5 V module (rev.L5, AE-XC9306-5V0): the footprint draws where it lies; I (in) and O (out) beside their pins.
+    # There is no hole for its TRIM pin (rear right): the module fits only one way.
+    ux3, uy3 = LL.U3_C
+    num(b, 13, ux3, uy3)                                    # in the middle of the module (between its pin rows)
+    text(b, "でんげん", ux3, uy3 + 5.5, 1.3, jp=True)          # right behind the module (over the IN tracks)
+    text(b, "I", ux3 - 2.0, uy3 - 2.54, 0.9, bold=True)
+    text(b, "O", ux3 - 2.0, uy3 + 2.54, 0.9, bold=True)
     text(b, "Linetracer2", 73.6, 44.6, 1.3, bold=True)       # (the right rear is free since rev.L4)
-    text(b, "Lite rev.L4", 73.6, 47.0, 1.0)
+    text(b, "Lite rev.L5", 73.6, 47.0, 1.0)
 
     # ---- test pads (for the teacher's multimeter; meaning and voltages in the manual) ---------------------
     for ref, label, dx, dy in (("TP1", "GND", 3.3, 0), ("TP2", "3V3", -3.0, 0), ("TP3", "VSYS", -0.6, 1.9),
@@ -309,8 +317,8 @@ def silk(b):
     text(b, "センサー", 50.0, 21.0, 1.6, layer=BL, jp=True)
     text(b, "キャスター", 50.0, 17.6, 1.2, layer=BL, jp=True)
     text(b, "Linetracer2 Lite", 50.0, 74.0, 3.0, layer=BL, bold=True)
-    text(b, "rev.L4  2026-10  EDTC", 50.0, 78.6, 1.2, layer=BL)
-    text(b, "XIAO ESP32C6 + TC78H653FTG + TPS63802 + FA-130 x2", 50.0, 81.4, 1.0, layer=BL)
+    text(b, "rev.L5  2026-11  EDTC", 50.0, 78.6, 1.2, layer=BL)
+    text(b, "XIAO ESP32C6 + TC78H653FTG + XC9306 + FA-130 x2", 50.0, 81.4, 1.0, layer=BL)
     text(b, "こどもむけ ライントレーサー", 50.0, 85.4, 2.2, layer=BL, jp=True)
 
 

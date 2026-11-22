@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate the PCB (Lite board rev.L3).
+"""Regenerate the PCB (Lite board rev.L5).
     python3 build_pcb.py
 
 placement (gen_pcb_lite.py) -> hand-drawn routes (route_lite.py, from layout_lite.py) -> silkscreen

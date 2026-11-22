@@ -1,6 +1,6 @@
 // Linetracer2Lite.h  -  Linetracer2 Lite library for Arduino (Seeed Studio XIAO ESP32C6)
 //
-// For the Lite board rev.L3 / rev.L4 (same pins): XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button + a buzzer on the same pin,
+// For the Lite board rev.L3 / rev.L4 / rev.L5 (same pins): XIAO ESP32C6 (on pin headers), 3 x LBR-127HLD, 1 button + a buzzer on the same pin,
 // 6 full-colour LEDs (PL9823, NeoPixel type, 3 down each side of the board) on one data pin.
 // C++ port of firmware/micropython/linetracer.py (same pins, same behaviour, same settings).
 //
@@ -9,7 +9,7 @@
 //     #include <Linetracer2Lite.h>
 //     Robot robot;
 //     void setup() { robot.begin(); }
-//     void loop()  { robot.motors.run(30, 30); }     // left %, right %  (100 % = maxVolt)
+//     void loop()  { robot.motors.run(55, 55); }     // left %, right %  (100 % = maxVolt = 1.6 V)
 //
 // Hardware: see README.md  (pin numbers below must match the PCB)
 #pragma once
@@ -23,7 +23,7 @@
 
 namespace lt2 {
 
-// ----------------------------------------------------------------- pins (PCB rev.L3 and rev.L4: the same)
+// ----------------------------------------------------------------- pins (PCB rev.L3, rev.L4 and rev.L5: the same)
 // GPIO numbers of the ESP32-C6 (XIAO pin names in the comments).
 constexpr uint8_t PIN_SENS_LED = 21;           // D3   HIGH = IR LEDs on (through Q1)
 constexpr uint8_t PIN_STBY = 17;               // D7 (RX)  TC78H653 STBY
@@ -36,10 +36,12 @@ constexpr uint8_t PIN_LED_XIAO = 15;           // yellow user LED on the XIAO it
 constexpr uint8_t ADC_SENS[3] = {2, 1, 0};     // S1 (left), S2 (centre), S3 (right) -> D2, D1, D0 (the only ADC pins)
 
 // ----------------------------------------------------------------- settings
-constexpr float MAX_MOTOR_VOLT = 3.0f;    // FA-130RA-2270 is rated 1.5-3.0 V. 100 % = this voltage (with BATTERY_VOLT)
+constexpr float MAX_MOTOR_VOLT = 1.6f;    // 100 % = this average motor voltage (with BATTERY_VOLT).  Not 3.0 V: a wheel
+                                          // held by hand draws volt / ~0.9 ohm and the driver (small mode) must stay
+                                          // under 2.0 A -> 1.6 V = about 1.8 A at most (rev.L5 circuit review)
 constexpr float BATTERY_VOLT = 4.2f;      // the board can NOT measure the battery: AA alkaline x3 while driving ~4.2 V
                                           // (NiMH x3: 3.7).  The robot gets slower as the cells run down.
-                                          // (rev.L4: the XIAO has its own 5 V buck-boost and keeps running
+                                          // (rev.L4/L5: the XIAO has its own 5 V buck-boost and keeps running
                                           // while the motors pull the cells down; rev.L3 restarted.)
 constexpr uint32_t PWM_FREQ = 20000;      // 20 kHz (not audible)
 constexpr uint8_t PWM_BITS = 10;          // 0 .. 1023
@@ -51,7 +53,9 @@ constexpr int CAL_MIN_SPAN = 250;         // calibration is good if white and bl
                                           // every sensor (= 4000 of 65535 in the MicroPython version)
 constexpr int N_SENS = 3;
 constexpr int N_RGB = 6;
-constexpr uint8_t RGB_MAX = 60;           // brightness limit 0..255: 6 x white at 255 = 0.36 A and they get warm
+constexpr uint8_t RGB_MAX = 60;           // default brightness 0..255: 6 x white at 255 = 0.36 A and they get warm
+constexpr uint8_t RGB_LIMIT = 100;        // brightness is never used above this (6 x white = 0.14 A): the LEDs are the
+                                          // biggest load on the 5 V module after Wi-Fi (rev.L5 circuit review)
 constexpr float FLOW_SPEED = 6.0f;        // running lights: steps per second at 100 % motor speed
 // chain order: D2 (left rear) -> D3 -> D4 (left front) -> D5 (right front) -> D6 -> D7 (right rear)
 constexpr uint8_t LEFT_SIDE[3] = {2, 1, 0};   // the left LEDs, front -> rear
@@ -80,7 +84,7 @@ class Motor {
   void setDuty(float duty);
   void coast();
   float duty() const { return duty_; }
-  bool invert = false;  // set true if this wheel turns backwards on run(30, 30)
+  bool invert = false;  // set true if this wheel turns backwards on run(55, 55)
   bool brake = true;
 
  private:
@@ -177,7 +181,7 @@ class Robot {
   };
   void melody(const Note* notes, size_t n, uint32_t gapMs = 20);
   // helpers
-  bool autoCalibrate(uint32_t ms = 2400, float speed = 25);  // spin left and right over the line
+  bool autoCalibrate(uint32_t ms = 2400, float speed = 45);  // spin left and right over the line
 
   Motors motors;
   LineSensors sensors;

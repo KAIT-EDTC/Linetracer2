@@ -1,6 +1,6 @@
 # Linetracer2 Lite の Arduino（C++）版ソフト
 
-MicroPython 版（`../micropython/`）と同じことを Arduino IDE（C++）で書いたもの。ピン番号・設定・動きは MicroPython の `linetracer.py` / `main.py` と同じ（rev.L3・rev.L4 の基板用。ピンは同じ）。
+MicroPython 版（`../micropython/`）と同じことを Arduino IDE（C++）で書いたもの。ピン番号・設定・動きは MicroPython の `linetracer.py` / `main.py` と同じ（rev.L3・rev.L4・rev.L5 の基板用。ピンは同じ）。
 
 > **どちらか一方だけ**: Arduino で書き込むと XIAO の中の MicroPython は消える。MicroPython に戻すときは `README.md` §8.1 のとおり書き込み直す。
 
@@ -101,7 +101,7 @@ void loop() {
   const Robot::Note doMiSo[] = {{1047, 150}, {1319, 150}, {1568, 300}};
   robot.melody(doMiSo, 3);
   robot.volume = 0.2;               // 音の大きさ 0〜1（標準 0.4）。0 = しずかモード
-  robot.motors.run(40, 40);         // 左 %, 右 %（-100〜100、100 % = 3.0 V）。何度も呼ぶと少しずつ加速
+  robot.motors.run(75, 75);         // 左 %, 右 %（-100〜100、100 % = 1.6 V）。何度も呼ぶと少しずつ加速
   robot.motors.brake();             // すぐ止まる（stop() = 惰性で止まる、off() = ドライバーも待機に）
   robot.ledXiao(true);              // XIAO の黄色い LED
   robot.motors.batteryVolt = 3.7;   // 電池の電圧（決め打ち）。ニッケル水素なら 3.7
