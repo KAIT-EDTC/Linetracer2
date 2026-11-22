@@ -14,7 +14,7 @@
 #
 # The board can not measure the battery: when the cells run down the robot gets slower, and when they are
 # nearly empty the XIAO restarts as the motors start (the LEDs go out) -> put in new cells.
-# (rev.L4: the XIAO has its own 5 V from a buck-boost module, so this happens only with almost empty cells.
+# (rev.L4/L5: the XIAO has its own 5 V from a buck-boost module, so this happens only with weak cells.
 #  On a rev.L3 board it happened already when a wheel was held or both motors started at full speed.)
 #
 # Put the robot on the line before pressing START.
@@ -25,13 +25,14 @@ from linetracer import Robot
 robot = Robot()
 m, s = robot.motors, robot.sensors
 
-# speed level -> (base speed %, Kp, Kd)   100 % = 3.0 V on the motors
+# speed level -> (base speed %, Kp, Kd)   100 % = MAX_MOTOR_VOLT = 1.6 V on the motors (rev.L5; was 3.0 V)
 # Position is -1000 .. +1000 (3 sensors, 12 mm apart), so Kp is larger than on the 6-sensor board.
-# (starting values - tune them on your course: Kp first, then Kd)
+# (starting values - tune them on your course: Kp first, then Kd.  Kp / Kd are the rev.L4 values x 1.875, so the
+#  steering is as strong in volts as before; level 1 is as fast as before, levels 2 and 3 a little slower)
 LEVELS = {
-    1: (30, 0.025, 0.35),     # slow
-    2: (45, 0.032, 0.50),     # medium
-    3: (60, 0.040, 0.65),     # fast
+    1: (55, 0.047, 0.66),     # slow    (0.9 V)
+    2: (70, 0.060, 0.94),     # medium  (1.1 V)
+    3: (85, 0.075, 1.22),     # fast    (1.4 V)
 }
 level = 1
 
@@ -60,7 +61,7 @@ def run_course(base, kp, kd):
                 lost_since = time.ticks_ms()
             if time.ticks_diff(time.ticks_ms(), lost_since) > 800:
                 break                       # gave up (off the course)
-            turn = 60 if s.last_pos > 0 else -60
+            turn = 75 if s.last_pos > 0 else -75   # (rev.L5: % of 1.6 V; the outer wheel ends at the limit)
             left, right = base * 0.3 + turn, base * 0.3 - turn
             m.run(left, right)
             continue

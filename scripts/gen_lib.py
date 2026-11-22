@@ -217,12 +217,15 @@ def sym_pl9823():
         g, "\n    ".join(pins))
 
 
-def sym_tps63802():
-    """Akizuki AE-TPS63802 buck-boost module (TI TPS63802): 4-pin header 1 = VIN, 2 = GND, 3 = VOUT, 4 = EN.
-    Lite rev.L4 uses it to make a steady 5 V for the XIAO out of the AA cells (the motors pull the cells down)."""
-    pins = [pin("power_in", -10.16, 2.54, 0, "VIN", "1"), pin("input", -10.16, -2.54, 0, "EN", "4"),
-            pin("power_out", 10.16, 2.54, 180, "VOUT", "3"), pin("power_in", 0, -7.62, 90, "GND", "2")]
-    return """(symbol "AE-TPS63802"
+def sym_xc9306():
+    """Akizuki AE-XC9306-5V0 buck-boost module (Torex XC9306, fixed 5 V): I = VIN (1), G = GND (2), O = VOUT (3) on
+    one edge; ON/OFF (4, pulled up on the module: leave open) and a second GND (5) on the other edge.  The TRIM pin
+    (across from O) has no pin here: Lite rev.L5 leaves it out of the board (no hole), which also keys the module.
+    Lite rev.L5 uses it to make a steady 5 V for the XIAO out of the AA cells (the motors pull the cells down)."""
+    pins = [pin("power_in", -10.16, 2.54, 0, "VIN", "1"), pin("input", -10.16, -2.54, 0, "ON/OFF", "4"),
+            pin("power_out", 10.16, 2.54, 180, "VOUT", "3"), pin("power_in", 2.54, -7.62, 90, "GND", "2"),
+            pin("power_in", 5.08, -7.62, 90, "GND", "5")]      # GND on the right: "ON/OFF" needs the left half
+    return """(symbol "AE-XC9306-5V0"
   (pin_names (offset 1.016))
   (exclude_from_sim no) (in_bom yes) (on_board yes)
   %s
@@ -230,20 +233,21 @@ def sym_tps63802():
   %s
   %s
   %s
-  (symbol "AE-TPS63802_0_1"
+  (symbol "AE-XC9306-5V0_0_1"
     (rectangle (start -7.62 5.08) (end 7.62 -5.08) (stroke (width 0.254) (type default)) (fill (type background)))
   )
-  (symbol "AE-TPS63802_1_1"
+  (symbol "AE-XC9306-5V0_1_1"
     %s
   )
   (embedded_fonts no)
 )""" % (
         prop("Reference", "U", 0, 7.62),
-        prop("Value", "AE-TPS63802", 0, -10.16),
-        prop("Footprint", "Linetracer2:AE-TPS63802", 0, -12.7, hide=True),
-        prop("Datasheet", "https://akizukidenshi.com/goodsaffix/AE-TPS63802.pdf", 0, -15.24, hide=True),
-        prop("Description", "Akizuki AE-TPS63802 buck-boost module (TI TPS63802, VIN 1.8-5.5 V, keeps running down to "
-             "1.3 V), output set by VR1 (470k = 5.13 V). EN must not float", 0, -17.78, hide=True),
+        prop("Value", "AE-XC9306-5V0", 0, -10.16),
+        prop("Footprint", "Linetracer2:AE-XC9306-5V0", 0, -12.7, hide=True),
+        prop("Datasheet", "https://akizukidenshi.com/goodsaffix/AE-XC9306-5V0.pdf", 0, -15.24, hide=True),
+        prop("Description", "Akizuki AE-XC9306-5V0 buck-boost module (Torex XC9306, VIN 2.5-5.5 V, 5 V fixed, about "
+             "500 mA at 3.3 V in). ON/OFF pulled up on the module (open = on). TRIM not used (no pin)", 0, -17.78,
+             hide=True),
         "\n    ".join(pins))
 
 
@@ -251,7 +255,7 @@ def write_symbols():
     txt = "(kicad_symbol_lib\n\t(version 20241209)\n\t(generator \"linetracer2_gen\")\n\t(generator_version \"9.0\")\n"
     lbr127 = sym_reflector("LBR-127HLD", "https://akizukidenshi.com/goodsaffix/lbr127hld.pdf",
                            "Reflective photo sensor (IR LED + NPN phototransistor), Letex LBR-127HLD, body 8.7 x 4.5 x 5.6 mm")
-    for s in (sym_module(), sym_reflector(), lbr127, sym_xiao(), sym_pl9823(), sym_tps63802()):
+    for s in (sym_module(), sym_reflector(), lbr127, sym_xiao(), sym_pl9823(), sym_xc9306()):
         node = sexpr.parse(s)
         txt += sexpr.dump(node, 1) + "\n"
     txt += sym_pico() + "\n)\n"
@@ -540,29 +544,34 @@ def fp_pl9823():
     f.circle(0, 0, 3.2, layer="F.CrtYd", w=0.05)
     f.write((0, -4.3), (0, 4.3))
 
-def fp_tps63802():
-    """Akizuki AE-TPS63802 buck-boost module (20 x 13 mm) on its own 4-pin header, lying flat 2.5 mm above the board
-    (Lite rev.L4).  Origin = centre of the pin row, pin 1 (VIN) at -x.  The body is drawn on the +y side: the pins
-    are assumed to sit on one 13 mm end, 1.8 mm in from the edge (Akizuki's drawing gives 20 / 13 / 1.8 / 2.7 /
-    2.54 mm; 2.7 = (13 - 3 x 2.54) / 2).  CHECK THE REAL MODULE before ordering boards.  Turning the module over
-    (parts down) keeps every pin in its hole and puts the body on the other side of the row, so it fits either way
-    round as long as the parts on it stay under 2.5 mm (VR1 = a 470k resistor lying flat, not the 25-turn trimmer)."""
-    f = FP("AE-TPS63802",
-           "Akizuki AE-TPS63802 buck-boost module 20x13 mm, 1x4 pin header VIN GND VOUT EN (2.54 mm), lying flat",
-           "TPS63802 buck boost DC-DC module Akizuki")
-    for i, nm in enumerate(("VIN", "GND", "OUT", "EN")):
-        x = round(-3.81 + 2.54 * i, 3)
-        f.pad(str(i + 1), x, 0, "rect" if i == 0 else "circle", 1.7, 1.7, 1.0)
-        f.text(nm, x, -2.6, size=0.8, thick=0.15)        # 0.8 mm: the board's minimum silk text height
-    f.rect(-6.5, -1.8, 6.5, 18.2)                                  # the module (silkscreen: where it lies)
-    f.rect(-6.5, -1.8, 6.5, 18.2, layer="F.Fab", w=0.1)
-    f.text("AE-TPS63802", 0, 9.0, layer="F.Fab", size=1.0, thick=0.15)
-    f.rect(-6.75, -3.3, 6.75, 18.45, layer="F.CrtYd", w=0.05)
-    f.write((0, 19.4), (0, 20.8))
+def fp_xc9306():
+    """Akizuki AE-XC9306-5V0 buck-boost module (8.5 x 7.6 mm, castellated edges, Lite rev.L5), lying flat on the two
+    thin 1x3 pin headers that come with it (parts up).  Origin = centre of the pin pattern.  Akizuki's drawing (seen
+    from the side with the big pads and the "XC9306 / O G I" print, i.e. from below): O G I along one 8.5 mm edge,
+    2.54 mm apart; the other edge (7.6 mm away) has TRIM across from O, GND, ON/OFF across from I.  Seen from above
+    (parts up): row y +3.81 = I (1), G (2), O (3) from -x to +x; row y -3.81 = ON/OFF (4), GND (5), TRIM (no hole).
+    NO HOLE FOR TRIM: the teacher pulls that pin out of the header, and the five remaining pins then fit the board in
+    only one position (turned round or turned over they do not fit), so IN and OUT can not be swapped.  If the
+    mirror image of the drawing were the truth, the module would still fit only one way - parts down - with every
+    pin in the right hole.  CHECK THE REAL MODULE before ordering boards."""
+    f = FP("AE-XC9306-5V0",
+           "Akizuki AE-XC9306-5V0 buck-boost 5 V module 8.5x7.6 mm on 2 rows of pins (2.54 mm, rows 7.62 mm apart), "
+           "lying flat. Pins I G O / ON-OFF GND; no hole for TRIM (keys the module)",
+           "XC9306 buck boost DC-DC module Akizuki 5V")
+    for num, x, y in (("1", -2.54, 3.81), ("2", 0, 3.81), ("3", 2.54, 3.81), ("4", -2.54, -3.81), ("5", 0, -3.81)):
+        f.pad(num, x, y, "rect" if num == "1" else "circle", 1.7, 1.7, 1.0)
+    # where the module lies: its 8.5 mm ends, and lines just outside the pin rows (the pins sit on its edges)
+    f.rect(-4.25, -4.8, 4.25, 4.8)
+    f.rect(-4.25, -3.8, 4.25, 3.8, layer="F.Fab", w=0.1)
+    f.text("XC9306", 0, 0, layer="F.Fab", size=0.8, thick=0.12)
+    f.circle(2.54, -3.81, 0.5, layer="F.Fab", w=0.1)               # TRIM: no pin, no hole
+    f.text("TRIM", 2.54, -2.6, layer="F.Fab", size=0.5, thick=0.08)
+    f.rect(-4.5, -5.0, 4.5, 5.0, layer="F.CrtYd", w=0.05)
+    f.write((0, 6.0), (0, 7.2))
 
 
 def write_footprints():
-    fp_tps63802()
+    fp_xc9306()
     fp_pl9823()
     fp_xiao_header()
     fp_buzzer_pkm13()

@@ -1,22 +1,30 @@
 #!/usr/bin/env python3
-"""Generate hardware/kicad/Linetracer2-Lite.kicad_sch (Lite board rev.L4, single A3 sheet).
+"""Generate hardware/kicad/Linetracer2-Lite.kicad_sch (Lite board rev.L5, single A3 sheet).
 
     cd scripts && python3 gen_schematic_lite.py
 
 Differences from the former standard board rev.A1 (removed; see the git history):
   * Seeed Studio XIAO ESP32C6 on two 1x7 pin headers (footprint Linetracer2:XIAO_ESP32C6_Header);
-    powered through its 5V pin (= USB VBUS) from a buck-boost module (rev.L4, see below)
+    powered through its 5V pin (= USB VBUS) from a buck-boost module (rev.L4/L5, see below)
   * 3 x LBR-127HLD sensors straight into the XIAO's three ADC pins (no 4051 multiplexer)
   * no battery measurement (the XIAO has only 3 ADC pins; all of them are used by the sensors)
   * 1 button, a passive piezo buzzer sharing the button's pin (D4), 6 full-colour LEDs (PL9823, one data line
     on D6 through R11 1k), test pads for a multimeter, no power LED, no expansion header
 
 rev.L4 (power): the XIAO reset whenever the motors pulled hard (start, stall, 100 %): 3 x AA under 2-3 A of motor
-current sag to 2.5-3.3 V, but the XIAO needs about 4 V on its 5V pin (its own Schottky + buck regulator).  Now
-VBAT -> D1 -> AE-TPS63802 buck-boost (keeps running down to 1.3 V in) -> 5.13 V -> D8 -> VSYS (XIAO 5V pin,
-right LED column); D8 keeps the module from feeding the PC's USB port and USB from feeding the module.
-The 470 uF that sat on VSYS (= USB VBUS) is gone (USB allows 10 uF there).  The left LED column (D2 = the first
-LED) runs from VSYS through D9 (1N4148, -0.7 V), so its 3.3 V data input is a valid "1" (PL9823: 0.7 x VDD).
+current sag to 2.5-3.3 V, but the XIAO needs about 4 V on its 5V pin (its own Schottky + buck regulator).  So
+VBAT -> D1 -> buck-boost 5 V -> D8 -> VSYS (XIAO 5V pin, right LED column); D8 keeps the module from feeding the PC's
+USB port and USB from feeding the module.  No bulk capacitor on VSYS (= USB VBUS: USB allows 10 uF there).  The left
+LED column (D2 = the first LED) runs from VSYS through D9 (1N4148, -0.7 V), so its 3.3 V data input is a valid "1"
+(PL9823: 0.7 x VDD).
+rev.L5 (circuit review 2026-11-19):
+  * U3 = Akizuki AE-XC9306-5V0 (fixed 5 V, VIN 2.5-5.5 V, in stock, nothing to set) instead of the AE-TPS63802 kit
+    (out of stock with no date, and it needed a 470k soldered in place of VR1 before the first power-up).
+    No hole for its TRIM pin: the module then fits only one way.  ON/OFF is left open (pulled up on the module).
+  * C2 470 uF on VIN_BB, behind D1: D1 keeps the motors from draining it, so it carries the 5 V module through
+    short gaps of the battery springs (a bump, a shake) - about 3 ms.  (VSYS itself still has no bulk capacitor.)
+  * the firmware limits the motors to 1.6 V average (MAX_MOTOR_VOLT): a wheel held by hand then draws at most
+    about 1.8 A, inside the TC78H653FTG's 2.0 A (small mode, absolute maximum), and the cells sag half as much.
 """
 import os
 import sys
@@ -30,7 +38,7 @@ C_FP = "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm"
 CP_FP = "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm"
 RGB_FP = "Linetracer2:LED_PL9823_5mm"
 
-s = Sch("Linetracer2 Lite rev.L4 - XIAO ESP32C6 kids line tracer")
+s = Sch("Linetracer2 Lite rev.L5 - XIAO ESP32C6 kids line tracer")
 
 # Akizuki (akizukidenshi.com) 通販コード for parts that are placed many times (checked 2026-10-05)
 AKIZUKI = {
@@ -55,9 +63,9 @@ def _place_with_code(lib_id, ref, value, *args, **kw):
 s.place = _place_with_code
 
 # ----------------------------------------------------------------- headings
-s.text("Linetracer2 Lite rev.L4  :  XIAO ESP32C6 on pin headers, 3 x LBR-127HLD, 1 button, 1 buzzer, 6 RGB LEDs, 5 V buck-boost", 20.32, 17.78, 3, True)
-s.text("Power: AA x3 (alkaline 4.5V / NiMH 3.6V) -> VBAT (motors) ; VBAT -> D1 -> buck-boost 5.13 V -> D8 -> VSYS -> XIAO 5V pin. "
-       "The XIAO no longer resets when the motors pull the cells down. Never use 4 cells (the module takes 5.5 V max).", 20.32, 24.13, 1.5)
+s.text("Linetracer2 Lite rev.L5  :  XIAO ESP32C6 on pin headers, 3 x LBR-127HLD, 1 button, 1 buzzer, 6 RGB LEDs, 5 V buck-boost", 20.32, 17.78, 3, True)
+s.text("Power: AA x3 (alkaline 4.5V / NiMH 3.6V) -> VBAT (motors) ; VBAT -> D1 -> C2 + buck-boost 5.0 V -> D8 -> VSYS -> XIAO 5V pin. "
+       "The XIAO does not reset when the motors pull the cells down. Never use 4 cells (the module takes 5.5 V max).", 20.32, 24.13, 1.5)
 
 # ================================================================= POWER block
 s.rect(17.78, 30.48, 264.16, 99.06)
@@ -84,26 +92,36 @@ s.pwr(c1, "2", "GND")
 
 d1 = s.place("Device:D_Schottky", "D1", "1N5819", 73.66, 45.72, 180,
              footprint="Diode_THT:D_DO-41_SOD81_P7.62mm_Horizontal",
-             fields={"Note": "reverse battery: protects U3 and the XIAO"},
+             fields={"Note": "reverse battery: protects U3 and the XIAO; keeps the motors off C2"},
              ref_off=(-2.54, -3.81), val_off=(-3.81, 3.81))
 s.lab(d1, "2", "VBAT")      # A
-# D1 K -> U3 VIN with EN tied to it (EN must not float: always on); one VIN_BB label names the net for the PCB
-u3 = s.place("Linetracer2:AE-TPS63802", "U3", "AE-TPS63802", 104.14, 48.26, 0,
-             footprint="Linetracer2:AE-TPS63802",
-             fields={"Akizuki": "115557 (AE-TPS63802 kit) + 470k 125474 for VR1",
-                     "Note": "VR1 = 470k resistor (5.13 V), lying flat; header 4P from the kit"},
+# D1 K -> C2 (hold-up) -> U3 VIN; one VIN_BB label names the net for the PCB.  ON/OFF open (pulled up on the module).
+u3 = s.place("Linetracer2:AE-XC9306-5V0", "U3", "AE-XC9306-5V0", 104.14, 48.26, 0,
+             footprint="Linetracer2:AE-XC9306-5V0",
+             fields={"Akizuki": "115775 (AE-XC9306-5V0, 5 V fixed, 2 thin 1x3 pin headers included)",
+                     "Note": "pull the TRIM pin (across from O) out of its header: no hole on the board"},
              ref_off=(0, -10.16), val_off=(0, -7.62))
 xk, yk, _ = d1.pin("1")
 xv, yv, _ = u3.pin("1")
-xe, ye, _ = u3.pin("4")
 s.wire(xk, yk, xv, yv)
-s.path((xe, ye), (xe - 5.08, ye), (xe - 5.08, yv))
-s.junction(xe - 5.08, yv)
 s.label("VIN_BB", xk + 2.54, yk, "right")
 s.power("PWR_FLAG", 83.82, 43.18, "up")
 s.wire(83.82, 43.18, 83.82, yk)
 s.junction(83.82, yk)
-s.pwr(u3, "2", "GND")
+s.nc(u3, "4")
+# both GND pins (2.54 apart) on one GND symbol: two symbols side by side would print "GNGND"
+xg2, yg2, dg = s.stub_end(u3, "2")
+xg5, yg5, _ = s.stub_end(u3, "5")
+s.wire(xg2, yg2, xg5, yg5)
+s.junction(xg2, yg2)
+s.power("GND", xg2, yg2, dg)
+# C2: hold-up capacitor on the module's input (behind D1, so the motors can not drain it)
+c2 = s.place("Device:C_Polarized", "C2", "470uF 16V", 88.9, 55.88, 0, footprint=CP_FP,
+             fields={"Note": "hold-up: carries U3 through short gaps of the battery contacts"})
+xc2, yc2, _ = c2.pin("1")
+s.wire(xc2, yc2, xc2, yk)
+s.junction(xc2, yk)
+s.pwr(c2, "2", "GND")
 
 # U3 VOUT -> D8 A (one VOUT_BB label), D8 K -> VSYS
 d8 = s.place("Device:D_Schottky", "D8", "1N5819", 132.08, 45.72, 180,
@@ -131,9 +149,9 @@ s.lab(d9, "1", "VLED_L")    # K
 s.power("PWR_FLAG", 198.12, 43.18, "up")
 s.wire(198.12, 43.18, 198.12, 45.72)
 s.label("VLED_L", 198.12, 45.72, "down")
-s.text("D9: VLED_L = VSYS - 0.7 V = about 4.1 V for the left LEDs D2-D4.", 167.64, 55.88, 1.27)
-s.text("A PL9823 reads '1' above 0.7 x VDD: 2.9 V there, so the XIAO's 3.3 V", 167.64, 59.69, 1.27)
-s.text("data is enough.  D2-D4 pass the data on at 4.1 V, enough for D5-D7.", 167.64, 63.5, 1.27)
+s.text("D9: VLED_L = VSYS - 0.7 V = about 4.0 V for the left LEDs D2-D4.", 167.64, 55.88, 1.27)
+s.text("A PL9823 reads '1' above 0.7 x VDD: 2.8 V there, so the XIAO's 3.3 V", 167.64, 59.69, 1.27)
+s.text("data is enough.  D2-D4 pass the data on at 4.0 V, enough for D5-D7.", 167.64, 63.5, 1.27)
 
 # GND: nothing on this board is a power output for GND (the XIAO's GND pin is a power input)
 s.power("PWR_FLAG", 228.6, 43.18, "up")
@@ -142,10 +160,10 @@ s.power("GND", 228.6, 45.72, "down")
 
 s.text("Why rev.L4: 2 motors starting / stalled pull 2-4 A and the AA cells sag to 2.5-3.3 V; the XIAO needs about 4 V on its "
        "5V pin and reset.", 20.32, 73.66, 1.27)
-s.text("U3 makes 5.13 V from 1.3-5.5 V (start 1.8 V).  VSYS = about 4.8 V (USB: 5 V).  No bulk capacitor on VSYS: it is USB "
-       "VBUS (max 10 uF).", 20.32, 77.47, 1.27)
-s.text("U3 kit: solder a 470k resistor (flat) in place of VR1 BEFORE power-up.  Battery voltage is NOT measured (3 ADC pins, "
-       "all used by the sensors).", 20.32, 81.28, 1.27)
+s.text("rev.L5: U3 = AE-XC9306-5V0 (5.0 V from 2.5-5.5 V). C2 holds VIN_BB through short battery-contact gaps (D1 keeps the "
+       "motors off it).", 20.32, 77.47, 1.27)
+s.text("Motors limited to 1.6 V average in the firmware (held wheel <= about 1.8 A < 2.0 A of the driver). No bulk capacitor on "
+       "VSYS (= USB VBUS, max 10 uF).", 20.32, 81.28, 1.27)
 
 # ---- mechanical (mounting holes, kept in the schematic for PCB parity)
 s.text("MECHANICAL: H1-H4 = gearbox frame M3 (x30/x70, y62/y96), H5 = front ball caster / skid, snap-in (x50, y11: behind the centre sensor)",
@@ -251,7 +269,7 @@ s.text("internal pull-up, pressed = 0.  R10: if START is pressed while D4 beeps,
 s.text("short press = start / stop, long press = speed level", 271.78, 128.27, 1.27)
 
 # 6 full-colour LEDs in one chain, 3 down each side of the board: D6 -> D2 DIN (left rear), D2 -> D3 -> D4 (left front)
-# -> D5 (right front) -> D6 -> D7 (right rear), D7 DO open.  The right column runs from VSYS (about 4.8 V from U3 / D8,
+# -> D5 (right front) -> D6 -> D7 (right rear), D7 DO open.  The right column runs from VSYS (about 4.7 V from U3 / D8,
 # 5 V on USB: inside the PL9823's 4.5-6 V).  A PL9823 reads "1" above 0.7 x VDD = 3.4-3.5 V there, more than the
 # XIAO's 3.3 V: so the left column (with D2, the first LED) runs from VLED_L = VSYS - D9 (1N4148) = about 4.1 V
 # (USB 4.3 V) -> 2.9-3.0 V is enough.  D2..D4 pass the data on at their own VDD (4.1 V), enough for D5..D7.
@@ -363,13 +381,13 @@ for i, (ref, net) in enumerate(TPS):
         s.pwr(t, "1", net)
     else:
         s.lab(t, "1", net)
-s.text("VBAT (D1 anode / J1 +) 3.6-4.8 V,  VSYS about 4.8 V (USB: 5 V),  3V3 = 3.3 V.", 302.26, 228.6, 1.27)
+s.text("VBAT (D1 anode / J1 +) 3.6-4.8 V,  VSYS about 4.7 V (USB: 5 V),  3V3 = 3.3 V.", 302.26, 228.6, 1.27)
 s.text("S1-S3: white low, black about 3 V.", 302.26, 232.41, 1.27)     # not '~3 V': it prints like '-3 V'
 s.text("IR (LED_K): about 0.1 V while the IR LEDs are on (robot.sensors.leds(True)),", 302.26, 236.22, 1.27)
 s.text("about 2 V when off.", 302.26, 240.03, 1.27)
 
 out = os.path.join(KDIR, PROJ + ".kicad_sch")
-s.save(out, date="2026-10-30", rev="L4",
+s.save(out, date="2026-11-19", rev="L5",
        comments=("All parts through-hole. XIAO on two 1x7 pin headers",
-                 "XIAO ESP32C6 + AE-TC78H653FTG + AE-TPS63802 (5 V) + 3 x LBR-127HLD",
+                 "XIAO ESP32C6 + AE-TC78H653FTG + AE-XC9306-5V0 (5 V) + 3 x LBR-127HLD",
                  "Design notes: README.md"))

@@ -9,6 +9,8 @@ PDF はメーカー・販売店の著作物なので、リポジトリには入�
 | FA-130RA-2270 | 外形・特性 | https://akizukidenshi.com/goodsaffix/FA-130RA-2270_20190306.pdf |
 | LBR-123F（削除した標準版） | データシート | https://akizukidenshi.com/goodsaffix/lbr-123f.pdf |
 | LBR-127HLD | データシート | https://akizukidenshi.com/goodsaffix/lbr127hld.pdf |
+| AE-XC9306-5V0（秋月、5 V 昇降圧モジュール、rev.L5 の U3） | 説明書（ピン配置・推奨最大負荷電流） | https://akizukidenshi.com/goodsaffix/AE-XC9306-5V0.pdf |
+| AE-TPS63802（秋月、rev.L4 の U3。2026-11-19 に入荷未定） | 説明書 | https://akizukidenshi.com/goodsaffix/AE-TPS63802.pdf |
 | Seeed Studio XIAO ESP32C6 | 解説（ピン配置・電源） | https://wiki.seeedstudio.com/xiao_esp32c6_getting_started/ |
 | 同上 | 回路図 / KiCad データ（基板） | https://files.seeedstudio.com/wiki/SeeedStudio-XIAO-ESP32C6/XIAO_ESP32_C6_v1.0_SCH_260114.pdf ／ https://files.seeedstudio.com/wiki/SeeedStudio-XIAO-ESP32C6/XIAO_ESP32_C6_v1.0_SCH&PCB_260114.zip |
 | ESP32-C6（Espressif） | データシート（Table 2-1 にピンの起動時の状態） | https://documentation.espressif.com/esp32-c6_datasheet_en.pdf |

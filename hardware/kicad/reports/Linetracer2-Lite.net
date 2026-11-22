@@ -1,18 +1,18 @@
 (export
 	(version "E")
 	(design
-		(source "/home/user/Linetracer2/lite/hardware/kicad/Linetracer2-Lite.kicad_sch")
-		(date "2026-11-19T09:28:22")
-		(tool "Eeschema 10.0.7")
+		(source "/home/aonuma/Desktop/EDTC/Linetracer2/hardware/kicad/Linetracer2-Lite.kicad_sch")
+		(date "2026-11-19T19:42:55")
+		(tool "Eeschema 10.0.8")
 		(sheet
 			(number "1")
 			(name "/")
 			(tstamps "/")
 			(title_block
-				(title "Linetracer2 Lite rev.L4 - XIAO ESP32C6 kids line tracer")
+				(title "Linetracer2 Lite rev.L5 - XIAO ESP32C6 kids line tracer")
 				(company "EDTC")
-				(rev "L4")
-				(date "2026-10-30")
+				(rev "L5")
+				(date "2026-11-19")
 				(source "Linetracer2-Lite.kicad_sch")
 				(comment
 					(number "1")
@@ -20,11 +20,11 @@
 				)
 				(comment
 					(number "2")
-					(value "XIAO ESP32C6 + AE-TC78H653FTG + AE-TPS63802 (5 V) + 3 x LBR-127HLD")
+					(value "XIAO ESP32C6 + AE-TC78H653FTG + AE-XC9306-5V0 (5 V) + 3 x LBR-127HLD")
 				)
 				(comment
 					(number "3")
-					(value "Design notes: lite/README.md")
+					(value "Design notes: README.md")
 				)
 				(comment
 					(number "4")
@@ -187,6 +187,72 @@
 			)
 		)
 		(comp
+			(ref "C2")
+			(value "470uF 16V")
+			(footprint "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm")
+			(description "Polarized capacitor")
+			(fields
+				(field
+					(name "Note") "hold-up: carries U3 through short gaps of the battery contacts")
+				(field
+					(name "Akizuki") "108426 (Rubycon 16WXA470MEFC 8x9)")
+				(field
+					(name "Footprint") "Capacitor_THT:CP_Radial_D8.0mm_P3.50mm")
+				(field
+					(name "Datasheet")
+				)
+				(field
+					(name "Description") "Polarized capacitor")
+			)
+			(libsource
+				(lib "Device")
+				(part "C_Polarized")
+				(description "Polarized capacitor")
+			)
+			(property
+				(name "Note")
+				(value "hold-up: carries U3 through short gaps of the battery contacts")
+			)
+			(property
+				(name "Akizuki")
+				(value "108426 (Rubycon 16WXA470MEFC 8x9)")
+			)
+			(property
+				(name "Sheetname")
+				(value "Linetracer2-Lite")
+			)
+			(property
+				(name "Sheetfile")
+				(value "Linetracer2-Lite.kicad_sch")
+			)
+			(property
+				(name "ki_keywords")
+				(value "cap capacitor")
+			)
+			(property
+				(name "ki_fp_filters")
+				(value "CP_*")
+			)
+			(sheetpath
+				(names "/")
+				(tstamps "/")
+			)
+			(tstamps "b14b34e0-1eb5-5620-9668-de3dc70877a5")
+			(units
+				(unit
+					(name "A")
+					(pins
+						(pin
+							(num "1")
+						)
+						(pin
+							(num "2")
+						)
+					)
+				)
+			)
+		)
+		(comp
 			(ref "C3")
 			(value "0.1uF (at motor)")
 			(footprint "Capacitor_THT:C_Disc_D3.0mm_W2.0mm_P2.50mm")
@@ -313,7 +379,7 @@
 			(description "Schottky diode")
 			(fields
 				(field
-					(name "Note") "reverse battery: protects U3 and the XIAO")
+					(name "Note") "reverse battery: protects U3 and the XIAO; keeps the motors off C2")
 				(field
 					(name "Akizuki") "117244 (10pcs)")
 				(field
@@ -331,7 +397,7 @@
 			)
 			(property
 				(name "Note")
-				(value "reverse battery: protects U3 and the XIAO")
+				(value "reverse battery: protects U3 and the XIAO; keeps the motors off C2")
 			)
 			(property
 				(name "Akizuki")
@@ -2763,34 +2829,34 @@
 		)
 		(comp
 			(ref "U3")
-			(value "AE-TPS63802")
-			(footprint "Linetracer2:AE-TPS63802")
-			(datasheet "https://akizukidenshi.com/goodsaffix/AE-TPS63802.pdf")
-			(description "Akizuki AE-TPS63802 buck-boost module (TI TPS63802, VIN 1.8-5.5 V, keeps running down to 1.3 V), output set by VR1 (470k = 5.13 V). EN must not float")
+			(value "AE-XC9306-5V0")
+			(footprint "Linetracer2:AE-XC9306-5V0")
+			(datasheet "https://akizukidenshi.com/goodsaffix/AE-XC9306-5V0.pdf")
+			(description "Akizuki AE-XC9306-5V0 buck-boost module (Torex XC9306, VIN 2.5-5.5 V, 5 V fixed, about 500 mA at 3.3 V in). ON/OFF pulled up on the module (open = on). TRIM not used (no pin)")
 			(fields
 				(field
-					(name "Akizuki") "115557 (AE-TPS63802 kit) + 470k 125474 for VR1")
+					(name "Akizuki") "115775 (AE-XC9306-5V0, 5 V fixed, 2 thin 1x3 pin headers included)")
 				(field
-					(name "Note") "VR1 = 470k resistor (5.13 V), lying flat; header 4P from the kit")
+					(name "Note") "pull the TRIM pin (across from O) out of its header: no hole on the board")
 				(field
-					(name "Footprint") "Linetracer2:AE-TPS63802")
+					(name "Footprint") "Linetracer2:AE-XC9306-5V0")
 				(field
-					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/AE-TPS63802.pdf")
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/AE-XC9306-5V0.pdf")
 				(field
-					(name "Description") "Akizuki AE-TPS63802 buck-boost module (TI TPS63802, VIN 1.8-5.5 V, keeps running down to 1.3 V), output set by VR1 (470k = 5.13 V). EN must not float")
+					(name "Description") "Akizuki AE-XC9306-5V0 buck-boost module (Torex XC9306, VIN 2.5-5.5 V, 5 V fixed, about 500 mA at 3.3 V in). ON/OFF pulled up on the module (open = on). TRIM not used (no pin)")
 			)
 			(libsource
 				(lib "Linetracer2")
-				(part "AE-TPS63802")
-				(description "Akizuki AE-TPS63802 buck-boost module (TI TPS63802, VIN 1.8-5.5 V, keeps running down to 1.3 V), output set by VR1 (470k = 5.13 V). EN must not float")
+				(part "AE-XC9306-5V0")
+				(description "Akizuki AE-XC9306-5V0 buck-boost module (Torex XC9306, VIN 2.5-5.5 V, 5 V fixed, about 500 mA at 3.3 V in). ON/OFF pulled up on the module (open = on). TRIM not used (no pin)")
 			)
 			(property
 				(name "Akizuki")
-				(value "115557 (AE-TPS63802 kit) + 470k 125474 for VR1")
+				(value "115775 (AE-XC9306-5V0, 5 V fixed, 2 thin 1x3 pin headers included)")
 			)
 			(property
 				(name "Note")
-				(value "VR1 = 470k resistor (5.13 V), lying flat; header 4P from the kit")
+				(value "pull the TRIM pin (across from O) out of its header: no hole on the board")
 			)
 			(property
 				(name "Sheetname")
@@ -2817,6 +2883,9 @@
 						)
 						(pin
 							(num "2")
+						)
+						(pin
+							(num "5")
 						)
 						(pin
 							(num "3")
@@ -3209,20 +3278,20 @@
 		)
 		(libpart
 			(lib "Linetracer2")
-			(part "AE-TPS63802")
-			(description "Akizuki AE-TPS63802 buck-boost module (TI TPS63802, VIN 1.8-5.5 V, keeps running down to 1.3 V), output set by VR1 (470k = 5.13 V). EN must not float")
-			(docs "https://akizukidenshi.com/goodsaffix/AE-TPS63802.pdf")
+			(part "AE-XC9306-5V0")
+			(description "Akizuki AE-XC9306-5V0 buck-boost module (Torex XC9306, VIN 2.5-5.5 V, 5 V fixed, about 500 mA at 3.3 V in). ON/OFF pulled up on the module (open = on). TRIM not used (no pin)")
+			(docs "https://akizukidenshi.com/goodsaffix/AE-XC9306-5V0.pdf")
 			(fields
 				(field
 					(name "Reference") "U")
 				(field
-					(name "Value") "AE-TPS63802")
+					(name "Value") "AE-XC9306-5V0")
 				(field
-					(name "Footprint") "Linetracer2:AE-TPS63802")
+					(name "Footprint") "Linetracer2:AE-XC9306-5V0")
 				(field
-					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/AE-TPS63802.pdf")
+					(name "Datasheet") "https://akizukidenshi.com/goodsaffix/AE-XC9306-5V0.pdf")
 				(field
-					(name "Description") "Akizuki AE-TPS63802 buck-boost module (TI TPS63802, VIN 1.8-5.5 V, keeps running down to 1.3 V), output set by VR1 (470k = 5.13 V). EN must not float")
+					(name "Description") "Akizuki AE-XC9306-5V0 buck-boost module (Torex XC9306, VIN 2.5-5.5 V, 5 V fixed, about 500 mA at 3.3 V in). ON/OFF pulled up on the module (open = on). TRIM not used (no pin)")
 			)
 			(pins
 				(pin
@@ -3242,8 +3311,13 @@
 				)
 				(pin
 					(num "4")
-					(name "EN")
+					(name "ON/OFF")
 					(type "input")
+				)
+				(pin
+					(num "5")
+					(name "GND")
+					(type "power_in")
 				)
 			)
 		)
@@ -4030,6 +4104,11 @@
 			(name "/VIN_BB")
 			(class "Default")
 			(node
+				(ref "C2")
+				(pin "1")
+				(pintype "passive")
+			)
+			(node
 				(ref "D1")
 				(pin "1")
 				(pinfunction "K_1")
@@ -4040,12 +4119,6 @@
 				(pin "1")
 				(pinfunction "VIN_1")
 				(pintype "power_in")
-			)
-			(node
-				(ref "U3")
-				(pin "4")
-				(pinfunction "EN_4")
-				(pintype "input")
 			)
 		)
 		(net
@@ -4153,6 +4226,11 @@
 			)
 			(node
 				(ref "C1")
+				(pin "2")
+				(pintype "passive")
+			)
+			(node
+				(ref "C2")
 				(pin "2")
 				(pintype "passive")
 			)
@@ -4274,6 +4352,12 @@
 				(ref "U3")
 				(pin "2")
 				(pinfunction "GND_2")
+				(pintype "power_in")
+			)
+			(node
+				(ref "U3")
+				(pin "5")
+				(pinfunction "GND_5")
 				(pintype "power_in")
 			)
 		)
@@ -4467,6 +4551,17 @@
 				(pin "2")
 				(pinfunction "DO_2")
 				(pintype "output+no_connect")
+			)
+		)
+		(net
+			(code "37")
+			(name "unconnected-(U3-ON{slash}OFF-Pad4)")
+			(class "Default")
+			(node
+				(ref "U3")
+				(pin "4")
+				(pinfunction "ON/OFF_4")
+				(pintype "input+no_connect")
 			)
 		)
 	)

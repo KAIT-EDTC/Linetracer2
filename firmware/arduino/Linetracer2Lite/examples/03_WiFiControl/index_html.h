@@ -39,7 +39,7 @@ select{min-height:44px;border-radius:10px;background:#2a3442;color:var(--fg);bor
 
 <div class="card">
  <div id="pad"><div id="knob"></div></div>
- <div class="row"><label>はやさ</label><input id="spd" type="range" min="20" max="100" value="60"><span id="spdv">60</span>%</div>
+ <div class="row"><label>はやさ</label><input id="spd" type="range" min="40" max="100" value="80"><span id="spdv">80</span>%</div>
 </div>
 
 <div class="card">

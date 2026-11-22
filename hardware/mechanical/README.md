@@ -1,4 +1,4 @@
-# 3D プリント部品（Linetracer2 Lite rev.L3）
+# 3D プリント部品（Linetracer2 Lite rev.L3〜rev.L5 共通）
 
 サークルの **Bambu Lab P1S（0.4 mm ノズル）** で印刷する前提。STL は**印刷する向きで**書き出してあるので、Bambu Studio に読み込んでそのまま並べればよい（回転不要・サポート不要）。
 

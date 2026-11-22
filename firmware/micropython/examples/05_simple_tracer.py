@@ -15,7 +15,7 @@ try:
     robot.wait_release()
     robot.blink(2)
 
-    SPEED = 30
+    SPEED = 55                    # % of MAX_MOTOR_VOLT (1.6 V)
     while not robot.start_pressed():
         v = s.read()              # 0 = 白 ... 1000 = 黒
         left_black = v[0] > 500   # S1

@@ -9,7 +9,7 @@ robot = Robot()
 m = robot.motors
 
 try:
-    for name, l, r in (("forward", 40, 40), ("back", -40, -40), ("turn right", 40, -40), ("turn left", -40, 40)):
+    for name, l, r in (("forward", 75, 75), ("back", -75, -75), ("turn right", 75, -75), ("turn left", -75, 75)):
         print(name)
         t0 = time.ticks_ms()
         while time.ticks_diff(time.ticks_ms(), t0) < 1500:

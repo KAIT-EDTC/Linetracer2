@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lite board rev.L4: placement + hand-drawn routes.  Pure data (no pcbnew), shared by
+"""Lite board rev.L5: placement + hand-drawn routes.  Pure data (no pcbnew), shared by
 gen_pcb_lite.py (placement), route_lite.py (tracks into the board) and the preview tool.
 
 Board coordinates (mm): x -> right, y -> rear, (0, 0) = front-left corner of the standard board; the Lite board
@@ -14,12 +14,13 @@ Routing style ("beautiful" by rule, not by an autorouter):
     plus a GND pour on both sides
   * symmetric where the parts allow it: the driver sits on the centre line and fans out to both motors alike
 
-rev.L4 (5 V buck-boost for the XIAO): the module U3 (20 x 13 mm, on its 4-pin header) lies in the middle, between the
-buzzer and the XIAO's antenna end, over the 3-line bus (tracks may run under it; it sits 2.5 mm up).  D1 (battery ->
-U3) and D8 (U3 -> VSYS) stand beside it.  The battery and the 5 V reach the right rear (the driver's VM pins, the XIAO's
+rev.L4 (5 V buck-boost for the XIAO): the battery and the 5 V reach the right rear (the driver's VM pins, the XIAO's
 5V pin) through the gap between the driver's two pin rows: the driver module sits 2.5 mm up on its headers, so two
 tracks pass under it -- the only way past the XIAO's antenna keep-out and the STBY line without crossing anything.
 The left LED column gets its supply through D9 (on the bottom cross bar), see gen_schematic_lite.py.
+rev.L5: the 5 V module is the small AE-XC9306-5V0 (8.5 x 7.6 mm, two rows of pins 7.62 mm apart, lying flat on its
+own headers) in the middle, with C2 (470 uF hold-up, behind D1) in front of it; the resistor key moved right, beside
+the module (it was under the big rev.L4 module).
 """
 
 # ---------------------------------------------------------------- placement
@@ -58,14 +59,16 @@ PLACE["C4"] = (53.81 + (CAP_Y - U2_R), CAP_Y, 180, "F")   # pad 1 on OUT4's diag
 # VBAT runs straight from the driver's VM pins to J1; C1 hangs on it with a short stub.
 PLACE["C1"] = (64.8, 54.25, 90, "F")     # + rear (next to the VBAT line), - front
 PLACE["J1"] = (72.8, 53.0, 0, "F")       # + (red) left, - right
-# rev.L4 5 V supply, in the middle: D1 (battery -> U3) and D8 (U3 -> VSYS) stand up the left side of the module.
-# U3 turned 180 deg: pins EN, OUT, GND, VIN from left to right on y U3_ROW, the body to the front (over the 3-line
-# bus and the resistor key; the parts on its top face the sky).  Body x 41.5 .. 54.5, y 19.8 .. 39.8: 2 mm off the
-# XIAO's antenna keep-out, 0.4 mm in front of the IN2 track.
-U3_ROW = 38.0
-PLACE["U3"] = (48.0, U3_ROW, 180, "F")
-PLACE["D1"] = (36.5, 26.0, 270, "F")     # K front (VIN_BB, along y 26 under U3 to its VIN), A rear (VBAT lane)
-PLACE["D8"] = (39.55, 44.12, 90, "F")     # K rear (VSYS lane), A front (U3's OUT)
+# 5 V supply, in the middle (rev.L5): D1 (battery -> C2 / U3) and D8 (U3 -> VSYS) stand up the left side.
+# U3 = AE-XC9306-5V0 turned 270 deg: left column x 43.0 = I (front), G, O (rear); right column x 50.62 = ON/OFF
+# (open), GND, and no hole where TRIM would be (rear).  O sits level with D8's anode (y 36.5).  The module lies
+# 2.5 mm up on its headers (nothing runs under it now).  C2 (470 uF, + on the left) in front of it, its + pad straight
+# in front of U3's I: D1's cathode -> C2 + -> U3 I is one short line.
+U3_C = (46.81, 33.96)
+PLACE["U3"] = (U3_C[0], U3_C[1], 270, "F")
+PLACE["C2"] = (43.0, 24.9, 0, "F")       # + (pad 1) at x 43.0 (on U3's I column), - at x 46.5; can centre (44.75, 24.9)
+PLACE["D1"] = (36.5, 26.0, 270, "F")     # K front (VIN_BB, to C2 +), A rear (VBAT lane)
+PLACE["D8"] = (39.55, 44.12, 90, "F")     # K rear (VSYS lane), A front (U3's O)
 # left LED column supply: D9 (1N4148) on the bottom cross bar, between R7 and R1 (A front = VSYS, K rear = VLED_L)
 PLACE["D9"] = (28.8, 18.12, 90, "F")
 
@@ -81,7 +84,7 @@ PLACE["SW1"] = (19.08, 37.4, 0, "F")     # pin 1 (front) on R10, pin 2 (rear) GN
 PLACE["R9"] = (32.5, UI_R, 270, "F")     # 100: D4 -> buzzer +
 PLACE["BZ1"] = (32.5, 47.5, 270, "F")    # + front, - rear (body centre 32.5 / 50.0; 1 mm from the frame pillar)
 # 1k in the RGB data line, same row, at the left end (left of R10, behind the left LED column): pad 1 (D6) at the
-# front.  (rev.L3 had it right of the bus at x 55.5; since rev.L4 the 5 V module U3 sits there.)
+# front.  (rev.L3 had it right of the bus at x 55.5; since rev.L4 the 5 V supply sits there.)
 PLACE["R11"] = (22.0, UI_R, 270, "F")
 
 # 6 full-colour LEDs (PL9823), 3 down each side edge of the front half (the board is free there in front of the
@@ -184,7 +187,7 @@ route("BTN", "F", W_SIG, P("SW1", "1"), X(25.58))      # the button's two pin-1 
 route("Q1-B", "F", W_SIG, P("R7", "2"), P("Q1", "3"))
 route("BZ1+", "F", W_SIG, P("R9", "2"), P("BZ1", "1"))
 
-# RGB LEDs.  Data: D6 on the bottom just in front of the XIAO's pins (y 21.8, under U3) to R11 at the left end, from
+# RGB LEDs.  Data: D6 on the bottom just in front of the XIAO's pins (y 21.8, under C2) to R11 at the left end, from
 # R11's rear pad on the top 45 deg to the left and straight forward to the left rear LED, then on the top along each
 # column (a step and a 45 deg jog between neighbours) and along the front edge from the left to the right
 route("RGB_DIN", "B", W_SIG, P("U1", "7"), Y(21.8), X(22.0), P("R11", "1"))
@@ -227,14 +230,14 @@ route("MOT_OUT4", "F", W_PWR, P("U2", "14"), DX(59.5), P("M2", "1"))
 # power: VBAT straight from VM to J1, C1 on a short stub
 route("VBAT", "F", W_PWR, P("U2", "15"), X(72.8), P("J1", "1"))
 route("VBAT", "F", W_PWR, (64.8, U2_R), P("C1", "1"))
-# rev.L4 5 V supply.  Two lanes under the driver module, between its pin rows (y 48.7 .. 54.5):
+# 5 V supply.  Two lanes under the driver module, between its pin rows (y 48.7 .. 54.5):
 #   rear lane  VBAT (U3's input, up to 1 A at low battery) from the VM pin, out at the left end, up past D8 to D1's A
 #   front lane VSYS (up to 0.5 A) from D8's K, out at the right end, round C1's - pad and up to the XIAO's 5V pin
 W_BB = 0.6
 route("VBAT", "F", W_BB, P("U2", "15"), Y(53.0), X(37.85), Y(34.97), DY(33.62, -1), P("D1", "2"))
-route("VIN_BB", "F", W_VSYS, P("D1", "1"), X(51.81), P("U3", "1"))                # under U3 to its VIN
-route("VIN_BB", "F", W_SIG + 0.05, P("U3", "4"), Y(39.55), X(51.81), P("U3", "1"))   # EN = VIN (always on)
-route("VOUT_BB", "F", W_BB, P("U3", "3"), Y(36.1), X(39.55), P("D8", "2"))
+route("VIN_BB", "F", W_VSYS, P("D1", "1"), DX(37.6, -1), X(43.0), P("C2", "1"))      # D1 K -> C2 +
+route("VIN_BB", "F", W_VSYS, P("C2", "1"), P("U3", "1"))                              # C2 + -> U3 I (straight back)
+route("VOUT_BB", "F", W_BB, P("U3", "3"), P("D8", "2"))                               # U3 O -> D8 A (level)
 route("VSYS", "F", W_BB, P("D8", "1"), DX(38.75, 1), Y(48.5), DX(39.55, 1), X(78.67), P("U1", "14"))
 
 # IR LED cathodes: a bus on the bottom right behind the sensors, to Q1's collector

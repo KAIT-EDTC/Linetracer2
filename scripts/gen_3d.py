@@ -85,16 +85,17 @@ x = [box(1.25, -0.425, 0, 7.4, 5.75, 7.0, WHITE)]
 x += [box(px, 0, -3.0, 0.64, 0.64, 9.5, GOLD) for px in (0, 2.5)]
 write("BatteryXH_2P", x)
 
-# Akizuki AE-TPS63802 (20 x 13 mm) lying flat on its 4-pin header (origin = pin row centre, body on footprint +y
-# = KiCad 3D -y).  On top: the TPS63802, the inductor and VR1 (a 470k resistor lying flat).
-BLUEPCB = (0.1, 0.25, 0.55)
-x = [box(0, 0, 0, 10.16, 2.54, 2.5, BLACK)]
-x += [box(-3.81 + 2.54 * i, 0, -3.0, 0.64, 0.64, 3.0 + 2.5 + 1.0 + 1.5, GOLD) for i in range(4)]
-x += [box(0, -8.2, 2.5, 13.0, 20.0, 1.0, BLUEPCB),
-      box(-2.0, -7.0, 3.5, 3.0, 2.0, 0.9, BLACK),             # TPS63802
-      box(2.5, -7.0, 3.5, 2.5, 2.0, 1.2, (0.35, 0.35, 0.35)),   # inductor
-      box(0, -13.5, 3.5, 6.3, 2.5, 2.5, (0.85, 0.75, 0.55))]    # VR1 = 470k resistor
-write("AE-TPS63802", x)
+# Akizuki AE-XC9306-5V0 (8.5 x 7.6 mm) lying flat on its two thin pin headers (origin = centre of the pin pattern;
+# KiCad 3D y = footprint -y).  Rows at footprint y +-3.81: I G O and ON/OFF GND (the TRIM pin is pulled out).
+GREENPCB = (0.1, 0.45, 0.25)
+x = [box(0, -3.81, 0, 7.62, 2.0, 2.5, BLACK), box(0, 3.81, 0, 7.62, 2.0, 2.5, BLACK)]    # header plastic (3 places)
+x += [box(px, -py, -3.0, 0.5, 0.5, 3.0 + 2.5 + 1.0 + 0.8, GOLD)
+      for px, py in ((-2.54, 3.81), (0, 3.81), (2.54, 3.81), (-2.54, -3.81), (0, -3.81))]
+x += [box(0, 0, 2.5, 8.5, 7.6, 0.8, GREENPCB),
+      box(-1.6, 0.4, 3.3, 2.0, 2.0, 0.6, BLACK),               # XC9306
+      box(1.6, 0.4, 3.3, 1.6, 1.2, 0.9, (0.35, 0.35, 0.35)),   # inductor
+      box(0, -1.9, 3.3, 1.6, 0.8, 0.8, (0.75, 0.65, 0.45))]    # capacitor
+write("AE-XC9306-5V0", x)
 
 # PL9823-F5: 5 mm full-colour LED, flange 5.8 mm, 8.7 mm tall (dome approximated by steps), milky white body.
 # Legs at the staggered holes (KiCad 3D y = footprint -y).

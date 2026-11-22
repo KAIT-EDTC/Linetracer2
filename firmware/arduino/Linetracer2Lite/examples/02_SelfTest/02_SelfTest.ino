@@ -163,8 +163,8 @@ Result testMotors() {
     const char* name;
     float l, r;
   };
-  const Step steps[] = {{"左 前へ", 40, 0}, {"左 後ろへ", -40, 0}, {"右 前へ", 0, 40}, {"右 後ろへ", 0, -40},
-                        {"両方 前へ", 40, 40}};
+  const Step steps[] = {{"左 前へ", 75, 0}, {"左 後ろへ", -75, 0}, {"右 前へ", 0, 75}, {"右 後ろへ", 0, -75},
+                        {"両方 前へ", 75, 75}};
   for (const Step& st : steps) {
     Serial.printf("  %s\n", st.name);
     robot.led.side(st.l ? Colors::GREEN : Colors::OFF, st.r ? Colors::GREEN : Colors::OFF);
@@ -180,7 +180,7 @@ Result testMotors() {
   robot.led.fill(Colors::OFF);
   Serial.println("  前へ の はずが 後ろに 回った 車輪は、スケッチで robot.motors.left.invert / right.invert = true");
   Serial.println("  回らない: 電池・スイッチ、モーターの はんだ、ドライバ（U2）の はんだ。とちゅうで XIAO が");
-  Serial.println("  リセットした（LED が 消えた）なら 電池が ほとんど ない（rev.L4）。rev.L4 で 新しい 電池でも");
+  Serial.println("  リセットした（LED が 消えた）なら 電池が へっている（rev.L4/L5）。新しい 電池でも");
   Serial.println("  リセットするなら でんげん モジュール（U3）・D1・D8 の はんだと 向き");
   return Result::Look;
 }

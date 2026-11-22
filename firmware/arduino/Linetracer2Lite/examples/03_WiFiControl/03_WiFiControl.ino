@@ -26,7 +26,7 @@ DNSServer dns;
 struct Level {
   float base, kp, kd;
 };
-const Level LEVELS[] = {{30, 0.025, 0.35}, {45, 0.032, 0.50}, {60, 0.040, 0.65}};  // 01_LineTrace と 同じ
+const Level LEVELS[] = {{55, 0.047, 0.66}, {70, 0.060, 0.94}, {85, 0.075, 1.22}};  // 01_LineTrace と 同じ
 
 float targetL = 0, targetR = 0;  // スマホからの 速さ（%）
 uint32_t lastContact = 0;

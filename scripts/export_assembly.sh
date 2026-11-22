@@ -24,7 +24,9 @@ echo "== board (KiCad VRML, all parts)"
     "$ROOT/hardware/kicad/Linetracer2-Lite.kicad_pcb" | tail -1
 
 echo "== one picture per soldering step (docs/steps/)"
-python3 "$ROOT/scripts/step_images.py" "$T/board.wrl" | tail -1
+# (no pipe here: a "| tail" would hide a failure from set -e)
+python3 "$ROOT/scripts/step_images.py" "$T/board.wrl" >"$T/steps.log" || { echo "step_images.py failed"; exit 1; }
+tail -1 "$T/steps.log"
 
 echo "== mechanical pieces (OpenSCAD, LITE_SUPPORT=$SUPPORT)"
 # piece:colour (sRGB hex)
